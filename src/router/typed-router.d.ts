@@ -38,6 +38,13 @@ declare module 'vue-router/auto-routes' {
       { path: ParamValue<false> },
       | never
     >,
+    '/LandingPage': RouteRecordInfo<
+      '/LandingPage',
+      '/LandingPage',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
   }
 
   /**
@@ -58,6 +65,14 @@ declare module 'vue-router/auto-routes' {
         | never
       pathParamNames:
         | 'path'
+    }
+    'src/pages/LandingPage.vue': {
+      routes:
+        | '/LandingPage'
+      views:
+        | never
+      pathParamNames:
+        | never
     }
   }
 
