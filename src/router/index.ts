@@ -1,5 +1,7 @@
 import { defineRouter } from '#q-app';
 import { routes, handleHotUpdate } from 'vue-router/auto-routes';
+import { useAuthStore } from '../stores/auth.store';
+import { authGuard } from './guards/auth.guard';
 import {
   createMemoryHistory,
   createRouter,
@@ -32,6 +34,17 @@ export default defineRouter((/* { store, ssrContext } */) => {
     // quasar.conf.js -> build -> publicPath
     history: createHistory(import.meta.env.QUASAR_VUE_ROUTER_BASE),
   });
+
+  // Bloqueio Inicial (FOUC Prevention)
+  Router.beforeResolve(async () => {
+    const authStore = useAuthStore();
+    if (!authStore.isReady) {
+      await authStore.loadInitialSession();
+    }
+  });
+
+  // Middleware de proteção de rota
+  Router.beforeEach(authGuard);
 
   // enable HMR for it
   if (import.meta.hot) {
