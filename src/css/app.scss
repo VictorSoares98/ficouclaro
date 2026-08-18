@@ -1,1 +1,45 @@
-// app global css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+// ============================================================
+// SISTEMA MULTI-TEMAS (Quasar + Tailwind Single Source of Truth)
+// ============================================================
+
+// Tema Base (Light)
+body[data-theme='light'] {
+  --q-primary: #1976d2;
+  --q-secondary: #26a69a;
+  --q-accent: #9c27b0;
+  --q-dark: #1d1d1d;
+  --q-dark-page: #121212;
+  --q-positive: #21ba45;
+  --q-negative: #c10015;
+  --q-info: #31ccec;
+  --q-warning: #f2c037;
+}
+
+// Tema: Ocean (Dark variant)
+body[data-theme='ocean'] {
+  --q-primary: #0ea5e9; // tw-sky-500
+  --q-secondary: #14b8a6; // tw-teal-500
+  --q-accent: #8b5cf6; // tw-violet-500
+  --q-dark: #0f172a; // tw-slate-900 (Fundo principal)
+  --q-dark-page: #020617; // tw-slate-950 (Fundo mais escuro/páginas)
+  --q-positive: #10b981; // tw-emerald-500
+  --q-negative: #ef4444; // tw-red-500
+  --q-info: #38bdf8; // tw-sky-400
+  --q-warning: #f59e0b; // tw-amber-500
+}
+
+// O Quasar nativamente aplica text color base e bg color base.
+// Para garantir que o Tailwind respeite isso no body:
+@layer base {
+  body {
+    @apply tw-text-gray-900 tw-bg-white tw-transition-colors tw-duration-300;
+  }
+
+  body.body--dark {
+    @apply tw-text-gray-100 tw-bg-dark-page;
+  }
+}
