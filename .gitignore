@@ -1,0 +1,42 @@
+# ==========================================
+# 1. Dependências do Node
+# ==========================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ==========================================
+# 2. Build e Cache do Quasar
+# ==========================================
+.quasar/
+dist/
+dev/
+
+# ==========================================
+# 3. Variáveis de Ambiente e Segredos (CRÍTICO)
+# ==========================================
+.env
+.env.local
+.env.*.local
+
+# ==========================================
+# 4. Capacitor (Integração Mobile)
+# ==========================================
+src-capacitor/node_modules/
+src-capacitor/dist/
+src-capacitor/www/
+
+# IMPORTANTE: Em Capacitor, as pastas nativas (src-capacitor/android e src-capacitor/ios) 
+# DEVEM ser commitadas, pois elas contêm suas configurações nativas. 
+# Ignoramos apenas os diretórios de build e os node_modules internos.
+
+# ==========================================
+# 5. Configurações de IDE e Sistema Operacional
+# ==========================================
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.log
