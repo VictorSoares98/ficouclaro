@@ -12,4 +12,7 @@
  *   readonly MY_OTHER_VAR: string;
  * }
  */
-interface ImportMetaEnv {}
+interface ImportMetaEnv {
+  readonly QCLI_SUPABASE_URL: string;
+  readonly QCLI_SUPABASE_ANON_KEY: string;
+}
