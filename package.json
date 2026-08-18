@@ -12,7 +12,8 @@
     "dev": "quasar dev",
     "build": "quasar build",
     "typecheck": "vue-tsc --noEmit",
-    "postinstall": "quasar prepare --silent"
+    "postinstall": "quasar prepare --silent",
+    "db:build": "node supabase/build-schema.js"
   },
   "dependencies": {
     "@capacitor/cli": "^8.5.0",
