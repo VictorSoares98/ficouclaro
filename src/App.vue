@@ -2,9 +2,14 @@
 import { onMounted, onUnmounted } from 'vue';
 import { supabaseClient } from './core/supabase/client';
 import { useAuthStore } from './stores/auth.store';
+import { useThemeStore } from './stores/theme.store';
 import type { AuthChangeEvent, Session } from '@supabase/supabase-js';
 
 const authStore = useAuthStore();
+const themeStore = useThemeStore();
+
+// Inicialização síncrona do tema antes de montar o DOM para prevenir FOUC visual
+themeStore.initTheme();
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let authListener: any = null;
 
