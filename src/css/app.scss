@@ -32,14 +32,4 @@ body[data-theme='ocean'] {
   --q-warning: #f59e0b; // tw-amber-500
 }
 
-// O Quasar nativamente aplica text color base e bg color base.
-// Para garantir que o Tailwind respeite isso no body:
-@layer base {
-  body {
-    @apply tw-text-gray-900 tw-bg-white tw-transition-colors tw-duration-300;
-  }
 
-  body.body--dark {
-    @apply tw-text-gray-100 tw-bg-dark-page;
-  }
-}

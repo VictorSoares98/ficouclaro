@@ -12,10 +12,10 @@ export default defineBoot(({ router, store }) => {
     }
   });
 
-  router.beforeEach((to, from, next) => {
+  router.beforeEach((to) => {
     // Extrai o contexto raiz da rota. Ex: '/aluno/dashboard' -> '/aluno'
     const rootPath = `/${to.path.split('/')[1]}`;
-    
+
     const requiredRoles = ROUTE_ROLES[rootPath];
 
     // Rota Pública
@@ -23,24 +23,24 @@ export default defineBoot(({ router, store }) => {
       // Se já estiver logado e tentar ir para login/register, manda pro dashboard
       if (authStore.isAuthenticated && (to.path === '/login' || to.path === '/register')) {
         const userRole = authStore.user?.perfil.papel;
-        return next(userRole ? `/${userRole}` : '/');
+        return userRole ? `/${userRole}` : '/';
       }
-      return next(); // Permitido acesso público
+      return true; // Permitido acesso público
     }
 
     // Rota Protegida, mas sem login
     if (!authStore.isAuthenticated) {
-      return next('/login');
+      return '/login';
     }
 
     // Rota Protegida com login (Checagem RBAC)
     const userRole = authStore.user?.perfil.papel;
     if (userRole && !requiredRoles.includes(userRole)) {
       // Usuário logado tenta acessar área de outro papel
-      return next(`/${userRole}`);
+      return `/${userRole}`;
     }
 
     // Passou por tudo, acesso concedido
-    next();
+    return true;
   });
 });

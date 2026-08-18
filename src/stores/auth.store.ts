@@ -2,7 +2,11 @@ import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { authService } from '../modules/auth/services/auth.service';
 import type { AppUser } from '../core/types/auth.types';
-import type { User as SupabaseUser } from '@supabase/supabase-js';
+import type {
+  User as SupabaseUser,
+  SignInWithPasswordCredentials,
+  SignUpWithPasswordCredentials,
+} from '@supabase/supabase-js';
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<AppUser | null>(null);
@@ -51,6 +55,30 @@ export const useAuthStore = defineStore('auth', () => {
     clearUser();
   }
 
+  async function login(credentials: SignInWithPasswordCredentials) {
+    isLoading.value = true;
+    try {
+      const data = await authService.signIn(credentials);
+      if (data.user) {
+        await reloadProfile(data.user);
+      }
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function register(credentials: SignUpWithPasswordCredentials) {
+    isLoading.value = true;
+    try {
+      const data = await authService.signUp(credentials);
+      if (data.user) {
+        await reloadProfile(data.user);
+      }
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   return {
     user,
     isReady,
@@ -62,5 +90,7 @@ export const useAuthStore = defineStore('auth', () => {
     reloadProfile,
     clearUser,
     signOut,
+    login,
+    register,
   };
 });

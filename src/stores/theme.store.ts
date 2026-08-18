@@ -22,7 +22,14 @@ export const useThemeStore = defineStore('theme', () => {
     const isDark = THEME_DARK_VARIANTS[theme];
     Dark.set(isDark);
 
-    // 3. Persistência
+    // 3. Aciona o Tailwind Dark Mode nativo (injeta a classe .dark)
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+
+    // 4. Persistência
     localStorage.setItem(THEME_STORAGE_KEY, theme);
   };
 
