@@ -4,18 +4,31 @@
 
 -- Trigger: Auto-criar perfil após registro no Auth
 CREATE OR REPLACE FUNCTION public.processar_novo_usuario()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER SET search_path = public
+AS $$
+DECLARE
+  v_papel public.papel_usuario;
 BEGIN
-  INSERT INTO public.perfis (id, nome_completo, url_avatar, papel)
+  -- Bloco seguro para conversão de tipo ENUM
+  BEGIN
+    v_papel := (NEW.raw_user_meta_data->>'papel')::public.papel_usuario;
+  EXCEPTION WHEN OTHERS THEN
+    v_papel := 'aluno'::public.papel_usuario;
+  END;
+
+  INSERT INTO public.usuarios (id, nome_completo, url_avatar, papel)
   VALUES (
     NEW.id,
     NEW.raw_user_meta_data->>'nome_completo',
     NEW.raw_user_meta_data->>'url_avatar',
-    COALESCE((NEW.raw_user_meta_data->>'papel')::papel_usuario, 'aluno')
+    COALESCE(v_papel, 'aluno'::public.papel_usuario)
   );
+  
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$;
 
 CREATE TRIGGER ao_criar_usuario_auth
   AFTER INSERT ON auth.users

@@ -2,7 +2,12 @@
 -- 05 - ROW LEVEL SECURITY (RLS) E POLÍTICAS
 -- ============================================================
 
-ALTER TABLE public.perfis ENABLE ROW LEVEL SECURITY;
+-- GRANTS PADRÃO DO SUPABASE
+GRANT ALL ON ALL TABLES IN SCHEMA public TO anon, authenticated, service_role;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated, service_role;
+GRANT ALL ON ALL ROUTINES IN SCHEMA public TO anon, authenticated, service_role;
+
+ALTER TABLE public.usuarios ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.disciplinas ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.matriculas ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.sessoes ENABLE ROW LEVEL SECURITY;
@@ -13,14 +18,14 @@ ALTER TABLE public.duvidas ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.votos_duvida ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.avaliacoes_rapidas ENABLE ROW LEVEL SECURITY;
 
--- POLICIES: perfis
-CREATE POLICY "Usuário lê o próprio perfil" ON public.perfis FOR SELECT USING (id = auth.uid());
-CREATE POLICY "Usuário atualiza o próprio perfil" ON public.perfis FOR UPDATE USING (id = auth.uid());
-CREATE POLICY "Professor vê perfis de alunos matriculados" ON public.perfis FOR SELECT USING (
+-- POLICIES: usuarios
+CREATE POLICY "Usuário lê o próprio perfil" ON public.usuarios FOR SELECT USING (id = auth.uid());
+CREATE POLICY "Usuário atualiza o próprio perfil" ON public.usuarios FOR UPDATE USING (id = auth.uid());
+CREATE POLICY "Professor vê perfis de alunos matriculados" ON public.usuarios FOR SELECT USING (
   obter_meu_papel() = 'professor' AND EXISTS (
     SELECT 1 FROM public.matriculas m
     JOIN public.disciplinas d ON m.disciplina_id = d.id
-    WHERE m.aluno_id = perfis.id AND d.professor_id = auth.uid()
+    WHERE m.aluno_id = usuarios.id AND d.professor_id = auth.uid()
   )
 );
 

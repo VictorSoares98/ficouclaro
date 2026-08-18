@@ -1,7 +1,7 @@
 -- ====================================================================
 -- ⚠️ AVISO: ARQUIVO AUTO-GERADO!
 -- NÃO EDITE ESTE ARQUIVO DIRETAMENTE. ALTERE OS SNIPPETS E RODE db:build
--- Gerado em: 2026-08-18T03:07:35.338Z
+-- Gerado em: 2026-08-18T23:48:17.226Z
 -- ====================================================================
 
 -- >>> INÍCIO DO SNIPPET: 00_Init_Extensions.sql <<<
@@ -32,8 +32,8 @@ CREATE TYPE sinal_ritmo AS ENUM ('muito_rapido', 'boiando', 'tudo_certo', 'muito
 -- 02 - TABELAS
 -- ============================================================
 
--- perfis (Extensão do auth.users do Supabase)
-CREATE TABLE public.perfis (
+-- usuarios (Extensão do auth.users do Supabase)
+CREATE TABLE public.usuarios (
   id             UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   papel          papel_usuario NOT NULL DEFAULT 'aluno',
   nome_completo  TEXT,
@@ -44,7 +44,7 @@ CREATE TABLE public.perfis (
 -- disciplinas (Disciplinas do professor)
 CREATE TABLE public.disciplinas (
   id             UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  professor_id   UUID NOT NULL REFERENCES public.perfis(id) ON DELETE CASCADE,
+  professor_id   UUID NOT NULL REFERENCES public.usuarios(id) ON DELETE CASCADE,
   nome           TEXT NOT NULL,
   descricao      TEXT,
   codigo_convite TEXT UNIQUE NOT NULL DEFAULT substr(md5(random()::text), 1, 8),
@@ -55,7 +55,7 @@ CREATE TABLE public.disciplinas (
 CREATE TABLE public.matriculas (
   id            UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   disciplina_id UUID NOT NULL REFERENCES public.disciplinas(id) ON DELETE CASCADE,
-  aluno_id      UUID NOT NULL REFERENCES public.perfis(id) ON DELETE CASCADE,
+  aluno_id      UUID NOT NULL REFERENCES public.usuarios(id) ON DELETE CASCADE,
   created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   UNIQUE(disciplina_id, aluno_id)
 );
@@ -64,7 +64,7 @@ CREATE TABLE public.matriculas (
 CREATE TABLE public.sessoes (
   id            UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   disciplina_id UUID NOT NULL REFERENCES public.disciplinas(id) ON DELETE CASCADE,
-  professor_id  UUID NOT NULL REFERENCES public.perfis(id),
+  professor_id  UUID NOT NULL REFERENCES public.usuarios(id),
   topico        TEXT,
   status        status_sessao NOT NULL DEFAULT 'aguardando',
   iniciada_em   TIMESTAMPTZ,
@@ -139,7 +139,7 @@ CREATE TABLE public.avaliacoes_rapidas (
 -- Retorna o papel do usuário autenticado
 CREATE OR REPLACE FUNCTION public.obter_meu_papel()
 RETURNS papel_usuario AS $$
-  SELECT papel FROM public.perfis WHERE id = auth.uid();
+  SELECT papel FROM public.usuarios WHERE id = auth.uid();
 $$ LANGUAGE sql STABLE SECURITY DEFINER;
 
 -- Verifica se usuário está matriculado em uma disciplina
@@ -161,18 +161,31 @@ $$ LANGUAGE sql STABLE SECURITY DEFINER;
 
 -- Trigger: Auto-criar perfil após registro no Auth
 CREATE OR REPLACE FUNCTION public.processar_novo_usuario()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER SET search_path = public
+AS $$
+DECLARE
+  v_papel public.papel_usuario;
 BEGIN
-  INSERT INTO public.perfis (id, nome_completo, url_avatar, papel)
+  -- Bloco seguro para conversão de tipo ENUM
+  BEGIN
+    v_papel := (NEW.raw_user_meta_data->>'papel')::public.papel_usuario;
+  EXCEPTION WHEN OTHERS THEN
+    v_papel := 'aluno'::public.papel_usuario;
+  END;
+
+  INSERT INTO public.usuarios (id, nome_completo, url_avatar, papel)
   VALUES (
     NEW.id,
     NEW.raw_user_meta_data->>'nome_completo',
     NEW.raw_user_meta_data->>'url_avatar',
-    COALESCE((NEW.raw_user_meta_data->>'papel')::papel_usuario, 'aluno')
+    COALESCE(v_papel, 'aluno'::public.papel_usuario)
   );
+  
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$;
 
 CREATE TRIGGER ao_criar_usuario_auth
   AFTER INSERT ON auth.users
@@ -203,7 +216,12 @@ CREATE TRIGGER ao_alterar_voto
 -- 05 - ROW LEVEL SECURITY (RLS) E POLÍTICAS
 -- ============================================================
 
-ALTER TABLE public.perfis ENABLE ROW LEVEL SECURITY;
+-- GRANTS PADRÃO DO SUPABASE
+GRANT ALL ON ALL TABLES IN SCHEMA public TO anon, authenticated, service_role;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated, service_role;
+GRANT ALL ON ALL ROUTINES IN SCHEMA public TO anon, authenticated, service_role;
+
+ALTER TABLE public.usuarios ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.disciplinas ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.matriculas ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.sessoes ENABLE ROW LEVEL SECURITY;
@@ -214,14 +232,14 @@ ALTER TABLE public.duvidas ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.votos_duvida ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.avaliacoes_rapidas ENABLE ROW LEVEL SECURITY;
 
--- POLICIES: perfis
-CREATE POLICY "Usuário lê o próprio perfil" ON public.perfis FOR SELECT USING (id = auth.uid());
-CREATE POLICY "Usuário atualiza o próprio perfil" ON public.perfis FOR UPDATE USING (id = auth.uid());
-CREATE POLICY "Professor vê perfis de alunos matriculados" ON public.perfis FOR SELECT USING (
+-- POLICIES: usuarios
+CREATE POLICY "Usuário lê o próprio perfil" ON public.usuarios FOR SELECT USING (id = auth.uid());
+CREATE POLICY "Usuário atualiza o próprio perfil" ON public.usuarios FOR UPDATE USING (id = auth.uid());
+CREATE POLICY "Professor vê perfis de alunos matriculados" ON public.usuarios FOR SELECT USING (
   obter_meu_papel() = 'professor' AND EXISTS (
     SELECT 1 FROM public.matriculas m
     JOIN public.disciplinas d ON m.disciplina_id = d.id
-    WHERE m.aluno_id = perfis.id AND d.professor_id = auth.uid()
+    WHERE m.aluno_id = usuarios.id AND d.professor_id = auth.uid()
   )
 );
 

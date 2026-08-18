@@ -2,8 +2,8 @@
 -- 02 - TABELAS
 -- ============================================================
 
--- perfis (Extensão do auth.users do Supabase)
-CREATE TABLE public.perfis (
+-- usuarios (Extensão do auth.users do Supabase)
+CREATE TABLE public.usuarios (
   id             UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   papel          papel_usuario NOT NULL DEFAULT 'aluno',
   nome_completo  TEXT,
@@ -14,7 +14,7 @@ CREATE TABLE public.perfis (
 -- disciplinas (Disciplinas do professor)
 CREATE TABLE public.disciplinas (
   id             UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  professor_id   UUID NOT NULL REFERENCES public.perfis(id) ON DELETE CASCADE,
+  professor_id   UUID NOT NULL REFERENCES public.usuarios(id) ON DELETE CASCADE,
   nome           TEXT NOT NULL,
   descricao      TEXT,
   codigo_convite TEXT UNIQUE NOT NULL DEFAULT substr(md5(random()::text), 1, 8),
@@ -25,7 +25,7 @@ CREATE TABLE public.disciplinas (
 CREATE TABLE public.matriculas (
   id            UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   disciplina_id UUID NOT NULL REFERENCES public.disciplinas(id) ON DELETE CASCADE,
-  aluno_id      UUID NOT NULL REFERENCES public.perfis(id) ON DELETE CASCADE,
+  aluno_id      UUID NOT NULL REFERENCES public.usuarios(id) ON DELETE CASCADE,
   created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   UNIQUE(disciplina_id, aluno_id)
 );
@@ -34,7 +34,7 @@ CREATE TABLE public.matriculas (
 CREATE TABLE public.sessoes (
   id            UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   disciplina_id UUID NOT NULL REFERENCES public.disciplinas(id) ON DELETE CASCADE,
-  professor_id  UUID NOT NULL REFERENCES public.perfis(id),
+  professor_id  UUID NOT NULL REFERENCES public.usuarios(id),
   topico        TEXT,
   status        status_sessao NOT NULL DEFAULT 'aguardando',
   iniciada_em   TIMESTAMPTZ,

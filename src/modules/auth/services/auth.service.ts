@@ -28,7 +28,7 @@ class AuthService {
    */
   async getProfile(userId: string): Promise<Perfil> {
     const { data, error } = await supabaseClient
-      .from('perfis')
+      .from('usuarios')
       .select('*')
       .eq('id', userId)
       .single();
