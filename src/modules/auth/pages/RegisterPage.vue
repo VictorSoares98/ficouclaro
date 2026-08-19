@@ -51,19 +51,11 @@ async function onSubmit() {
 </script>
 
 <template>
-  <q-page
-    class="tw-flex tw-flex-col tw-items-center tw-justify-center tw-p-4"
-  >
-    <q-card
-      class="tw-w-full tw-max-w-md tw-rounded-2xl tw-shadow-xl tw-p-8"
-    >
+  <q-page class="tw-flex tw-flex-col tw-items-center tw-justify-center tw-p-4">
+    <q-card class="tw-w-full tw-max-w-md tw-rounded-2xl tw-shadow-xl tw-p-8">
       <div class="tw-text-center tw-mb-8">
-        <h2 class="tw-text-3xl tw-font-extrabold tw-mb-2">
-          Criar Conta
-        </h2>
-        <p class="tw-opacity-70">
-          Junte-se à revolução do aprendizado síncrono.
-        </p>
+        <h2 class="tw-text-3xl tw-font-extrabold tw-mb-2">Criar Conta</h2>
+        <p class="tw-opacity-70">Junte-se à revolução do aprendizado síncrono.</p>
       </div>
 
       <q-form @submit.prevent="onSubmit" class="tw-space-y-6">
