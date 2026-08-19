@@ -13,12 +13,12 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/aluno',
     component: () => import('../layouts/StudentLayout.vue'),
-    children: [{ path: '', component: () => import('../pages/ErrorNotFound.vue') }],
+    children: [{ path: '', component: () => import('../pages/StudentDashboard.vue') }],
   },
   {
     path: '/professor',
     component: () => import('../layouts/ProfessorLayout.vue'),
-    children: [{ path: '', component: () => import('../pages/ErrorNotFound.vue') }],
+    children: [{ path: '', component: () => import('../pages/ProfessorDashboard.vue') }],
   },
   {
     path: '/:catchAll(.*)*',
