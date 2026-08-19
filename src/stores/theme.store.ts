@@ -11,9 +11,7 @@ export const useThemeStore = defineStore('theme', () => {
     (localStorage.getItem(THEME_STORAGE_KEY) as AppTheme) || 'default',
   );
 
-  const activeMode = ref<AppMode>(
-    (localStorage.getItem(MODE_STORAGE_KEY) as AppMode) || 'auto',
-  );
+  const activeMode = ref<AppMode>((localStorage.getItem(MODE_STORAGE_KEY) as AppMode) || 'auto');
 
   const applyTheme = (theme: AppTheme) => {
     document.body.setAttribute('data-theme', theme);

@@ -5,16 +5,12 @@
 <template>
   <q-page class="tw-flex tw-flex-col tw-items-center tw-justify-center tw-px-4 tw-text-center">
     <div class="tw-max-w-3xl tw-space-y-8">
-      <h1
-        class="tw-text-5xl md:tw-text-6xl tw-font-extrabold tw-tracking-tight"
-      >
+      <h1 class="tw-text-5xl md:tw-text-6xl tw-font-extrabold tw-tracking-tight">
         O fim das dúvidas que
         <span class="tw-text-primary">ficaram para trás</span>
       </h1>
 
-      <p
-        class="tw-text-lg md:tw-text-xl tw-opacity-70 tw-max-w-2xl tw-mx-auto"
-      >
+      <p class="tw-text-lg md:tw-text-xl tw-opacity-70 tw-max-w-2xl tw-mx-auto">
         Acompanhe o ritmo da turma em tempo real. Uma plataforma conectando professores e alunos
         para garantir que todo o conteúdo realmente "ficou claro".
       </p>
