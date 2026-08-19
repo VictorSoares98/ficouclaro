@@ -1,6 +1,2 @@
-export type AppTheme = 'light' | 'ocean';
-
-export const THEME_DARK_VARIANTS: Record<AppTheme, boolean> = {
-  light: false,
-  ocean: true,
-};
+export type AppTheme = 'default' | 'ocean' | 'dracula' | 'summer_berries' | 'lunar_twilight' | 'nature_terrain';
+export type AppMode = 'light' | 'dark' | 'auto';
