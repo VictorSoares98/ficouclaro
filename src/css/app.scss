@@ -1,0 +1,92 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+// ============================================================
+// SISTEMA MULTI-TEMAS ORTOGONAL (Quasar + Tailwind)
+// ============================================================
+
+// --- Eixo 1: Iluminação (Dark / Light Mode) ---
+// O Quasar injeta a classe .body--dark no <body> dinamicamente.
+body {
+  // Fundo Claro (Light Mode)
+  --q-dark: #1d1d1d;
+  --q-dark-page: #121212;
+}
+
+body.body--dark {
+  // Fundo Escuro (Dark Mode)
+  --q-dark: #1e293b;
+  --q-dark-page: #0f172a;
+}
+
+// --- Eixo 2: Branding (Cores da Marca) ---
+
+// 1. Tema: Default
+body[data-theme='default'] {
+  --q-primary: #1976d2;
+  --q-secondary: #26a69a;
+  --q-accent: #9c27b0;
+  
+  --q-positive: #21ba45;
+  --q-negative: #c10015;
+  --q-info: #31ccec;
+  --q-warning: #f2c037;
+}
+
+// 2. Tema: Ocean
+body[data-theme='ocean'] {
+  --q-primary: #0ea5e9;
+  --q-secondary: #14b8a6;
+  --q-accent: #8b5cf6;
+  
+  --q-positive: #10b981;
+  --q-negative: #ef4444;
+  --q-info: #38bdf8;
+  --q-warning: #f59e0b;
+}
+
+// 3. Tema: Dracula
+body[data-theme='dracula'] {
+  --q-primary: #bd93f9;
+  --q-secondary: #ff79c6;
+  --q-accent: #f1fa8c;
+  
+  --q-positive: #50fa7b;
+  --q-negative: #ff5555;
+  --q-info: #8be9fd;
+  --q-warning: #ffb86c;
+}
+
+// 4. Tema: Amoras do Verão
+body[data-theme='summer_berries'] {
+  --q-primary: #d50b53;
+  --q-secondary: #824ca7;
+  --q-accent: #a882c1;
+  --q-warning: #b9c406;
+  --q-info: #f4f3f4;
+  --q-positive: #21ba45;
+  --q-negative: #c10015;
+}
+
+// 5. Tema: Crepúsculo Lunar
+body[data-theme='lunar_twilight'] {
+  --q-primary: #f08b33;
+  --q-secondary: #d75404;
+  --q-accent: #8a2c02;
+  --q-warning: #eecc8d;
+  --q-info: #07000e;
+  --q-positive: #21ba45;
+  --q-negative: #c10015;
+}
+
+// 6. Tema: Natura e Terreno
+body[data-theme='nature_terrain'] {
+  --q-primary: #52733b;
+  --q-secondary: #84a45a;
+  --q-accent: #818a6f;
+  --q-warning: #715e4e;
+  --q-info: #e4ebf2;
+  --q-positive: #21ba45;
+  --q-negative: #c10015;
+}
