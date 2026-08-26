@@ -65,24 +65,23 @@ export const useThermometerStore = defineStore('thermometer', () => {
 
       // Escuta novos inserts na tabela sinais_ritmo apenas para esta sessão
       const channel = realtimeManager.getChannel(`thermometer-${sessionId}`);
-      channel
-        .on(
-          'postgres_changes',
-          {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'sinais_ritmo',
-            filter: `sessao_id=eq.${sessionId}`,
-          },
-          (payload: RealtimePostgresInsertPayload<{ sinal: SinalRitmo }>) => {
-            const novoSinal = payload.new.sinal;
-            if (signalCounts.value[novoSinal] !== undefined) {
-              // Reatividade incrementa diretamente a UI do Quasar/Vue
-              signalCounts.value[novoSinal]++;
-            }
-          },
-        )
-        .subscribe();
+      channel.on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'sinais_ritmo',
+          filter: `sessao_id=eq.${sessionId}`,
+        },
+        (payload: RealtimePostgresInsertPayload<{ sinal: SinalRitmo }>) => {
+          const novoSinal = payload.new.sinal;
+          if (signalCounts.value[novoSinal] !== undefined) {
+            // Reatividade incrementa diretamente a UI do Quasar/Vue
+            signalCounts.value[novoSinal]++;
+          }
+        },
+      );
+      realtimeManager.subscribe(`thermometer-${sessionId}`);
     } catch (error) {
       console.error('Erro ao conectar termômetro', error);
     }

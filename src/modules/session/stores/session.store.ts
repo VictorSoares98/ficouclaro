@@ -28,25 +28,24 @@ export const useSessionStore = defineStore('session', () => {
 
       // Assinar as mudanças dessa sessão específica
       const channel = realtimeManager.getChannel(`session-${sessionId}`);
-      channel
-        .on(
-          'postgres_changes',
-          {
-            event: 'UPDATE',
-            schema: 'public',
-            table: 'sessoes',
-            filter: `id=eq.${sessionId}`,
-          },
-          (payload: RealtimePostgresUpdatePayload<Sessao>) => {
-            // Atualizar estado local quando o BD mudar
-            if (currentSession.value) {
-              currentSession.value.status = payload.new.status;
-              currentSession.value.iniciada_em = payload.new.iniciada_em;
-              currentSession.value.encerrada_em = payload.new.encerrada_em;
-            }
-          },
-        )
-        .subscribe();
+      channel.on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'sessoes',
+          filter: `id=eq.${sessionId}`,
+        },
+        (payload: RealtimePostgresUpdatePayload<Sessao>) => {
+          // Atualizar estado local quando o BD mudar
+          if (currentSession.value) {
+            currentSession.value.status = payload.new.status;
+            currentSession.value.iniciada_em = payload.new.iniciada_em;
+            currentSession.value.encerrada_em = payload.new.encerrada_em;
+          }
+        },
+      );
+      realtimeManager.subscribe(`session-${sessionId}`);
     } catch (err: unknown) {
       error.value = err instanceof Error ? err.message : 'Erro ao entrar na sessão.';
       throw err instanceof Error ? err : new Error(error.value);
