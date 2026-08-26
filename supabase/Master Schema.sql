@@ -151,11 +151,18 @@ RETURNS BOOLEAN AS $$
   );
 $$ LANGUAGE sql STABLE SECURITY DEFINER;
 
+-- Exclui a conta do próprio usuário autenticado (Direito ao Esquecimento - LGPD)
+CREATE OR REPLACE FUNCTION public.delete_own_account()
+RETURNS void AS $$
+BEGIN
+  DELETE FROM auth.users WHERE id = auth.uid();
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+
 -- >>> FIM DO SNIPPET: 03_Funcoes.sql <<<
 
 
 -- >>> INÍCIO DO SNIPPET: 04_Triggers.sql <<<
--- ============================================================
 -- 04 - TRIGGERS
 -- ============================================================
 

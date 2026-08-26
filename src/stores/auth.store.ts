@@ -55,6 +55,16 @@ export const useAuthStore = defineStore('auth', () => {
     clearUser();
   }
 
+  async function deleteAccount() {
+    isLoading.value = true;
+    try {
+      await authService.deleteAccount();
+      clearUser();
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   async function login(credentials: SignInWithPasswordCredentials) {
     isLoading.value = true;
     try {
@@ -92,5 +102,6 @@ export const useAuthStore = defineStore('auth', () => {
     signOut,
     login,
     register,
+    deleteAccount,
   };
 });
