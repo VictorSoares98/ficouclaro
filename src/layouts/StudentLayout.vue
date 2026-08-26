@@ -28,7 +28,15 @@ async function handleLogout() {
           Ficou Claro? <span class="tw-text-sm tw-font-normal tw-opacity-80">| Área do Aluno</span>
         </q-toolbar-title>
         <ThemeSwitcher />
-        <q-btn flat round dense icon="logout" @click="handleLogout" aria-label="Sair" class="tw-ml-2" />
+        <q-btn
+          flat
+          round
+          dense
+          icon="logout"
+          @click="handleLogout"
+          aria-label="Sair"
+          class="tw-ml-2"
+        />
       </q-toolbar>
     </q-header>
 
