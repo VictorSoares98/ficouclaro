@@ -1,7 +1,7 @@
 -- ====================================================================
 -- ⚠️ AVISO: ARQUIVO AUTO-GERADO!
 -- NÃO EDITE ESTE ARQUIVO DIRETAMENTE. ALTERE OS SNIPPETS E RODE db:build
--- Gerado em: 2026-08-18T23:48:17.226Z
+-- Gerado em: 2026-08-26T16:50:41.338Z
 -- ====================================================================
 
 -- >>> INÍCIO DO SNIPPET: 00_Init_Extensions.sql <<<
@@ -245,7 +245,7 @@ CREATE POLICY "Professor vê perfis de alunos matriculados" ON public.usuarios F
 
 -- POLICIES: disciplinas
 CREATE POLICY "Professor gerencia próprias disciplinas" ON public.disciplinas FOR ALL USING (professor_id = auth.uid());
-CREATE POLICY "Aluno visualiza disciplinas matriculadas" ON public.disciplinas FOR SELECT USING (esta_matriculado(id));
+CREATE POLICY "Usuários autenticados podem ver disciplinas" ON public.disciplinas FOR SELECT USING (auth.role() = 'authenticated');
 
 -- POLICIES: matriculas
 CREATE POLICY "Aluno se matricula" ON public.matriculas FOR INSERT WITH CHECK (aluno_id = auth.uid());
@@ -330,5 +330,19 @@ CREATE INDEX IF NOT EXISTS idx_votos_duvida_id ON public.votos_duvida(duvida_id)
 CREATE INDEX IF NOT EXISTS idx_avaliacoes_rapidas_sessao_id ON public.avaliacoes_rapidas(sessao_id);
 
 -- >>> FIM DO SNIPPET: 06_Indexes_Performance.sql <<<
+
+
+-- >>> INÍCIO DO SNIPPET: 07_Realtime.sql <<<
+-- ============================================================
+-- 07 - REALTIME
+-- ============================================================
+
+-- Adiciona as tabelas que precisam de reatividade ao vivo no Supabase Realtime
+ALTER PUBLICATION supabase_realtime ADD TABLE public.sessoes;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.sinais_ritmo;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.duvidas;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.enquetes;
+
+-- >>> FIM DO SNIPPET: 07_Realtime.sql <<<
 
 
