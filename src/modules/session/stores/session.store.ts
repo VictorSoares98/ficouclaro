@@ -75,8 +75,9 @@ export const useSessionStore = defineStore('session', () => {
   async function startSession() {
     if (!currentSession.value) throw new Error('Nenhuma sessão carregada');
     try {
-      await sessionService.startSession(currentSession.value.id);
-      // Não precisa atualizar `currentSession.value` manualmente pois o Realtime fará isso
+      const updated = await sessionService.startSession(currentSession.value.id);
+      currentSession.value.status = updated.status;
+      currentSession.value.iniciada_em = updated.iniciada_em;
     } catch (err: unknown) {
       error.value = err instanceof Error ? err.message : 'Erro ao iniciar aula.';
       throw err instanceof Error ? err : new Error(error.value);
@@ -86,7 +87,9 @@ export const useSessionStore = defineStore('session', () => {
   async function endSession() {
     if (!currentSession.value) throw new Error('Nenhuma sessão carregada');
     try {
-      await sessionService.endSession(currentSession.value.id);
+      const updated = await sessionService.endSession(currentSession.value.id);
+      currentSession.value.status = updated.status;
+      currentSession.value.encerrada_em = updated.encerrada_em;
     } catch (err: unknown) {
       error.value = err instanceof Error ? err.message : 'Erro ao encerrar sessão.';
       throw err instanceof Error ? err : new Error(error.value);

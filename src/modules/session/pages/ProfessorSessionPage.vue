@@ -3,6 +3,7 @@ import { ref, onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useSessionStore } from '../stores/session.store';
 import { useQuasar } from 'quasar';
+import ThermometerDisplay from '../../thermometer/components/ThermometerDisplay.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -135,8 +136,11 @@ function handleEnd() {
       </q-tabs>
 
       <q-tab-panels v-model="tab" animated class="tw-flex-1 tw-bg-transparent">
-        <q-tab-panel name="termometro" class="tw-flex tw-items-center tw-justify-center">
-          <div class="tw-text-center tw-opacity-50">[Painel do Termômetro Virá Aqui]</div>
+        <q-tab-panel
+          name="termometro"
+          class="tw-p-0 sm:tw-p-4 tw-flex tw-items-start tw-justify-center"
+        >
+          <ThermometerDisplay />
         </q-tab-panel>
 
         <q-tab-panel name="qa" class="tw-flex tw-items-center tw-justify-center">

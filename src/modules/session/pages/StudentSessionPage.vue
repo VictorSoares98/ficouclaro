@@ -3,6 +3,7 @@ import { onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useSessionStore } from '../stores/session.store';
 import { useQuasar } from 'quasar';
+import PaceButton from '../../thermometer/components/PaceButton.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -51,10 +52,8 @@ onUnmounted(() => {
         <h2 class="tw-text-2xl tw-font-bold tw-text-positive">Aula Ativa!</h2>
         <p class="tw-opacity-70">Tópico: {{ sessionStore.currentSession.topico || 'Aberto' }}</p>
 
-        <div
-          class="tw-mt-8 tw-p-6 tw-bg-gray-100 dark:tw-bg-gray-800 tw-rounded-xl tw-shadow-inner"
-        >
-          <p class="tw-opacity-50 tw-text-sm">[Componente do Termômetro Entrará Aqui]</p>
+        <div class="tw-mt-8 tw-w-full">
+          <PaceButton />
         </div>
       </div>
 
