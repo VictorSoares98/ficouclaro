@@ -13,6 +13,14 @@ export const useSessionStore = defineStore('session', () => {
    * Carrega a sessão e assina o canal Realtime para escutar mudanças (ex: professor inicia ou encerra)
    */
   async function joinSession(sessionId: string) {
+    if (currentSession.value?.id === sessionId) {
+      return; // Proteção contra double-subscribe (ex: createSession + onMounted)
+    }
+
+    if (currentSession.value) {
+      leaveSession(); // Limpa a anterior se estiver trocando de sala
+    }
+
     isLoading.value = true;
     error.value = null;
     try {
@@ -57,7 +65,6 @@ export const useSessionStore = defineStore('session', () => {
   async function createSession(professorId: string, disciplinaId: string, topico?: string) {
     try {
       const novaSessao = await sessionService.createSession(professorId, disciplinaId, topico);
-      await joinSession(novaSessao.id); // Já assina o canal
       return novaSessao;
     } catch (err: unknown) {
       error.value = err instanceof Error ? err.message : 'Erro ao criar sessão.';
