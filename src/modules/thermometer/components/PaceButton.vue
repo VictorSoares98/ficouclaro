@@ -1,10 +1,16 @@
 <script setup lang="ts">
+import { onUnmounted } from 'vue';
 import { useThermometerStore } from '../stores/thermometer.store';
 import type { SinalRitmo } from '../services/thermometer.service';
 import { useSessionStore } from '../../session/stores/session.store';
 
 const thermometerStore = useThermometerStore();
 const sessionStore = useSessionStore();
+
+// Garante que o timer de cooldown seja cancelado e o estado seja limpo ao sair da tela
+onUnmounted(() => {
+  thermometerStore.clearStudentState();
+});
 
 const options: { value: SinalRitmo; label: string; icon: string; color: string }[] = [
   { value: 'tudo_certo', label: 'Tudo Certo', icon: 'thumb_up', color: 'positive' },
