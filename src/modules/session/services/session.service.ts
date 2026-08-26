@@ -79,6 +79,27 @@ export class SessionService {
     if (error) throw error;
     return data as unknown as Sessao;
   }
+
+  /**
+   * Busca a sessão mais recente de uma disciplina que não esteja encerrada.
+   * Retorna o ID da sessão ou lança um erro se não encontrar.
+   */
+  async getActiveSessionByCourse(courseId: string): Promise<string> {
+    const { data, error } = await supabase
+      .from('sessoes')
+      .select('id')
+      .eq('disciplina_id', courseId)
+      .in('status', ['aguardando', 'ativa'])
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single();
+
+    if (error || !data) {
+      throw new Error('Não há nenhuma aula ativa no momento para esta disciplina.');
+    }
+
+    return (data as unknown as { id: string }).id;
+  }
 }
 
 export const sessionService = new SessionService();

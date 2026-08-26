@@ -96,6 +96,19 @@ export const useSessionStore = defineStore('session', () => {
     }
   }
 
+  async function getActiveSession(courseId: string): Promise<string> {
+    isLoading.value = true;
+    error.value = null;
+    try {
+      return await sessionService.getActiveSessionByCourse(courseId);
+    } catch (err: unknown) {
+      error.value = err instanceof Error ? err.message : 'Erro ao buscar aula ativa.';
+      throw err instanceof Error ? err : new Error(error.value);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   return {
     currentSession,
     isLoading,
@@ -105,5 +118,6 @@ export const useSessionStore = defineStore('session', () => {
     createSession,
     startSession,
     endSession,
+    getActiveSession,
   };
 });

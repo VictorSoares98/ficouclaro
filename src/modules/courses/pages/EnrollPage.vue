@@ -2,10 +2,11 @@
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useCourseStore } from '../stores/course.store';
+import { useSessionStore } from '../../session/stores/session.store';
 import { useQuasar } from 'quasar';
-import { supabaseClient as supabase } from '../../../core/supabase/client';
 
 const courseStore = useCourseStore();
+const sessionStore = useSessionStore();
 const router = useRouter();
 const $q = useQuasar();
 
@@ -35,21 +36,9 @@ async function handleJoinActiveSession(courseId: string) {
   try {
     $q.loading.show({ message: 'Buscando aula ativa...' });
 
-    // Busca a sessão mais recente deste curso que não esteja encerrada
-    const { data, error } = await supabase
-      .from('sessoes')
-      .select('id')
-      .eq('disciplina_id', courseId)
-      .in('status', ['aguardando', 'ativa'])
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .single();
+    // Busca a sessão mais recente deste curso que não esteja encerrada via store
+    const sessionId = await sessionStore.getActiveSession(courseId);
 
-    if (error || !data) {
-      throw new Error('Não há nenhuma aula ativa no momento para esta disciplina.');
-    }
-
-    const sessionId = (data as unknown as { id: string }).id;
     $q.loading.hide();
     void router.push(`/aluno/session/${sessionId}`);
   } catch (err: unknown) {
