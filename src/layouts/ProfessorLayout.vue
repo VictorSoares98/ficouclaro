@@ -2,6 +2,7 @@
 import { useAuthStore } from '../stores/auth.store';
 import { useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
+import ThemeSwitcher from '../components/ThemeSwitcher.vue';
 
 const authStore = useAuthStore();
 const router = useRouter();
@@ -27,8 +28,8 @@ async function handleLogout() {
           Ficou Claro?
           <span class="tw-text-sm tw-font-normal tw-opacity-80">| Área do Professor</span>
         </q-toolbar-title>
-
-        <q-btn flat round dense icon="logout" @click="handleLogout" aria-label="Sair" />
+        <ThemeSwitcher />
+        <q-btn flat round dense icon="logout" @click="handleLogout" aria-label="Sair" class="tw-ml-2" />
       </q-toolbar>
     </q-header>
 
