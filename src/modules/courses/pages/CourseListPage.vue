@@ -3,10 +3,12 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useCourseStore } from '../stores/course.store';
 import { useSessionStore } from '../../session/stores/session.store';
+import { useAuthStore } from '../../../stores/auth.store';
 import { useQuasar } from 'quasar';
 
 const courseStore = useCourseStore();
 const sessionStore = useSessionStore();
+const authStore = useAuthStore();
 const router = useRouter();
 const $q = useQuasar();
 
@@ -37,7 +39,6 @@ async function handleCreateCourse() {
 async function handleStartSession(courseId: string) {
   try {
     $q.loading.show({ message: 'Preparando Sala...' });
-    const authStore = (await import('../../../stores/auth.store')).useAuthStore();
     if (!authStore.user) throw new Error('Não autenticado');
 
     // Cria uma sessão com tópico "Aula de Hoje" padrão (pode ser editado futuramente)
