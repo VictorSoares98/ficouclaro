@@ -79,21 +79,25 @@ const stats = computed(() => [
     </div>
 
     <!-- Loading State -->
-    <div
+    <q-card
       v-if="thermometerStore.isConnecting"
-      class="tw-py-12 tw-flex tw-justify-center tw-items-center tw-bg-gray-50 dark:tw-bg-dark-page tw-rounded-xl tw-border tw-border-dashed tw-border-gray-300 dark:tw-border-gray-700"
+      flat
+      bordered
+      class="tw-py-12 tw-flex tw-justify-center tw-items-center tw-rounded-xl tw-border-dashed"
     >
       <q-spinner color="primary" size="3em" />
-    </div>
+    </q-card>
 
     <!-- Empty State -->
-    <div
+    <q-card
       v-else-if="totalSignals === 0"
-      class="tw-py-12 tw-text-center tw-bg-gray-50 dark:tw-bg-dark-page tw-rounded-xl tw-border tw-border-dashed tw-border-gray-300 dark:tw-border-gray-700"
+      flat
+      bordered
+      class="tw-py-12 tw-text-center tw-rounded-xl tw-border-dashed"
     >
       <q-icon name="insights" size="3rem" class="tw-opacity-30 tw-mb-2" />
       <p class="tw-opacity-60">Aguardando os primeiros sinais dos alunos...</p>
-    </div>
+    </q-card>
 
     <!-- Barras de Progresso -->
     <div v-else class="tw-space-y-6">
