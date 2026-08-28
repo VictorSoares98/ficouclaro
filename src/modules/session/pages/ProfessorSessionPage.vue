@@ -131,8 +131,12 @@ function handleEnd() {
         align="justify"
       >
         <q-tab name="termometro" icon="thermostat" label="Termômetro" />
-        <q-tab name="qa" icon="question_answer" label="Dúvidas" />
-        <q-tab name="enquetes" icon="poll" label="Enquetes" />
+        <q-tab name="qa" icon="question_answer" label="Dúvidas" disable>
+          <q-badge color="warning" floating>Breve</q-badge>
+        </q-tab>
+        <q-tab name="enquetes" icon="poll" label="Enquetes" disable>
+          <q-badge color="warning" floating>Breve</q-badge>
+        </q-tab>
       </q-tabs>
 
       <q-tab-panels v-model="tab" animated class="tw-flex-1 tw-bg-transparent">
