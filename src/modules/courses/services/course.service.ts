@@ -28,9 +28,9 @@ export class CourseService {
       if (error) throw error;
 
       // Mapeia o resultado para extrair o array de disciplinas
-      const courses = (data as unknown as Array<{ disciplinas: Disciplina }>)
+      const courses = data
         .map((d) => d.disciplinas)
-        .filter(Boolean);
+        .filter((d): d is Disciplina => d !== null && !Array.isArray(d));
       return courses;
     }
   }
