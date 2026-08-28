@@ -41,7 +41,7 @@ class AuthService {
       .single();
 
     if (error) throw error;
-    return data as unknown as Perfil;
+    return data;
   }
 
   /**

@@ -1,14 +1,8 @@
 import type { User as SupabaseUser } from '@supabase/supabase-js';
+import type { Database } from './database.types';
 
-export type PapelUsuario = 'aluno' | 'professor';
-
-export interface Perfil {
-  id: string;
-  papel: PapelUsuario;
-  nome_completo: string | null;
-  url_avatar: string | null;
-  created_at: string;
-}
+export type PapelUsuario = Database['public']['Enums']['papel_usuario'];
+export type Perfil = Database['public']['Tables']['usuarios']['Row'];
 
 export interface AppUser {
   auth: SupabaseUser;
