@@ -8,6 +8,7 @@ import type { RealtimePostgresUpdatePayload } from '@supabase/supabase-js';
 export const useSessionStore = defineStore('session', () => {
   const currentSession = ref<Sessao | null>(null);
   const { isLoading, error, execute } = useAsyncOperation();
+  const hasSubscribed = ref(false);
 
   /**
    * Carrega a sessão e assina o canal Realtime para escutar mudanças (ex: professor inicia ou encerra)
@@ -25,31 +26,37 @@ export const useSessionStore = defineStore('session', () => {
       currentSession.value = await sessionService.getSessionById(sessionId);
 
       // Assinar as mudanças dessa sessão específica
-      const channel = realtimeManager.getChannel(`session-${sessionId}`);
-      channel.on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'sessoes',
-          filter: `id=eq.${sessionId}`,
-        },
-        (payload: RealtimePostgresUpdatePayload<Sessao>) => {
-          // Atualizar estado local quando o BD mudar
-          if (currentSession.value) {
-            currentSession.value.status = payload.new.status;
-            currentSession.value.iniciada_em = payload.new.iniciada_em;
-            currentSession.value.encerrada_em = payload.new.encerrada_em;
-          }
-        },
-      );
-      realtimeManager.subscribe(`session-${sessionId}`);
+      if (!hasSubscribed.value) {
+        hasSubscribed.value = true;
+        const channel = realtimeManager.getChannel(`session-${sessionId}`);
+        channel.on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'sessoes',
+            filter: `id=eq.${sessionId}`,
+          },
+          (payload: RealtimePostgresUpdatePayload<Sessao>) => {
+            // Atualizar estado local quando o BD mudar
+            if (currentSession.value) {
+              currentSession.value.status = payload.new.status;
+              currentSession.value.iniciada_em = payload.new.iniciada_em;
+              currentSession.value.encerrada_em = payload.new.encerrada_em;
+            }
+          },
+        );
+        realtimeManager.subscribe(`session-${sessionId}`);
+      }
     }, 'Erro ao entrar na sessão.');
   }
 
   function leaveSession() {
     if (currentSession.value) {
-      realtimeManager.releaseChannel(`session-${currentSession.value.id}`);
+      if (hasSubscribed.value) {
+        realtimeManager.releaseChannel(`session-${currentSession.value.id}`);
+        hasSubscribed.value = false;
+      }
       currentSession.value = null;
     }
   }
