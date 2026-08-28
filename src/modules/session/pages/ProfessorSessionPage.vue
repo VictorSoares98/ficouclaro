@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { useSessionStore } from '../stores/session.store';
+import { useSessionStore } from '@/modules/session/stores/session.store';
 import { useQuasar } from 'quasar';
-import ThermometerDisplay from '../../thermometer/components/ThermometerDisplay.vue';
-import QaPanel from '../../qa/components/QaPanel.vue';
+import ThermometerDisplay from '@/modules/thermometer/components/ThermometerDisplay.vue';
+import QaPanel from '@/modules/qa/components/QaPanel.vue';
 
 const route = useRoute();
 const router = useRouter();

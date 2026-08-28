@@ -1,5 +1,5 @@
-import { supabaseClient } from '../../../core/supabase/client';
-import type { Database } from '../../../core/types/database.types';
+import { supabaseClient } from '@/core/supabase/client';
+import type { Database } from '@/core/types/database.types';
 
 export type Duvida = Database['public']['Tables']['duvidas']['Row'];
 

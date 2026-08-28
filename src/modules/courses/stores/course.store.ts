@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import { courseService, type Disciplina } from '../services/course.service';
-import { useAuthStore } from '../../../stores/auth.store';
-import { useAsyncOperation } from '../../../core/composables/useAsyncOperation';
+import { courseService, type Disciplina } from '@/modules/courses/services/course.service';
+import { useAuthStore } from '@/stores/auth.store';
+import { useAsyncOperation } from '@/core/composables/useAsyncOperation';
 
 export const useCourseStore = defineStore('course', () => {
   const courses = ref<Disciplina[]>([]);

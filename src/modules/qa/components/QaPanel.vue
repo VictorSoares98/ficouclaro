@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, computed } from 'vue';
-import { useQaStore } from '../stores/qa.store';
-import { useSessionStore } from '../../session/stores/session.store';
-import { useAuthStore } from '../../../stores/auth.store';
-import QuestionForm from './QuestionForm.vue';
-import QuestionCard from './QuestionCard.vue';
+import { useQaStore } from '@/modules/qa/stores/qa.store';
+import { useSessionStore } from '@/modules/session/stores/session.store';
+import { useAuthStore } from '@/stores/auth.store';
+import QuestionForm from '@/modules/qa/components/QuestionForm.vue';
+import QuestionCard from '@/modules/qa/components/QuestionCard.vue';
 
 const qaStore = useQaStore();
 const sessionStore = useSessionStore();

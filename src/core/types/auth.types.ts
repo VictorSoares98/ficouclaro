@@ -1,5 +1,5 @@
 import type { User as SupabaseUser } from '@supabase/supabase-js';
-import type { Database } from './database.types';
+import type { Database } from '@/core/types/database.types';
 
 export type PapelUsuario = Database['public']['Enums']['papel_usuario'];
 export type Perfil = Pick<

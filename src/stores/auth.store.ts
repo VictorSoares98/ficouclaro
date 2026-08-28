@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { authService } from '../modules/auth/services/auth.service';
-import { useAsyncOperation } from '../core/composables/useAsyncOperation';
-import type { AppUser } from '../core/types/auth.types';
+import { authService } from '@/modules/auth/services/auth.service';
+import { useAsyncOperation } from '@/core/composables/useAsyncOperation';
+import type { AppUser } from '@/core/types/auth.types';
 import type {
   User as SupabaseUser,
   SignInWithPasswordCredentials,

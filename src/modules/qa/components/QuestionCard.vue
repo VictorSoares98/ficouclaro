@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { Duvida } from '../services/qa.service';
-import { useAuthStore } from '../../../stores/auth.store';
+import type { Duvida } from '@/modules/qa/services/qa.service';
+import { useAuthStore } from '@/stores/auth.store';
 import { computed } from 'vue';
 
 const props = defineProps<{

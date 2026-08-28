@@ -1,11 +1,11 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { qaService, type Duvida } from '../services/qa.service';
-import { realtimeManager } from '../../../core/supabase/realtime.manager';
-import { useAsyncOperation } from '../../../core/composables/useAsyncOperation';
+import { qaService, type Duvida } from '@/modules/qa/services/qa.service';
+import { realtimeManager } from '@/core/supabase/realtime.manager';
+import { useAsyncOperation } from '@/core/composables/useAsyncOperation';
 import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
-import { generateVoterHash } from '../utils/hash';
-import { useAuthStore } from '../../../stores/auth.store';
+import { generateVoterHash } from '@/modules/qa/utils/hash';
+import { useAuthStore } from '@/stores/auth.store';
 
 export const useQaStore = defineStore('qa', () => {
   const questions = ref<Duvida[]>([]);

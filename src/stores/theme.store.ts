@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, watch } from 'vue';
 import { Dark } from 'quasar';
-import type { AppTheme, AppMode } from '../core/types/theme.types';
+import type { AppTheme, AppMode } from '@/core/types/theme.types';
 
 const THEME_STORAGE_KEY = 'ficouclaro_theme';
 const MODE_STORAGE_KEY = 'ficouclaro_mode';

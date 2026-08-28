@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { useSessionStore } from '../stores/session.store';
+import { useSessionStore } from '@/modules/session/stores/session.store';
 import { useQuasar } from 'quasar';
-import PaceButton from '../../thermometer/components/PaceButton.vue';
-import QaPanel from '../../qa/components/QaPanel.vue';
+import PaceButton from '@/modules/thermometer/components/PaceButton.vue';
+import QaPanel from '@/modules/qa/components/QaPanel.vue';
 
 const route = useRoute();
 const router = useRouter();

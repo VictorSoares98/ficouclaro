@@ -1,5 +1,5 @@
 import type { RealtimeChannel } from '@supabase/supabase-js';
-import { supabaseClient } from './client';
+import { supabaseClient } from '@/core/supabase/client';
 
 class RealtimeManager {
   private channels = new Map<string, RealtimeChannel>();
