@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { useSessionStore } from '../stores/session.store';
 import { useQuasar } from 'quasar';
 import ThermometerDisplay from '../../thermometer/components/ThermometerDisplay.vue';
+import QaPanel from '../../qa/components/QaPanel.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -129,9 +130,7 @@ function handleEnd() {
         align="justify"
       >
         <q-tab name="termometro" icon="thermostat" label="Termômetro" />
-        <q-tab name="qa" icon="question_answer" label="Dúvidas" disable>
-          <q-badge color="warning" floating>Breve</q-badge>
-        </q-tab>
+        <q-tab name="qa" icon="question_answer" label="Dúvidas" />
         <q-tab name="enquetes" icon="poll" label="Enquetes" disable>
           <q-badge color="warning" floating>Breve</q-badge>
         </q-tab>
@@ -145,8 +144,8 @@ function handleEnd() {
           <ThermometerDisplay />
         </q-tab-panel>
 
-        <q-tab-panel name="qa" class="tw-flex tw-items-center tw-justify-center">
-          <div class="tw-text-center tw-opacity-50">[Painel de Dúvidas Virá Aqui]</div>
+        <q-tab-panel name="qa" class="tw-p-0 sm:tw-p-4 tw-flex tw-items-start tw-justify-center">
+          <QaPanel />
         </q-tab-panel>
 
         <q-tab-panel name="enquetes" class="tw-flex tw-items-center tw-justify-center">

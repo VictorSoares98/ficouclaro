@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { useSessionStore } from '../stores/session.store';
 import { useQuasar } from 'quasar';
 import PaceButton from '../../thermometer/components/PaceButton.vue';
+import QaPanel from '../../qa/components/QaPanel.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -54,6 +55,15 @@ onUnmounted(() => {
 
         <div class="tw-mt-8 tw-w-full">
           <PaceButton />
+        </div>
+
+        <q-separator class="tw-my-8 tw-w-full" />
+
+        <div class="tw-w-full tw-pb-8">
+          <h3 class="tw-text-xl tw-font-bold tw-text-primary tw-text-left tw-mb-4">
+            Painel de Dúvidas
+          </h3>
+          <QaPanel />
         </div>
       </div>
 
