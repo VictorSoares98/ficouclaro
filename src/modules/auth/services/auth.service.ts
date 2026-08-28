@@ -1,5 +1,5 @@
-import { supabaseClient } from '../../../core/supabase/client';
-import type { AppUser, Perfil } from '../../../core/types/auth.types';
+import { supabaseClient } from '@/core/supabase/client';
+import type { AppUser, Perfil } from '@/core/types/auth.types';
 import type {
   SignInWithPasswordCredentials,
   SignUpWithPasswordCredentials,

@@ -2,8 +2,8 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
-import { useAuthStore } from '../../../stores/auth.store';
-import type { PapelUsuario } from '../../../core/types/auth.types';
+import { useAuthStore } from '@/stores/auth.store';
+import type { PapelUsuario } from '@/core/types/auth.types';
 
 const router = useRouter();
 const $q = useQuasar();

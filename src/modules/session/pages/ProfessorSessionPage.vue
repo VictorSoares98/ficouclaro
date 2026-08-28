@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { useSessionStore } from '../stores/session.store';
+import { useSessionStore } from '@/modules/session/stores/session.store';
 import { useQuasar } from 'quasar';
-import ThermometerDisplay from '../../thermometer/components/ThermometerDisplay.vue';
+import ThermometerDisplay from '@/modules/thermometer/components/ThermometerDisplay.vue';
+import QaPanel from '@/modules/qa/components/QaPanel.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -118,7 +119,7 @@ function handleEnd() {
     <!-- Abas de Ferramentas (Apenas Visível se Ativa ou Encerrada) -->
     <div
       class="tw-flex-1 tw-flex tw-flex-col"
-      v-if="sessionStore.currentSession?.status !== 'aguardando'"
+      v-if="sessionStore.currentSession && sessionStore.currentSession.status !== 'aguardando'"
     >
       <q-tabs
         v-model="tab"
@@ -129,9 +130,7 @@ function handleEnd() {
         align="justify"
       >
         <q-tab name="termometro" icon="thermostat" label="Termômetro" />
-        <q-tab name="qa" icon="question_answer" label="Dúvidas" disable>
-          <q-badge color="warning" floating>Breve</q-badge>
-        </q-tab>
+        <q-tab name="qa" icon="question_answer" label="Dúvidas" />
         <q-tab name="enquetes" icon="poll" label="Enquetes" disable>
           <q-badge color="warning" floating>Breve</q-badge>
         </q-tab>
@@ -145,8 +144,8 @@ function handleEnd() {
           <ThermometerDisplay />
         </q-tab-panel>
 
-        <q-tab-panel name="qa" class="tw-flex tw-items-center tw-justify-center">
-          <div class="tw-text-center tw-opacity-50">[Painel de Dúvidas Virá Aqui]</div>
+        <q-tab-panel name="qa" class="tw-p-0 sm:tw-p-4 tw-flex tw-items-start tw-justify-center">
+          <QaPanel />
         </q-tab-panel>
 
         <q-tab-panel name="enquetes" class="tw-flex tw-items-center tw-justify-center">
@@ -158,7 +157,7 @@ function handleEnd() {
     <!-- State Aguardando -->
     <div
       class="tw-flex-1 tw-flex tw-items-center tw-justify-center"
-      v-else-if="sessionStore.currentSession?.status === 'aguardando'"
+      v-else-if="sessionStore.currentSession && sessionStore.currentSession.status === 'aguardando'"
     >
       <div class="tw-text-center">
         <q-icon name="qr_code_scanner" size="6rem" color="primary" class="tw-mb-4" />

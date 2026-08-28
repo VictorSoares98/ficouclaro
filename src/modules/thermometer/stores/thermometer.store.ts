@@ -1,8 +1,11 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import { thermometerService, type SinalRitmo } from '../services/thermometer.service';
-import { realtimeManager } from '../../../core/supabase/realtime.manager';
-import { useAsyncOperation } from '../../../core/composables/useAsyncOperation';
+import {
+  thermometerService,
+  type SinalRitmo,
+} from '@/modules/thermometer/services/thermometer.service';
+import { realtimeManager } from '@/core/supabase/realtime.manager';
+import { useAsyncOperation } from '@/core/composables/useAsyncOperation';
 import type { RealtimePostgresInsertPayload } from '@supabase/supabase-js';
 
 export const useThermometerStore = defineStore('thermometer', () => {

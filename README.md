@@ -65,6 +65,8 @@ Para mantermos a base de código previsível e escalável, seguimos regras infle
    - **Layout, grid e espaçamentos:** `Tailwind CSS` (Configurado estritamente com o prefixo `tw-` para evitar conflitos de escopo).
    - **Componentes de Interação (Inputs, Modais, Dropdowns):** `Quasar Framework`.
 4. **Arquitetura SQL Modular:** Nada de migrations obscuras baseadas em data e hora para o desenvolvimento do MVP. O schema do Postgres é gerenciado semanticamente por snippets (`00_Init.sql`, `01_Enums.sql`, etc), unificados de forma determinística pelo script `db:build`.
+5. **Concorrência e Estado Assíncrono:** Para aniquilar redundâncias, todas as stores e requisições devem consumir o composable universal `useAsyncOperation`, padronizando *Loading States* elegantes e engolindo exceções sem estourar *Unhandled Promise Rejections*.
+6. **Conexões Realtime (WebSocket):** Inscrições nativas no Supabase estão proibidas nas views. Qualquer escuta em tempo real deve transacionar exclusivamente via Padrão Singleton pelo `RealtimeManager`, prevenindo *Race Conditions* e conexões fantasmas.
 
 ## 🛠️ 5. Scripts & Workflow
 

@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import { sessionService, type Sessao } from '../services/session.service';
-import { realtimeManager } from '../../../core/supabase/realtime.manager';
-import { useAsyncOperation } from '../../../core/composables/useAsyncOperation';
+import { sessionService, type Sessao } from '@/modules/session/services/session.service';
+import { realtimeManager } from '@/core/supabase/realtime.manager';
+import { useAsyncOperation } from '@/core/composables/useAsyncOperation';
 import type { RealtimePostgresUpdatePayload } from '@supabase/supabase-js';
 
 export const useSessionStore = defineStore('session', () => {

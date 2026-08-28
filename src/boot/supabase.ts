@@ -1,5 +1,5 @@
 import { defineBoot } from '#q-app';
-import { supabaseClient } from '../core/supabase/client';
+import { supabaseClient } from '@/core/supabase/client';
 
 // Arquivo de Boot injetado antes do Vue montar a aplicação
 export default defineBoot(() => {

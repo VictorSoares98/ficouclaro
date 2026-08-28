@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { useCourseStore } from '../stores/course.store';
-import { useSessionStore } from '../../session/stores/session.store';
-import { useAuthStore } from '../../../stores/auth.store';
+import { useCourseStore } from '@/modules/courses/stores/course.store';
+import { useSessionStore } from '@/modules/session/stores/session.store';
+import { useAuthStore } from '@/stores/auth.store';
 import { useQuasar } from 'quasar';
-import CourseCard from '../components/CourseCard.vue';
-import CourseCardSkeleton from '../components/CourseCardSkeleton.vue';
+import CourseCard from '@/modules/courses/components/CourseCard.vue';
+import CourseCardSkeleton from '@/modules/courses/components/CourseCardSkeleton.vue';
 
 const courseStore = useCourseStore();
 const sessionStore = useSessionStore();
