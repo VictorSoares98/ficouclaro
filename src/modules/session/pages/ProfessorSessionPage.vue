@@ -5,6 +5,7 @@ import { useSessionStore } from '@/modules/session/stores/session.store';
 import { useQuasar } from 'quasar';
 import ThermometerDisplay from '@/modules/thermometer/components/ThermometerDisplay.vue';
 import QaPanel from '@/modules/qa/components/QaPanel.vue';
+import ProfessorPollPanel from '@/modules/poll/components/ProfessorPollPanel.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -131,9 +132,7 @@ function handleEnd() {
       >
         <q-tab name="termometro" icon="thermostat" label="Termômetro" />
         <q-tab name="qa" icon="question_answer" label="Dúvidas" />
-        <q-tab name="enquetes" icon="poll" label="Enquetes" disable>
-          <q-badge color="warning" floating>Breve</q-badge>
-        </q-tab>
+        <q-tab name="enquetes" icon="poll" label="Enquetes" />
       </q-tabs>
 
       <q-tab-panels v-model="tab" animated class="tw-flex-1 tw-bg-transparent">
@@ -148,8 +147,11 @@ function handleEnd() {
           <QaPanel />
         </q-tab-panel>
 
-        <q-tab-panel name="enquetes" class="tw-flex tw-items-center tw-justify-center">
-          <div class="tw-text-center tw-opacity-50">[Painel de Enquetes Virá Aqui]</div>
+        <q-tab-panel
+          name="enquetes"
+          class="tw-p-0 sm:tw-p-4 tw-flex tw-items-start tw-justify-center"
+        >
+          <ProfessorPollPanel />
         </q-tab-panel>
       </q-tab-panels>
     </div>
