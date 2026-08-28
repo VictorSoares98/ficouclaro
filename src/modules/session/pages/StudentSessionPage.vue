@@ -2,11 +2,12 @@
 import { onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useSessionStore } from '@/modules/session/stores/session.store';
+import { usePollStore } from '@/modules/poll/stores/poll.store';
 import { useQuasar } from 'quasar';
 import PaceButton from '@/modules/thermometer/components/PaceButton.vue';
 import QaPanel from '@/modules/qa/components/QaPanel.vue';
 import ActivePollPanel from '@/modules/poll/components/ActivePollPanel.vue';
-import { usePollStore } from '@/modules/poll/stores/poll.store';
+import ReviewModal from '@/modules/flash-review/components/ReviewModal.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -83,5 +84,6 @@ onUnmounted(() => {
         <q-btn color="primary" label="Voltar" to="/aluno" class="tw-mt-4" />
       </div>
     </div>
+    <ReviewModal />
   </q-page>
 </template>

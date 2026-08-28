@@ -12,6 +12,8 @@ export const useQaStore = defineStore('qa', () => {
   const { isLoading, error, execute } = useAsyncOperation();
   const authStore = useAuthStore();
 
+  const currentSessionId = ref<string | null>(null);
+
   // Cache local para os upvotes que este usuário já deu
   const myUpvotes = ref<Set<string>>(new Set());
 
@@ -29,6 +31,9 @@ export const useQaStore = defineStore('qa', () => {
   });
 
   async function subscribeToSession(sessionId: string) {
+    if (currentSessionId.value === sessionId) return;
+    currentSessionId.value = sessionId;
+
     return execute(async () => {
       questions.value = await qaService.fetchQuestions(sessionId);
 
@@ -72,6 +77,9 @@ export const useQaStore = defineStore('qa', () => {
   }
 
   function unsubscribeFromSession(sessionId: string) {
+    if (currentSessionId.value !== sessionId) return;
+    currentSessionId.value = null;
+
     realtimeManager.releaseChannel(`qa-${sessionId}`);
     questions.value = [];
     myUpvotes.value.clear();

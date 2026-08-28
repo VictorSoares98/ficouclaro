@@ -22,6 +22,7 @@ export const useThermometerStore = defineStore('thermometer', () => {
   });
 
   const { isLoading: isConnecting, execute } = useAsyncOperation();
+  const currentSessionId = ref<string | null>(null);
 
   let cooldownTimer: number | null = null;
   const COOLDOWN_MS = 10000; // 10 segundos de Throttle para poupar DB
@@ -65,6 +66,9 @@ export const useThermometerStore = defineStore('thermometer', () => {
    * Evita SELECTs contínuos pesados.
    */
   async function subscribeToSession(sessionId: string) {
+    if (currentSessionId.value === sessionId) return;
+    currentSessionId.value = sessionId;
+
     await execute(async () => {
       // Snapshot inicial
       signalCounts.value = await thermometerService.getInitialCounts(sessionId);
@@ -95,6 +99,9 @@ export const useThermometerStore = defineStore('thermometer', () => {
    * [PROFESSOR] Desconecta o Realtime
    */
   function unsubscribeFromSession(sessionId: string) {
+    if (currentSessionId.value !== sessionId) return;
+    currentSessionId.value = null;
+
     realtimeManager.releaseChannel(`thermometer-${sessionId}`);
     signalCounts.value = {
       muito_rapido: 0,
