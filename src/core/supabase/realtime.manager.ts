@@ -4,13 +4,18 @@ import { supabaseClient } from './client';
 class RealtimeManager {
   private channels = new Map<string, RealtimeChannel>();
   private refCounts = new Map<string, number>();
+  private subscribedChannels = new Set<string>();
 
   /**
    * Obtém um canal existente ou cria um novo se não existir.
    * Incrementa o contador de referências para proteger a conexão de destruição prematura.
    *
+   * IMPORTANTE: Após registrar todos os listeners com .on(), acione
+   * realtimeManager.subscribe(channelName) para ativar a conexão.
+   * Nunca chame .subscribe() diretamente no canal retornado.
+   *
    * @param channelName Nome único do canal (ex: 'session-123')
-   * @returns Instância do RealtimeChannel para anexar listeners
+   * @returns Instância do RealtimeChannel para anexar listeners via .on()
    */
   getChannel(channelName: string): RealtimeChannel {
     const currentCount = this.refCounts.get(channelName) || 0;
@@ -23,6 +28,24 @@ class RealtimeManager {
     const channel = supabaseClient.channel(channelName);
     this.channels.set(channelName, channel);
     return channel;
+  }
+
+  /**
+   * Ativa a subscription de um canal previamente configurado com .on().
+   * É idempotente: chamadas subsequentes para um canal já subscrito são ignoradas com segurança,
+   * prevenindo o bug de duplo-subscribe que causa comportamento indefinido no SDK do Supabase.
+   *
+   * @param channelName Nome único do canal (ex: 'session-123')
+   */
+  subscribe(channelName: string): void {
+    if (this.subscribedChannels.has(channelName)) {
+      return; // No-op: canal já subscrito, ignorando com segurança
+    }
+    const channel = this.channels.get(channelName);
+    if (channel) {
+      channel.subscribe();
+      this.subscribedChannels.add(channelName);
+    }
   }
 
   /**
@@ -47,6 +70,7 @@ class RealtimeManager {
         this.channels.delete(channelName);
       }
       this.refCounts.delete(channelName);
+      this.subscribedChannels.delete(channelName);
     } else {
       this.refCounts.set(channelName, currentCount - 1);
     }
