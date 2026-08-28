@@ -1,7 +1,7 @@
 -- ====================================================================
 -- ⚠️ AVISO: ARQUIVO AUTO-GERADO!
 -- NÃO EDITE ESTE ARQUIVO DIRETAMENTE. ALTERE OS SNIPPETS E RODE db:build
--- Gerado em: 2026-08-26T16:50:41.338Z
+-- Gerado em: 2026-08-28T05:02:08.548Z
 -- ====================================================================
 
 -- >>> INÍCIO DO SNIPPET: 00_Init_Extensions.sql <<<
@@ -163,6 +163,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 
 -- >>> INÍCIO DO SNIPPET: 04_Triggers.sql <<<
+-- ============================================================
 -- 04 - TRIGGERS
 -- ============================================================
 
@@ -222,11 +223,15 @@ CREATE TRIGGER ao_alterar_voto
 -- ============================================================
 -- 05 - ROW LEVEL SECURITY (RLS) E POLÍTICAS
 -- ============================================================
+-- Role: anon (Apenas leitura/execução, RLS cuida do resto)
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO anon;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon;
+GRANT EXECUTE ON ALL ROUTINES IN SCHEMA public TO anon;
 
--- GRANTS PADRÃO DO SUPABASE
-GRANT ALL ON ALL TABLES IN SCHEMA public TO anon, authenticated, service_role;
-GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated, service_role;
-GRANT ALL ON ALL ROUTINES IN SCHEMA public TO anon, authenticated, service_role;
+-- Role: authenticated & service_role (Mantêm ALL)
+GRANT ALL ON ALL TABLES IN SCHEMA public TO authenticated, service_role;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO authenticated, service_role;
+GRANT ALL ON ALL ROUTINES IN SCHEMA public TO authenticated, service_role;
 
 ALTER TABLE public.usuarios ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.disciplinas ENABLE ROW LEVEL SECURITY;
