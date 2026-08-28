@@ -23,6 +23,13 @@ class AuthService {
     if (error) throw error;
   }
 
+  async deleteAccount() {
+    const { error } = await supabaseClient.rpc('delete_own_account');
+    if (error) throw error;
+    // Também forçamos o signout no cliente para limpar cache
+    await supabaseClient.auth.signOut();
+  }
+
   /**
    * Busca os metadados da tabela pública de perfis associada ao Auth
    */
@@ -34,7 +41,7 @@ class AuthService {
       .single();
 
     if (error) throw error;
-    return data;
+    return data as unknown as Perfil;
   }
 
   /**

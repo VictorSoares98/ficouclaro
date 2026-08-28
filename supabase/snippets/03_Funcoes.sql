@@ -16,3 +16,11 @@ RETURNS BOOLEAN AS $$
     WHERE disciplina_id = p_disciplina_id AND aluno_id = auth.uid()
   );
 $$ LANGUAGE sql STABLE SECURITY DEFINER;
+
+-- Exclui a conta do próprio usuário autenticado (Direito ao Esquecimento - LGPD)
+CREATE OR REPLACE FUNCTION public.delete_own_account()
+RETURNS void AS $$
+BEGIN
+  DELETE FROM auth.users WHERE id = auth.uid();
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;

@@ -31,7 +31,7 @@ CREATE POLICY "Professor vê perfis de alunos matriculados" ON public.usuarios F
 
 -- POLICIES: disciplinas
 CREATE POLICY "Professor gerencia próprias disciplinas" ON public.disciplinas FOR ALL USING (professor_id = auth.uid());
-CREATE POLICY "Aluno visualiza disciplinas matriculadas" ON public.disciplinas FOR SELECT USING (esta_matriculado(id));
+CREATE POLICY "Usuários autenticados podem ver disciplinas" ON public.disciplinas FOR SELECT USING (auth.role() = 'authenticated');
 
 -- POLICIES: matriculas
 CREATE POLICY "Aluno se matricula" ON public.matriculas FOR INSERT WITH CHECK (aluno_id = auth.uid());

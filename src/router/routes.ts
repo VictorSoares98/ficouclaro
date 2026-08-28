@@ -13,12 +13,24 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/aluno',
     component: () => import('../layouts/StudentLayout.vue'),
-    children: [{ path: '', component: () => import('../pages/StudentDashboard.vue') }],
+    children: [
+      { path: '', component: () => import('../modules/courses/pages/EnrollPage.vue') },
+      {
+        path: 'session/:id',
+        component: () => import('../modules/session/pages/StudentSessionPage.vue'),
+      },
+    ],
   },
   {
     path: '/professor',
     component: () => import('../layouts/ProfessorLayout.vue'),
-    children: [{ path: '', component: () => import('../pages/ProfessorDashboard.vue') }],
+    children: [
+      { path: '', component: () => import('../modules/courses/pages/CourseListPage.vue') },
+      {
+        path: 'session/:id',
+        component: () => import('../modules/session/pages/ProfessorSessionPage.vue'),
+      },
+    ],
   },
   {
     path: '/:catchAll(.*)*',

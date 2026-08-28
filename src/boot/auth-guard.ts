@@ -5,14 +5,13 @@ import { ROUTE_ROLES } from '../router/route-meta';
 export default defineBoot(({ router, store }) => {
   const authStore = useAuthStore(store);
 
-  // FOUC Prevention & Initial Session Load
-  router.beforeResolve(async () => {
+  router.beforeEach(async (to) => {
+    // FOUC Prevention & Initial Session Load:
+    // DEVE rodar antes de qualquer checagem de RBAC
     if (!authStore.isReady) {
       await authStore.loadInitialSession();
     }
-  });
 
-  router.beforeEach((to) => {
     // Extrai o contexto raiz da rota. Ex: '/aluno/dashboard' -> '/aluno'
     const rootPath = `/${to.path.split('/')[1]}`;
 
