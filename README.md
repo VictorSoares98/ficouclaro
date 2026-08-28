@@ -1,46 +1,92 @@
-# Identidade do Projeto
+# 🎓 Ficou Claro?
 
-- **Nome:** Ficou Claro?
-- **Objetivo:** Permitir que alunos avaliem a didática dos docentes e interajam de forma anônima e em tempo real, gerando dados instantâneos para a melhoria contínua da aula.
+> Feedback em tempo real para conectar alunos e professores sem fricção.
 
-# Contexto
+[![Vue 3](https://img.shields.io/badge/Vue.js-35495E?style=flat&logo=vuedotjs&logoColor=4FC08D)](https://vuejs.org/)
+[![Quasar](https://img.shields.io/badge/Quasar-1976D2?style=flat&logo=quasar&logoColor=white)](https://quasar.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=flat&logo=supabase&logoColor=white)](https://supabase.com/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 
-- **Público-alvo Principal:** Alunos universitários.
-- **Público-alvo Secundário:** Professores (que utilizam os dados para ajustar a aula).
+**Objetivo:** Permitir que alunos avaliem a didática dos docentes e interajam de forma anônima e em tempo real, gerando dados instantâneos para a melhoria contínua da aula.
 
-### Funcionalidades Principais
+---
 
-Para garantir o engajamento dos alunos e fornecer dados úteis aos professores, o aplicativo conta com 5 funcionalidades centrais, inspiradas em plataformas de interação em tempo real (como Kahoot e Wooclap):
+## 🏗️ 2. Arquitetura e Stack
 
-1. **Enquetes e Interações em Tempo Real (Check-in Didático):**
-   O professor pode lançar um rápido "Ficou Claro?" durante a aula. Os alunos respondem no app através de:
-   - _Múltipla escolha:_ Para testar a compreensão de um conceito.
-   - _Nuvem de palavras:_ Para resumir o que entenderam do tópico.
-   - _Escalas de clareza:_ (Ex: 1 a 5, quão claro foi esse último bloco da aula?).
-   - _Rankings:_ Para priorizar quais tópicos devem ser revisados.
+Nossa stack foi rigorosamente escolhida para fornecer um MVP Híbrido, altamente reativo e de baixo custo inicial.
 
-2. **Termômetro de Ritmo da Aula (Feedback Contínuo):**
-   Uma tela sempre ativa no app do aluno com botões rápidos e visuais (Ex: "Muito Rápido 🐇", "Estou Boiando 🐢", "Tudo Certo 👍"). O professor visualiza em seu painel um termômetro ou gráfico atualizado ao vivo, permitindo que ele desacelere ou avance conforme o clima da sala, sem que nenhum aluno precise levantar a mão e se expor.
+- **Frontend & Mobile:** [Vue 3](https://vuejs.org/) (Composition API), [Quasar Framework](https://quasar.dev/) (UI System), [Tailwind CSS](https://tailwindcss.com/) (Estilização Utilitária), [Pinia](https://pinia.vuejs.org/) (Gerenciamento de Estado).
+- **Backend & Database:** [Supabase](https://supabase.com/) (PostgreSQL + Auth + Realtime), Proteção por Row Level Security (RLS) rígida, Arquitetura SQL Modular.
+- **Infra/Deploy:** [Quasar CLI](https://quasar.dev/quasar-cli-vite/introduction) (Build tool oficial baseado em Vite), [Capacitor](https://capacitorjs.com/) (Mobile nativo).
 
-3. **Painel de Dúvidas com Upvote (Q&A Dinâmico):**
-   Para combater a vergonha de perguntar, os alunos podem enviar dúvidas textuais de forma 100% anônima. A própria turma visualiza as dúvidas e dá "Upvote" (curtida) nas perguntas que também têm. O professor foca em responder as dúvidas mais votadas pela sala.
+## 🚀 3. Pré-requisitos & Ambiente Local
 
-4. **Avaliação Flash Pós-Aula:**
-   Ao final da transmissão/aula, o app envia um alerta de 10 segundos para o aluno avaliar o desempenho geral do dia (ex: nota de 1 a 5 estrelas) e deixar um comentário construtivo opcional. Isso cria um histórico de evolução da disciplina.
+### Pré-requisitos
 
-5. **🌟 DIFERENCIAL: Dashboard de Insights e Heatmap Didático (Para o Professor):**
-   Enquanto a maioria dos apps apenas exibe a nota final, o "Ficou Claro?" entrega um relatório inteligente. Ele cruza as enquetes, o termômetro e as avaliações flash para criar um "Mapa de Calor" do semestre. O professor consegue ver exatamente em quais aulas, ou até em quais minutos da aula, a turma teve mais dificuldade, ajudando-o a reformular seu plano de ensino de forma cirúrgica para o semestre seguinte.
+- **Node.js:** v20+ (Recomendado o uso de `nvm` ou `fnm`)
+- **NPM:** v10+
 
-# Tecnologia & Equipe
+### Instalação e Execução
 
-Este projeto foi desenhado para ser uma aplicação híbrida (rodando em web e mobile com a mesma base de código), focada em alta interatividade e baixo custo de infraestrutura inicial. As tecnologias escolhidas foram:
+1. **Clone o repositório e instale as dependências:**
 
-- **Front-end & Mobile:**
-  - **Quasar.js:** Framework Vue para criação da interface unificada, responsiva e com componentes prontos para mobile.
-  - **TypeScript:** Tipagem estática para garantir maior manutenibilidade e redução de erros no código.
-  - **Capacitor:** Responsável por empacotar a aplicação web e entregá-la como um aplicativo nativo (iOS e Android).
+   ```bash
+   git clone <url-do-repo>
+   cd ficouclaro
+   npm install
+   ```
 
-- **Back-end & Banco de Dados:**
-  - **Supabase (BaaS):** Utilizado em seu plano gratuito para fornecer banco de dados relacional (PostgreSQL) e autenticação. O grande diferencial desta escolha é o uso nativo das **Realtime subscriptions**, que permitem a atualização instantânea do termômetro de aula, painel de dúvidas e enquetes sem a necessidade de infraestrutura complexa de WebSockets.
+2. **Configuração de Ambiente (`.env`):**
+   Crie um arquivo `.env.local` na raiz do projeto contendo as chaves do seu projeto Supabase:
 
-- **Equipe:** Victor Soares
+   ```env
+   VITE_SUPABASE_URL="https://<seu-projeto>.supabase.co"
+   VITE_SUPABASE_ANON_KEY="<sua-anon-key>"
+   ```
+
+   > 💡 **Para testes mobile na rede local:** Utilize o IP interno da sua máquina/roteador no Supabase Local e no `.env` para permitir que emuladores e dispositivos físicos acessem a API e o websocket do Realtime.
+
+3. **Iniciando a aplicação (Modo Dev):**
+   ```bash
+   npm run dev
+   ```
+
+## 📜 4. Diretrizes de Engenharia (A Constituição)
+
+Para mantermos a base de código previsível e escalável, seguimos regras inflexíveis:
+
+1. **Sem `any` (Type-safety Strict):** O uso de `any` é terminantemente proibido. Garantimos tipagem ponta a ponta. Queries do Supabase recebem tipagem via DB Types gerados pelo CLI (`npx supabase gen types typescript --local`).
+2. **Separação de Responsabilidades (FSD - Feature Sliced Design):**
+   - **Componentes (`pages/`, `components/`):** São puramente visuais ("burros"). Lidam com layouts e dispatch de actions.
+   - **Stores (`stores/` - Pinia):** São "inteligentes". Gerenciam o estado global assíncrono, cache, loading e error state.
+   - **Services (`services/`):** Isolam regras de negócio puro e chamadas à API (Supabase) sem qualquer acoplamento com o ecossistema Vue.
+3. **UI Mista Consistente:**
+   - **Layout, grid e espaçamentos:** `Tailwind CSS` (Configurado estritamente com o prefixo `tw-` para evitar conflitos de escopo).
+   - **Componentes de Interação (Inputs, Modais, Dropdowns):** `Quasar Framework`.
+4. **Arquitetura SQL Modular:** Nada de migrations obscuras baseadas em data e hora para o desenvolvimento do MVP. O schema do Postgres é gerenciado semanticamente por snippets (`00_Init.sql`, `01_Enums.sql`, etc), unificados de forma determinística pelo script `db:build`.
+
+## 🛠️ 5. Scripts & Workflow
+
+Lista de comandos disponíveis via `npm run`:
+
+| Script     | Descrição                                                                                                         |
+| ---------- | ----------------------------------------------------------------------------------------------------------------- |
+| `dev`      | Inicia o servidor de desenvolvimento do Quasar CLI (HMR ativado).                                                 |
+| `build`    | Executa o Type Check (`vue-tsc`) e gera o bundle de produção estático otimizado.                                  |
+| `lint`     | Roda o ESLint + Prettier para garantir conformidade de tipagem e padronização visual do código em todo o projeto. |
+| `db:build` | Concatena os snippets da pasta `supabase/snippets` gerando o arquivo consolidado `Master Schema.sql`.             |
+
+## 🌟 6. Funcionalidades Principais (Visão do Produto)
+
+Para garantir o engajamento dos alunos e fornecer dados úteis aos professores, o aplicativo conta com funcionalidades centrais inspiradas em plataformas de interação em tempo real:
+
+1. **Enquetes e Interações em Tempo Real:** Check-in didático durante a aula (Múltipla escolha, Nuvem de palavras, Escalas).
+2. **Termômetro de Ritmo da Aula:** Feedback contínuo e visual ("Muito rápido", "Boiando", "Tudo certo") operando via _Supabase Realtime_, com proteção anti-spam via throttle de 10s.
+3. **Painel de Dúvidas com Upvote:** Sistema de Q&A textual 100% anônimo para os alunos (LGPD by design) priorizado pela própria turma.
+4. **Avaliação Flash Pós-Aula:** Sistema de avaliação instantânea pós-sessão para criar um histórico de qualidade da disciplina.
+5. **Insights & Heatmap (O Diferencial):** Dashboard avançado cruzando enquetes, termômetro e notas para o professor visualizar o mapa de calor da sua didática e reformular seu plano de ensino cirurgicamente.
+
+---
+
+**Equipe Responsável:** Victor Soares e Luan Victor Ogeda
