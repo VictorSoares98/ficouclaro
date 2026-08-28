@@ -40,6 +40,8 @@ export const usePollStore = defineStore('poll', () => {
 
   const { isLoading, error, execute } = useAsyncOperation();
 
+  const currentSessionId = ref<string | null>(null);
+
   function markAsResponded(pollId: string) {
     if (!myResponses.value.includes(pollId)) {
       myResponses.value.push(pollId);
@@ -167,7 +169,10 @@ export const usePollStore = defineStore('poll', () => {
   }
 
   function subscribeToSessionPolls(sessionId: string, isProfessor = false) {
-    const channelName = `session-${sessionId}`;
+    if (currentSessionId.value === sessionId) return;
+    currentSessionId.value = sessionId;
+
+    const channelName = `poll-${sessionId}`;
     const channel = realtimeManager.getChannel(channelName);
 
     // Escutar por novas enquetes ou alterações de status
@@ -243,7 +248,10 @@ export const usePollStore = defineStore('poll', () => {
   }
 
   function unsubscribeFromSessionPolls(sessionId: string) {
-    realtimeManager.releaseChannel(`session-${sessionId}`);
+    if (currentSessionId.value !== sessionId) return;
+    currentSessionId.value = null;
+
+    realtimeManager.releaseChannel(`poll-${sessionId}`);
     activePolls.value = [];
     pastPolls.value = [];
     pollResults.value = {};
