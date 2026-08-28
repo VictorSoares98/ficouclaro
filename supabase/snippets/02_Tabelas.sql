@@ -17,7 +17,7 @@ CREATE TABLE public.disciplinas (
   professor_id   UUID NOT NULL REFERENCES public.usuarios(id) ON DELETE CASCADE,
   nome           TEXT NOT NULL,
   descricao      TEXT,
-  codigo_convite TEXT UNIQUE NOT NULL DEFAULT substr(md5(random()::text), 1, 8),
+  codigo_convite TEXT UNIQUE NOT NULL DEFAULT encode(gen_random_bytes(4), 'hex'),
   created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 

@@ -1,7 +1,7 @@
 -- ====================================================================
 -- ⚠️ AVISO: ARQUIVO AUTO-GERADO!
 -- NÃO EDITE ESTE ARQUIVO DIRETAMENTE. ALTERE OS SNIPPETS E RODE db:build
--- Gerado em: 2026-08-28T05:02:08.548Z
+-- Gerado em: 2026-08-28T05:11:14.686Z
 -- ====================================================================
 
 -- >>> INÍCIO DO SNIPPET: 00_Init_Extensions.sql <<<
@@ -47,7 +47,7 @@ CREATE TABLE public.disciplinas (
   professor_id   UUID NOT NULL REFERENCES public.usuarios(id) ON DELETE CASCADE,
   nome           TEXT NOT NULL,
   descricao      TEXT,
-  codigo_convite TEXT UNIQUE NOT NULL DEFAULT substr(md5(random()::text), 1, 8),
+  codigo_convite TEXT UNIQUE NOT NULL DEFAULT encode(gen_random_bytes(4), 'hex'),
   created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
