@@ -7,10 +7,12 @@ defineProps<{
   actionIcon: string;
   actionColor: string;
   showInviteCode?: boolean;
+  showInsightsBtn?: boolean;
 }>();
 
 defineEmits<{
   (e: 'action', courseId: string): void;
+  (e: 'insights', courseId: string): void;
 }>();
 </script>
 
@@ -31,6 +33,14 @@ defineEmits<{
     <q-separator />
 
     <q-card-actions align="right">
+      <q-btn
+        v-if="showInsightsBtn"
+        flat
+        color="secondary"
+        icon="insights"
+        label="Insights"
+        @click="$emit('insights', course.id)"
+      />
       <q-btn
         flat
         :color="actionColor"
