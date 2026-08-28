@@ -5,10 +5,13 @@ import { useSessionStore } from '@/modules/session/stores/session.store';
 import { useQuasar } from 'quasar';
 import PaceButton from '@/modules/thermometer/components/PaceButton.vue';
 import QaPanel from '@/modules/qa/components/QaPanel.vue';
+import ActivePollPanel from '@/modules/poll/components/ActivePollPanel.vue';
+import { usePollStore } from '@/modules/poll/stores/poll.store';
 
 const route = useRoute();
 const router = useRouter();
 const sessionStore = useSessionStore();
+const pollStore = usePollStore();
 const $q = useQuasar();
 
 const sessionId = String((route.params as Record<string, unknown>).id);
@@ -16,6 +19,8 @@ const sessionId = String((route.params as Record<string, unknown>).id);
 onMounted(async () => {
   try {
     await sessionStore.joinSession(sessionId);
+    await pollStore.loadActivePolls(sessionId);
+    pollStore.subscribeToSessionPolls(sessionId, false);
   } catch (err: unknown) {
     $q.notify({ color: 'negative', message: err instanceof Error ? err.message : 'Erro' });
     void router.replace('/aluno'); // Voltar em caso de erro
@@ -24,11 +29,14 @@ onMounted(async () => {
 
 onUnmounted(() => {
   sessionStore.leaveSession();
+  pollStore.unsubscribeFromSessionPolls(sessionId);
 });
 </script>
 
 <template>
   <q-page class="tw-p-4 tw-flex tw-flex-col tw-items-center tw-max-w-xl tw-mx-auto">
+    <ActivePollPanel />
+
     <!-- Esqueleto de loading -->
     <div v-if="sessionStore.isLoading" class="tw-w-full">
       <q-skeleton type="text" class="tw-text-3xl tw-mb-4" />
