@@ -119,7 +119,7 @@ function handleEnd() {
     <!-- Abas de Ferramentas (Apenas Visível se Ativa ou Encerrada) -->
     <div
       class="tw-flex-1 tw-flex tw-flex-col"
-      v-if="sessionStore.currentSession?.status !== 'aguardando'"
+      v-if="sessionStore.currentSession && sessionStore.currentSession.status !== 'aguardando'"
     >
       <q-tabs
         v-model="tab"
@@ -157,7 +157,7 @@ function handleEnd() {
     <!-- State Aguardando -->
     <div
       class="tw-flex-1 tw-flex tw-items-center tw-justify-center"
-      v-else-if="sessionStore.currentSession?.status === 'aguardando'"
+      v-else-if="sessionStore.currentSession && sessionStore.currentSession.status === 'aguardando'"
     >
       <div class="tw-text-center">
         <q-icon name="qr_code_scanner" size="6rem" color="primary" class="tw-mb-4" />
