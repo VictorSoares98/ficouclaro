@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted } from 'vue';
-import { supabaseClient } from './core/supabase/client';
-import { useAuthStore } from './stores/auth.store';
-import { useThemeStore } from './stores/theme.store';
+import { supabaseClient } from '@/core/supabase/client';
+import { useAuthStore } from '@/stores/auth.store';
+import { useThemeStore } from '@/stores/theme.store';
 import type { AuthChangeEvent, Session } from '@supabase/supabase-js';
 
 const authStore = useAuthStore();

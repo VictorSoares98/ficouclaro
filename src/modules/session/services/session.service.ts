@@ -1,5 +1,5 @@
-import { supabaseClient as supabase } from '../../../core/supabase/client';
-import type { Database } from '../../../core/types/database.types';
+import { supabaseClient as supabase } from '@/core/supabase/client';
+import type { Database } from '@/core/types/database.types';
 
 export type StatusSessao = Database['public']['Enums']['status_sessao'];
 export type Sessao = Database['public']['Tables']['sessoes']['Row'];

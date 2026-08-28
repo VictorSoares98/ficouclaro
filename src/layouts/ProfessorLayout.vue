@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useAuthStore } from '../stores/auth.store';
+import { useAuthStore } from '@/stores/auth.store';
 import { useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
-import ThemeSwitcher from '../components/ThemeSwitcher.vue';
+import ThemeSwitcher from '@/components/ThemeSwitcher.vue';
 
 const authStore = useAuthStore();
 const router = useRouter();

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useThemeStore } from '../stores/theme.store';
-import type { AppTheme } from '../core/types/theme.types';
+import { useThemeStore } from '@/stores/theme.store';
+import type { AppTheme } from '@/core/types/theme.types';
 
 const themeStore = useThemeStore();
 

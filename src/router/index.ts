@@ -1,5 +1,5 @@
 import { defineRouter } from '#q-app';
-import routes from './routes';
+import routes from '@/router/routes';
 import {
   createMemoryHistory,
   createRouter,

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { onUnmounted } from 'vue';
-import { useThermometerStore } from '../stores/thermometer.store';
-import type { SinalRitmo } from '../services/thermometer.service';
-import { useSessionStore } from '../../session/stores/session.store';
+import { useThermometerStore } from '@/modules/thermometer/stores/thermometer.store';
+import type { SinalRitmo } from '@/modules/thermometer/services/thermometer.service';
+import { useSessionStore } from '@/modules/session/stores/session.store';
 
 const thermometerStore = useThermometerStore();
 const sessionStore = useSessionStore();

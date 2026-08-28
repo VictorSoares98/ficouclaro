@@ -1,6 +1,6 @@
 import { defineBoot } from '#q-app';
-import { useAuthStore } from '../stores/auth.store';
-import { ROUTE_ROLES } from '../router/route-meta';
+import { useAuthStore } from '@/stores/auth.store';
+import { ROUTE_ROLES } from '@/router/route-meta';
 
 export default defineBoot(({ router, store }) => {
   const authStore = useAuthStore(store);
