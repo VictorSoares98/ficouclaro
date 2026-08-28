@@ -64,9 +64,7 @@ function handleEnd() {
 <template>
   <q-page class="tw-flex tw-flex-col tw-h-[calc(100vh-64px)]">
     <!-- Header Fixo da Sessão -->
-    <div
-      class="tw-p-4 tw-bg-white dark:tw-bg-dark tw-shadow-sm tw-flex tw-justify-between tw-items-center"
-    >
+    <div class="tw-p-4 tw-shadow-sm tw-flex tw-justify-between tw-items-center">
       <div v-if="sessionStore.currentSession">
         <h1 class="tw-text-xl tw-font-bold tw-text-primary">
           {{ sessionStore.currentSession.topico || 'Aula sem Tópico' }}
@@ -125,7 +123,7 @@ function handleEnd() {
       <q-tabs
         v-model="tab"
         dense
-        class="tw-text-grey tw-bg-white dark:tw-bg-dark tw-shadow-sm"
+        class="tw-text-grey tw-shadow-sm"
         active-color="primary"
         indicator-color="primary"
         align="justify"
