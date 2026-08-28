@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { thermometerService, type SinalRitmo } from '../services/thermometer.service';
 import { realtimeManager } from '../../../core/supabase/realtime.manager';
+import { useAsyncOperation } from '../../../core/composables/useAsyncOperation';
 import type { RealtimePostgresInsertPayload } from '@supabase/supabase-js';
 
 export const useThermometerStore = defineStore('thermometer', () => {
@@ -16,6 +17,8 @@ export const useThermometerStore = defineStore('thermometer', () => {
     tudo_certo: 0,
     muito_devagar: 0,
   });
+
+  const { isLoading: isConnecting, execute } = useAsyncOperation();
 
   let cooldownTimer: number | null = null;
   const COOLDOWN_MS = 10000; // 10 segundos de Throttle para poupar DB
@@ -59,7 +62,7 @@ export const useThermometerStore = defineStore('thermometer', () => {
    * Evita SELECTs contínuos pesados.
    */
   async function subscribeToSession(sessionId: string) {
-    try {
+    await execute(async () => {
       // Snapshot inicial
       signalCounts.value = await thermometerService.getInitialCounts(sessionId);
 
@@ -82,9 +85,7 @@ export const useThermometerStore = defineStore('thermometer', () => {
         },
       );
       realtimeManager.subscribe(`thermometer-${sessionId}`);
-    } catch (error) {
-      console.error('Erro ao conectar termômetro', error);
-    }
+    }, 'Erro ao conectar termômetro');
   }
 
   /**
@@ -103,6 +104,7 @@ export const useThermometerStore = defineStore('thermometer', () => {
   return {
     lastSignalSent,
     isCooldown,
+    isConnecting,
     signalCounts,
     sendSignal,
     clearStudentState,

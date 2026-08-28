@@ -1,17 +1,8 @@
 import { supabaseClient as supabase } from '../../../core/supabase/client';
+import type { Database } from '../../../core/types/database.types';
 
-export type StatusSessao = 'aguardando' | 'ativa' | 'encerrada';
-
-export interface Sessao {
-  id: string;
-  disciplina_id: string;
-  professor_id: string;
-  topico: string | null;
-  status: StatusSessao;
-  iniciada_em: string | null;
-  encerrada_em: string | null;
-  created_at: string;
-}
+export type StatusSessao = Database['public']['Enums']['status_sessao'];
+export type Sessao = Database['public']['Tables']['sessoes']['Row'];
 
 export class SessionService {
   /**
@@ -31,7 +22,7 @@ export class SessionService {
       .single();
 
     if (error) throw error;
-    return data as unknown as Sessao;
+    return data;
   }
 
   /**
@@ -49,7 +40,7 @@ export class SessionService {
       .single();
 
     if (error) throw error;
-    return data as unknown as Sessao;
+    return data;
   }
 
   /**
@@ -67,7 +58,7 @@ export class SessionService {
       .single();
 
     if (error) throw error;
-    return data as unknown as Sessao;
+    return data;
   }
 
   /**
@@ -77,7 +68,7 @@ export class SessionService {
     const { data, error } = await supabase.from('sessoes').select('*').eq('id', sessionId).single();
 
     if (error) throw error;
-    return data as unknown as Sessao;
+    return data;
   }
 
   /**
@@ -98,7 +89,7 @@ export class SessionService {
       throw new Error('Não há nenhuma aula ativa no momento para esta disciplina.');
     }
 
-    return (data as unknown as { id: string }).id;
+    return data.id;
   }
 }
 
