@@ -11,7 +11,7 @@
     "lint:check": "prettier \"**/*.{js,ts,vue,css,scss,html,md,json}\" --ignore-path .gitignore && eslint -c ./eslint.config.js \"./src*/**/*.{ts,js,cjs,mjs,vue}\"",
     "db:start": "npx supabase start",
     "db:stop": "npx supabase stop",
-    "dev": "quasar dev",
+    "dev": "npm run db:start && quasar dev",
     "build": "quasar build",
     "typecheck": "vue-tsc --noEmit",
     "postinstall": "quasar prepare --silent",

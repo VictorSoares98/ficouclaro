@@ -1,20 +1,8 @@
 import { supabaseClient as supabase } from '../../../core/supabase/client';
+import type { Database } from '../../../core/types/database.types';
 
-export interface Disciplina {
-  id: string;
-  professor_id: string;
-  nome: string;
-  descricao: string | null;
-  codigo_convite: string;
-  created_at: string;
-}
-
-export interface Matricula {
-  id: string;
-  disciplina_id: string;
-  aluno_id: string;
-  created_at: string;
-}
+export type Disciplina = Database['public']['Tables']['disciplinas']['Row'];
+export type Matricula = Database['public']['Tables']['matriculas']['Row'];
 
 export class CourseService {
   /**
@@ -29,7 +17,7 @@ export class CourseService {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data as unknown as Disciplina[];
+      return data;
     } else {
       // É aluno, busca as matrículas com inner join (usando sintaxe do PostgREST)
       const { data, error } = await supabase
@@ -40,8 +28,9 @@ export class CourseService {
       if (error) throw error;
 
       // Mapeia o resultado para extrair o array de disciplinas
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const courses = (data as any[]).map((d) => d.disciplinas).filter(Boolean);
+      const courses = data
+        .map((d) => d.disciplinas)
+        .filter((d): d is Disciplina => d !== null && !Array.isArray(d));
       return courses;
     }
   }
@@ -58,7 +47,7 @@ export class CourseService {
       .single();
 
     if (error) throw error;
-    return data as unknown as Disciplina;
+    return data;
   }
 
   async enrollByCode(alunoId: string, codigoConvite: string): Promise<Matricula> {
@@ -77,7 +66,7 @@ export class CourseService {
     const { data, error } = await supabase
       .from('matriculas')
       .insert({
-        disciplina_id: (curso as unknown as { id: string }).id,
+        disciplina_id: curso.id,
         aluno_id: alunoId,
       })
       .select()
@@ -90,7 +79,7 @@ export class CourseService {
       throw error;
     }
 
-    return data as unknown as Matricula;
+    return data;
   }
 }
 

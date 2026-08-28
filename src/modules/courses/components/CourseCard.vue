@@ -1,0 +1,43 @@
+<script setup lang="ts">
+import type { Disciplina } from '../services/course.service';
+
+defineProps<{
+  course: Disciplina;
+  actionLabel: string;
+  actionIcon: string;
+  actionColor: string;
+  showInviteCode?: boolean;
+}>();
+
+defineEmits<{
+  (e: 'action', courseId: string): void;
+}>();
+</script>
+
+<template>
+  <q-card class="tw-shadow-sm hover:tw-shadow-md tw-transition-shadow">
+    <q-card-section>
+      <div class="tw-flex tw-justify-between tw-items-start">
+        <h2 class="tw-text-xl tw-font-bold">{{ course.nome }}</h2>
+        <q-badge v-if="showInviteCode" color="secondary" class="tw-text-sm">
+          Cód: {{ course.codigo_convite }}
+        </q-badge>
+      </div>
+      <p class="tw-opacity-70 tw-mt-2 tw-text-sm tw-min-h-[40px]">
+        {{ course.descricao || 'Sem descrição' }}
+      </p>
+    </q-card-section>
+
+    <q-separator />
+
+    <q-card-actions align="right">
+      <q-btn
+        flat
+        :color="actionColor"
+        :icon="actionIcon"
+        :label="actionLabel"
+        @click="$emit('action', course.id)"
+      />
+    </q-card-actions>
+  </q-card>
+</template>

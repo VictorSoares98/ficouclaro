@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { authService } from '../modules/auth/services/auth.service';
+import { useAsyncOperation } from '../core/composables/useAsyncOperation';
 import type { AppUser } from '../core/types/auth.types';
 import type {
   User as SupabaseUser,
@@ -13,7 +14,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   // Flag para prevenção de FOUC (Flash of Unauthenticated Content)
   const isReady = ref(false);
-  const isLoading = ref(false);
+  const { isLoading, error, execute } = useAsyncOperation();
 
   const isAuthenticated = computed(() => !!user.value);
   const isProfessor = computed(() => user.value?.perfil.papel === 'professor');
@@ -23,13 +24,10 @@ export const useAuthStore = defineStore('auth', () => {
    * Carrega a sessão pela primeira vez quando o app inicia.
    */
   async function loadInitialSession() {
-    isLoading.value = true;
-    try {
+    await execute(async () => {
       user.value = await authService.getSessionUser();
-    } finally {
-      isReady.value = true;
-      isLoading.value = false;
-    }
+    }, 'Erro ao carregar sessão.');
+    isReady.value = true;
   }
 
   /**
@@ -56,43 +54,35 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function deleteAccount() {
-    isLoading.value = true;
-    try {
+    return execute(async () => {
       await authService.deleteAccount();
       clearUser();
-    } finally {
-      isLoading.value = false;
-    }
+    }, 'Erro ao excluir conta.');
   }
 
   async function login(credentials: SignInWithPasswordCredentials) {
-    isLoading.value = true;
-    try {
+    return execute(async () => {
       const data = await authService.signIn(credentials);
       if (data.user) {
         await reloadProfile(data.user);
       }
-    } finally {
-      isLoading.value = false;
-    }
+    }, 'Erro ao fazer login. Verifique suas credenciais.');
   }
 
   async function register(credentials: SignUpWithPasswordCredentials) {
-    isLoading.value = true;
-    try {
+    return execute(async () => {
       const data = await authService.signUp(credentials);
       if (data.user) {
         await reloadProfile(data.user);
       }
-    } finally {
-      isLoading.value = false;
-    }
+    }, 'Erro ao criar conta.');
   }
 
   return {
     user,
     isReady,
     isLoading,
+    error,
     isAuthenticated,
     isProfessor,
     isAluno,

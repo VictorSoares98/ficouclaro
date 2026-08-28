@@ -1,6 +1,7 @@
 import { supabaseClient } from '../../../core/supabase/client';
+import type { Database } from '../../../core/types/database.types';
 
-export type SinalRitmo = 'muito_rapido' | 'boiando' | 'tudo_certo' | 'muito_devagar';
+export type SinalRitmo = Database['public']['Enums']['sinal_ritmo'];
 
 export class ThermometerService {
   /**
@@ -36,9 +37,9 @@ export class ThermometerService {
     if (error) throw error;
 
     if (data) {
-      const rows = data as unknown as Array<{ sinal: string }>;
+      const rows = data;
       for (const row of rows) {
-        const sinal = row.sinal as SinalRitmo;
+        const sinal = row.sinal;
         if (counts[sinal] !== undefined) {
           counts[sinal]++;
         }

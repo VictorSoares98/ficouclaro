@@ -2,12 +2,12 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { sessionService, type Sessao } from '../services/session.service';
 import { realtimeManager } from '../../../core/supabase/realtime.manager';
+import { useAsyncOperation } from '../../../core/composables/useAsyncOperation';
 import type { RealtimePostgresUpdatePayload } from '@supabase/supabase-js';
 
 export const useSessionStore = defineStore('session', () => {
   const currentSession = ref<Sessao | null>(null);
-  const isLoading = ref(false);
-  const error = ref<string | null>(null);
+  const { isLoading, error, execute } = useAsyncOperation();
 
   /**
    * Carrega a sessão e assina o canal Realtime para escutar mudanças (ex: professor inicia ou encerra)
@@ -21,9 +21,7 @@ export const useSessionStore = defineStore('session', () => {
       leaveSession(); // Limpa a anterior se estiver trocando de sala
     }
 
-    isLoading.value = true;
-    error.value = null;
-    try {
+    return execute(async () => {
       currentSession.value = await sessionService.getSessionById(sessionId);
 
       // Assinar as mudanças dessa sessão específica
@@ -46,12 +44,7 @@ export const useSessionStore = defineStore('session', () => {
         },
       );
       realtimeManager.subscribe(`session-${sessionId}`);
-    } catch (err: unknown) {
-      error.value = err instanceof Error ? err.message : 'Erro ao entrar na sessão.';
-      throw err instanceof Error ? err : new Error(error.value);
-    } finally {
-      isLoading.value = false;
-    }
+    }, 'Erro ao entrar na sessão.');
   }
 
   function leaveSession() {
@@ -62,50 +55,35 @@ export const useSessionStore = defineStore('session', () => {
   }
 
   async function createSession(professorId: string, disciplinaId: string, topico?: string) {
-    try {
-      const novaSessao = await sessionService.createSession(professorId, disciplinaId, topico);
-      return novaSessao;
-    } catch (err: unknown) {
-      error.value = err instanceof Error ? err.message : 'Erro ao criar sessão.';
-      throw err instanceof Error ? err : new Error(error.value);
-    }
+    return execute(async () => {
+      return await sessionService.createSession(professorId, disciplinaId, topico);
+    }, 'Erro ao criar sessão.');
   }
 
   async function startSession() {
     if (!currentSession.value) throw new Error('Nenhuma sessão carregada');
-    try {
-      const updated = await sessionService.startSession(currentSession.value.id);
-      currentSession.value.status = updated.status;
-      currentSession.value.iniciada_em = updated.iniciada_em;
-    } catch (err: unknown) {
-      error.value = err instanceof Error ? err.message : 'Erro ao iniciar aula.';
-      throw err instanceof Error ? err : new Error(error.value);
-    }
+
+    return execute(async () => {
+      const updated = await sessionService.startSession(currentSession.value!.id);
+      currentSession.value!.status = updated.status;
+      currentSession.value!.iniciada_em = updated.iniciada_em;
+    }, 'Erro ao iniciar aula.');
   }
 
   async function endSession() {
     if (!currentSession.value) throw new Error('Nenhuma sessão carregada');
-    try {
-      const updated = await sessionService.endSession(currentSession.value.id);
-      currentSession.value.status = updated.status;
-      currentSession.value.encerrada_em = updated.encerrada_em;
-    } catch (err: unknown) {
-      error.value = err instanceof Error ? err.message : 'Erro ao encerrar sessão.';
-      throw err instanceof Error ? err : new Error(error.value);
-    }
+
+    return execute(async () => {
+      const updated = await sessionService.endSession(currentSession.value!.id);
+      currentSession.value!.status = updated.status;
+      currentSession.value!.encerrada_em = updated.encerrada_em;
+    }, 'Erro ao encerrar sessão.');
   }
 
   async function getActiveSession(courseId: string): Promise<string> {
-    isLoading.value = true;
-    error.value = null;
-    try {
+    return execute(async () => {
       return await sessionService.getActiveSessionByCourse(courseId);
-    } catch (err: unknown) {
-      error.value = err instanceof Error ? err.message : 'Erro ao buscar aula ativa.';
-      throw err instanceof Error ? err : new Error(error.value);
-    } finally {
-      isLoading.value = false;
-    }
+    }, 'Erro ao buscar aula ativa.');
   }
 
   return {

@@ -4,6 +4,8 @@ import { useRouter } from 'vue-router';
 import { useCourseStore } from '../stores/course.store';
 import { useSessionStore } from '../../session/stores/session.store';
 import { useQuasar } from 'quasar';
+import CourseCard from '../components/CourseCard.vue';
+import CourseCardSkeleton from '../components/CourseCardSkeleton.vue';
 
 const courseStore = useCourseStore();
 const sessionStore = useSessionStore();
@@ -63,12 +65,7 @@ async function handleJoinActiveSession(courseId: string) {
 
     <!-- Loading State -->
     <div v-if="courseStore.isLoading" class="tw-grid tw-grid-cols-1 md:tw-grid-cols-2 tw-gap-4">
-      <q-card v-for="i in 4" :key="i" class="tw-shadow-sm">
-        <q-card-section>
-          <q-skeleton type="text" class="tw-text-xl tw-mb-2" />
-          <q-skeleton type="text" width="60%" />
-        </q-card-section>
-      </q-card>
+      <CourseCardSkeleton v-for="i in 4" :key="i" />
     </div>
 
     <!-- Empty State -->
@@ -83,32 +80,15 @@ async function handleJoinActiveSession(courseId: string) {
 
     <!-- Listagem -->
     <div v-else class="tw-grid tw-grid-cols-1 md:tw-grid-cols-2 tw-gap-4">
-      <q-card
+      <CourseCard
         v-for="course in courseStore.courses"
         :key="course.id"
-        class="tw-shadow-sm hover:tw-shadow-md tw-transition-shadow"
-      >
-        <q-card-section>
-          <div class="tw-flex tw-justify-between tw-items-start">
-            <h2 class="tw-text-xl tw-font-bold">{{ course.nome }}</h2>
-          </div>
-          <p class="tw-opacity-70 tw-mt-2 tw-text-sm tw-min-h-[40px]">
-            {{ course.descricao || 'Sem descrição' }}
-          </p>
-        </q-card-section>
-
-        <q-separator />
-
-        <q-card-actions align="right">
-          <q-btn
-            flat
-            color="positive"
-            icon="login"
-            label="Entrar na Aula"
-            @click="handleJoinActiveSession(course.id)"
-          />
-        </q-card-actions>
-      </q-card>
+        :course="course"
+        actionLabel="Entrar na Aula"
+        actionIcon="login"
+        actionColor="positive"
+        @action="handleJoinActiveSession"
+      />
     </div>
 
     <!-- Modal Entrar em Turma -->
