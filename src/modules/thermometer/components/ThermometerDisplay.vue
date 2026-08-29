@@ -70,11 +70,11 @@ const stats = computed(() => [
     <div class="tw-flex tw-justify-between tw-items-end tw-mb-6">
       <div>
         <h3 class="tw-text-xl tw-font-bold tw-text-primary">Clima da Turma</h3>
-        <p class="tw-text-sm tw-opacity-70">Monitoramento em tempo real</p>
+        <p class="tw-text-sm text-muted">Monitoramento em tempo real</p>
       </div>
       <div class="tw-text-right">
         <span class="tw-text-3xl tw-font-bold">{{ totalSignals }}</span>
-        <p class="tw-text-xs tw-opacity-70 tw-uppercase tw-tracking-wider">Feedbacks</p>
+        <p class="tw-text-xs text-muted tw-uppercase tw-tracking-wider">Feedbacks</p>
       </div>
     </div>
 
@@ -96,7 +96,7 @@ const stats = computed(() => [
       class="tw-py-12 tw-text-center tw-rounded-xl tw-border-dashed"
     >
       <q-icon name="insights" size="3rem" class="tw-opacity-30 tw-mb-2" />
-      <p class="tw-opacity-60">Aguardando os primeiros sinais dos alunos...</p>
+      <p class="text-hint">Aguardando os primeiros sinais dos alunos...</p>
     </q-card>
 
     <!-- Barras de Progresso -->
@@ -109,7 +109,7 @@ const stats = computed(() => [
           </div>
           <div class="tw-flex tw-items-baseline tw-gap-2">
             <span class="tw-font-bold tw-text-lg">{{ stat.count }}</span>
-            <span class="tw-text-xs tw-opacity-50 tw-w-8 tw-text-right">{{
+            <span class="tw-text-xs text-hint tw-w-8 tw-text-right">{{
               formatPercent(stat.count)
             }}</span>
           </div>

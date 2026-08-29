@@ -87,7 +87,7 @@ async function submit() {
               :max="5"
             />
           </div>
-          <div class="tw-flex tw-justify-between tw-text-xs tw-opacity-60 tw-mt-2">
+          <div class="tw-flex tw-justify-between tw-text-xs text-hint tw-mt-2">
             <span>Nada Claro</span>
             <span>Muito Claro</span>
           </div>

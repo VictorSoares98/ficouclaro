@@ -62,7 +62,7 @@ async function handleSubmit(texto: string) {
 
     <!-- Lista de Dúvidas -->
     <div v-else class="tw-flex tw-flex-col tw-gap-3">
-      <div v-if="qaStore.sortedQuestions.length === 0" class="tw-text-center tw-p-8 tw-opacity-60">
+      <div v-if="qaStore.sortedQuestions.length === 0" class="tw-text-center tw-p-8 text-hint">
         Nenhuma dúvida enviada ainda.
       </div>
 

@@ -35,7 +35,7 @@ function handleAnswered() {
   <BaseSurfaceCard
     variant="flat"
     class="tw-p-4 tw-w-full"
-    :class="{ 'tw-opacity-60': question.foi_respondida }"
+    :class="{ 'text-hint': question.foi_respondida }"
   >
     <div class="tw-flex tw-gap-3">
       <!-- Votos -->

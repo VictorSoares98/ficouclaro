@@ -26,7 +26,7 @@ defineEmits<{
           Cód: {{ course.codigo_convite }}
         </q-badge>
       </div>
-      <p class="tw-opacity-70 tw-mt-2 tw-text-sm tw-min-h-[40px]">
+      <p class="text-muted tw-mt-2 tw-text-sm tw-min-h-[40px]">
         {{ course.descricao || 'Sem descrição' }}
       </p>
     </q-card-section>

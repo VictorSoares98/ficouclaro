@@ -47,7 +47,7 @@ function handleCancel() {
     <BaseSurfaceCard style="min-width: 350px" class="tw-p-2">
       <q-card-section>
         <div class="tw-text-xl tw-font-bold tw-text-primary">Iniciar Nova Aula</div>
-        <div class="tw-text-sm tw-opacity-70 tw-mt-1">
+        <div class="tw-text-sm text-muted tw-mt-1">
           Turma: <strong>{{ courseName }}</strong>
         </div>
       </q-card-section>

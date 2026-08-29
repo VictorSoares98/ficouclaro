@@ -58,7 +58,7 @@ async function handleJoinActiveSession(courseId: string) {
     <div class="tw-flex tw-justify-between tw-items-center tw-mb-8">
       <div>
         <h1 class="tw-text-2xl tw-font-bold tw-text-primary">Minhas Disciplinas</h1>
-        <p class="tw-opacity-70">Acesse suas turmas e entre nas aulas ao vivo.</p>
+        <p class="text-muted">Acesse suas turmas e entre nas aulas ao vivo.</p>
       </div>
       <q-btn color="primary" icon="add" label="Entrar em Turma" @click="isEnrolling = true" />
     </div>
@@ -72,7 +72,7 @@ async function handleJoinActiveSession(courseId: string) {
     <div v-else-if="courseStore.courses.length === 0" class="tw-text-center tw-py-12">
       <q-icon name="cast_for_education" size="4rem" class="tw-opacity-20 tw-mb-4" />
       <h2 class="tw-text-xl tw-font-bold">Nenhuma matrícula encontrada</h2>
-      <p class="tw-opacity-70 tw-mb-4">
+      <p class="text-muted tw-mb-4">
         Peça o código de convite ao seu professor para se matricular.
       </p>
       <q-btn color="primary" outline label="Usar Código de Convite" @click="isEnrolling = true" />
@@ -96,7 +96,7 @@ async function handleJoinActiveSession(courseId: string) {
       <q-card style="min-width: 350px">
         <q-card-section>
           <div class="text-h6 tw-font-bold">Matricular-se</div>
-          <p class="tw-text-sm tw-opacity-70 tw-mt-1">Insira o código fornecido pelo professor.</p>
+          <p class="tw-text-sm text-muted tw-mt-1">Insira o código fornecido pelo professor.</p>
         </q-card-section>
 
         <q-card-section class="q-pt-none tw-space-y-4">

@@ -90,7 +90,7 @@ async function handleCreate() {
         v-if="needsOptions"
         class="tw-pl-4 tw-border-l-2 tw-border-gray-200 dark:tw-border-gray-700 tw-space-y-2"
       >
-        <div class="tw-text-sm tw-opacity-70 tw-mb-2">Opções (Mínimo 2)</div>
+        <div class="tw-text-sm text-muted tw-mb-2">Opções (Mínimo 2)</div>
 
         <div v-for="(opcao, index) in opcoes" :key="index" class="tw-flex tw-items-center tw-gap-2">
           <q-input

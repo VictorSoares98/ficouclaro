@@ -89,7 +89,7 @@ function handleOpenInsights(courseId: string) {
     <div class="tw-flex tw-justify-between tw-items-center tw-mb-8">
       <div>
         <h1 class="tw-text-2xl tw-font-bold tw-text-primary">Minhas Disciplinas</h1>
-        <p class="tw-opacity-70">Gerencie suas turmas e inicie aulas.</p>
+        <p class="text-muted">Gerencie suas turmas e inicie aulas.</p>
       </div>
       <q-btn color="primary" icon="add" label="Nova Disciplina" @click="isCreating = true" />
     </div>
@@ -103,7 +103,7 @@ function handleOpenInsights(courseId: string) {
     <div v-else-if="courseStore.courses.length === 0" class="tw-text-center tw-py-12">
       <q-icon name="school" size="4rem" class="tw-opacity-20 tw-mb-4" />
       <h2 class="tw-text-xl tw-font-bold">Nenhuma disciplina criada</h2>
-      <p class="tw-opacity-70 tw-mb-4">
+      <p class="text-muted tw-mb-4">
         Comece criando a sua primeira disciplina para gerar o código de convite aos alunos.
       </p>
       <q-btn color="primary" outline label="Criar Disciplina" @click="isCreating = true" />

@@ -84,7 +84,7 @@ function handleEnd() {
           >
             {{ sessionStore.currentSession.status.toUpperCase() }}
           </q-badge>
-          <span class="tw-opacity-60">ID: {{ sessionId }}</span>
+          <span class="text-hint">ID: {{ sessionId }}</span>
         </div>
       </div>
       <div v-else>
@@ -178,7 +178,7 @@ function handleEnd() {
       <div class="tw-text-center">
         <q-icon name="qr_code_scanner" size="6rem" color="primary" class="tw-mb-4" />
         <h2 class="tw-text-xl tw-font-bold">Sala de Espera</h2>
-        <p class="tw-opacity-70 tw-max-w-md tw-mx-auto tw-mt-2">
+        <p class="text-muted tw-max-w-md tw-mx-auto tw-mt-2">
           Os alunos já podem entrar na aula. Clique em "Iniciar Aula" quando estiver pronto para
           liberar as ferramentas.
         </p>

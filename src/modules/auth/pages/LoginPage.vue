@@ -92,7 +92,7 @@ async function onSubmit() {
     </q-form>
 
     <template #footer>
-      <p class="tw-opacity-70">
+      <p class="text-muted">
         Não tem uma conta?
         <router-link to="/register" class="tw-text-primary tw-font-semibold hover:tw-underline">
           Cadastre-se

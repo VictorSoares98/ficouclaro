@@ -24,6 +24,21 @@ body.body--dark {
   // Fundo Escuro (Dark Mode)
   --q-dark: #1e293b;
   --q-dark-page: #0f172a;
+
+  .text-muted {
+    opacity: 0.85 !important;
+  }
+  .text-hint {
+    opacity: 0.7 !important;
+  }
+}
+
+// --- Classes Semânticas Globais (Acessibilidade e Contraste) ---
+.text-muted {
+  opacity: 0.7 !important;
+}
+.text-hint {
+  opacity: 0.5 !important;
 }
 
 // --- Eixo 2: Branding (Cores da Marca) ---

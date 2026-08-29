@@ -55,7 +55,7 @@ const optionStats = computed(() => {
   <div class="tw-space-y-4">
     <div class="tw-flex tw-justify-between tw-items-end">
       <h3 class="tw-text-lg tw-font-bold">{{ poll.pergunta }}</h3>
-      <div class="tw-text-sm tw-opacity-70">{{ totalVotes }} Votos</div>
+      <div class="tw-text-sm text-muted">{{ totalVotes }} Votos</div>
     </div>
 
     <div v-if="poll.tipo === 'multipla_escolha'" class="tw-space-y-3">
@@ -78,7 +78,7 @@ const optionStats = computed(() => {
 
     <div
       v-else
-      class="tw-p-4 tw-bg-gray-100 dark:tw-bg-gray-800 tw-rounded-lg tw-text-center tw-opacity-70"
+      class="tw-p-4 tw-bg-gray-100 dark:tw-bg-gray-800 tw-rounded-lg tw-text-center text-muted"
     >
       Visualização para '{{ poll.tipo }}' estará disponível no próximo patch.
     </div>

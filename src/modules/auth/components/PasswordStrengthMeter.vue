@@ -41,7 +41,7 @@ const color = computed(() => {
     <div class="tw-grid tw-grid-cols-2 tw-gap-2 tw-text-xs tw-px-1">
       <div
         class="tw-flex tw-items-center tw-gap-1"
-        :class="validations.length ? 'tw-text-positive' : 'tw-opacity-50'"
+        :class="validations.length ? 'tw-text-positive' : 'text-hint'"
       >
         <q-icon
           :name="validations.length ? 'check_circle' : 'radio_button_unchecked'"
@@ -51,7 +51,7 @@ const color = computed(() => {
       </div>
       <div
         class="tw-flex tw-items-center tw-gap-1"
-        :class="validations.uppercase ? 'tw-text-positive' : 'tw-opacity-50'"
+        :class="validations.uppercase ? 'tw-text-positive' : 'text-hint'"
       >
         <q-icon
           :name="validations.uppercase ? 'check_circle' : 'radio_button_unchecked'"
@@ -61,7 +61,7 @@ const color = computed(() => {
       </div>
       <div
         class="tw-flex tw-items-center tw-gap-1"
-        :class="validations.lowercase ? 'tw-text-positive' : 'tw-opacity-50'"
+        :class="validations.lowercase ? 'tw-text-positive' : 'text-hint'"
       >
         <q-icon
           :name="validations.lowercase ? 'check_circle' : 'radio_button_unchecked'"
@@ -71,7 +71,7 @@ const color = computed(() => {
       </div>
       <div
         class="tw-flex tw-items-center tw-gap-1"
-        :class="validations.number ? 'tw-text-positive' : 'tw-opacity-50'"
+        :class="validations.number ? 'tw-text-positive' : 'text-hint'"
       >
         <q-icon
           :name="validations.number ? 'check_circle' : 'radio_button_unchecked'"
@@ -81,7 +81,7 @@ const color = computed(() => {
       </div>
       <div
         class="tw-flex tw-items-center tw-gap-1 tw-col-span-2"
-        :class="validations.symbol ? 'tw-text-positive' : 'tw-opacity-50'"
+        :class="validations.symbol ? 'tw-text-positive' : 'text-hint'"
       >
         <q-icon
           :name="validations.symbol ? 'check_circle' : 'radio_button_unchecked'"

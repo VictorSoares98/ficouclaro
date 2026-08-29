@@ -22,7 +22,7 @@ function handleSubmit() {
 
 <template>
   <q-card flat bordered class="tw-p-4 tw-rounded-xl tw-w-full">
-    <div class="tw-text-sm tw-font-semibold tw-mb-2 tw-opacity-80">
+    <div class="tw-text-sm tw-font-semibold tw-mb-2 text-muted">
       Tem alguma dúvida? (Envio anônimo)
     </div>
     <q-input

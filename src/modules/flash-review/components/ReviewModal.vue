@@ -78,7 +78,7 @@ function skip() {
     <BaseSurfaceCard class="tw-w-full tw-max-w-md q-pa-md">
       <q-card-section class="tw-text-center">
         <div class="tw-text-2xl tw-font-bold tw-mb-2">A aula foi encerrada!</div>
-        <div class="tw-text-sm tw-opacity-70 tw-mb-6">
+        <div class="tw-text-sm text-muted tw-mb-6">
           O que você achou da sessão de hoje? Seu feedback é anônimo e ajuda o professor a melhorar.
         </div>
 

@@ -50,7 +50,7 @@ onUnmounted(() => {
       <div v-if="sessionStore.currentSession.status === 'aguardando'" class="tw-space-y-4">
         <q-icon name="hourglass_empty" size="4rem" color="primary" class="tw-animate-pulse" />
         <h2 class="tw-text-2xl tw-font-bold tw-text-primary">Aguardando o professor</h2>
-        <p class="tw-opacity-70">
+        <p class="text-muted">
           A aula de <strong>{{ sessionStore.currentSession.topico || 'Sem Tópico' }}</strong> logo
           vai começar.
         </p>
@@ -60,7 +60,7 @@ onUnmounted(() => {
       <div v-else-if="sessionStore.currentSession.status === 'ativa'" class="tw-space-y-4">
         <q-icon name="cast_for_education" size="4rem" color="positive" />
         <h2 class="tw-text-2xl tw-font-bold tw-text-positive">Aula Ativa!</h2>
-        <p class="tw-opacity-70">Tópico: {{ sessionStore.currentSession.topico || 'Aberto' }}</p>
+        <p class="text-muted">Tópico: {{ sessionStore.currentSession.topico || 'Aberto' }}</p>
 
         <div class="tw-mt-8 tw-w-full">
           <PaceButton />
@@ -80,7 +80,7 @@ onUnmounted(() => {
       <div v-else-if="sessionStore.currentSession.status === 'encerrada'" class="tw-space-y-4">
         <q-icon name="task_alt" size="4rem" color="warning" />
         <h2 class="tw-text-2xl tw-font-bold tw-text-warning">Aula Encerrada</h2>
-        <p class="tw-opacity-70">Obrigado por participar.</p>
+        <p class="text-muted">Obrigado por participar.</p>
         <q-btn color="primary" label="Voltar" to="/aluno" class="tw-mt-4" />
       </div>
     </div>

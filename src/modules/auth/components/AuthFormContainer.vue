@@ -14,7 +14,7 @@ import BaseSurfaceCard from '@/core/components/BaseSurfaceCard.vue';
     >
       <div class="tw-text-center tw-mb-8">
         <h2 class="tw-text-3xl tw-font-extrabold tw-mb-2">{{ title }}</h2>
-        <p class="tw-opacity-70">{{ subtitle }}</p>
+        <p class="text-muted">{{ subtitle }}</p>
       </div>
 
       <slot></slot>

@@ -30,7 +30,7 @@ function handleSignal(sinal: SinalRitmo) {
   <div class="tw-w-full">
     <div class="tw-text-center tw-mb-6">
       <h3 class="tw-text-lg tw-font-bold tw-text-primary">Termômetro de Ritmo</h3>
-      <p class="tw-text-sm tw-opacity-70">Como está a aula para você agora?</p>
+      <p class="tw-text-sm text-muted">Como está a aula para você agora?</p>
     </div>
 
     <!-- Grid de Feedback -->

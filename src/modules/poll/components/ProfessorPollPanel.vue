@@ -83,7 +83,7 @@ async function activatePoll(pollId: string) {
 
     <!-- Anteriores (Rascunhos e Encerradas) -->
     <div v-if="pollStore.pastPolls.length > 0">
-      <h2 class="tw-text-xl tw-font-bold tw-opacity-70 tw-mb-4">Histórico & Rascunhos</h2>
+      <h2 class="tw-text-xl tw-font-bold text-muted tw-mb-4">Histórico & Rascunhos</h2>
       <div class="tw-space-y-4">
         <q-card v-for="poll in pollStore.pastPolls" :key="poll.id" flat bordered class="tw-p-4">
           <div v-if="poll.status === 'rascunho'">
@@ -91,14 +91,14 @@ async function activatePoll(pollId: string) {
               <span class="tw-font-bold">{{ poll.pergunta }}</span>
               <q-badge color="grey">Rascunho</q-badge>
             </div>
-            <div class="tw-text-sm tw-opacity-60 tw-mt-1">{{ poll.tipo }}</div>
+            <div class="tw-text-sm text-hint tw-mt-1">{{ poll.tipo }}</div>
             <div class="tw-flex tw-justify-end tw-mt-4">
               <q-btn color="positive" label="Lançar Enquete" @click="activatePoll(poll.id)" />
             </div>
           </div>
           <div v-else>
             <MultipleChoiceResult :poll="poll" :results="pollStore.pollResults[poll.id] || []" />
-            <div class="tw-text-xs tw-text-right tw-opacity-50 tw-mt-2">
+            <div class="tw-text-xs tw-text-right text-hint tw-mt-2">
               Encerrada em {{ new Date(poll.encerrada_em || '').toLocaleString() }}
             </div>
           </div>

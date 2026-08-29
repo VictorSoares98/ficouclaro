@@ -39,7 +39,7 @@ onUnmounted(() => {
     <div class="tw-flex tw-justify-between tw-items-center tw-mb-8">
       <div>
         <h1 class="tw-text-2xl sm:tw-text-3xl tw-font-bold tw-text-primary">Insights Analíticos</h1>
-        <p class="tw-opacity-70 tw-mt-1 tw-text-sm sm:tw-text-base">
+        <p class="text-muted tw-mt-1 tw-text-sm sm:tw-text-base">
           {{ courseTitle }}
         </p>
       </div>
@@ -65,8 +65,8 @@ onUnmounted(() => {
 
     <!-- Empty State -->
     <div v-else-if="dashboardStore.insights.length === 0" class="tw-text-center tw-py-20">
-      <q-icon name="insights" size="4rem" color="grey" class="tw-opacity-50" />
-      <p class="tw-opacity-70 tw-mt-4">Nenhuma sessão registrada para analisar métricas ainda.</p>
+      <q-icon name="insights" size="4rem" color="grey" class="text-hint" />
+      <p class="text-muted tw-mt-4">Nenhuma sessão registrada para analisar métricas ainda.</p>
     </div>
 
     <!-- Dashboard Content -->
@@ -122,7 +122,7 @@ onUnmounted(() => {
         >
           <q-card-section>
             <h2 class="tw-text-lg tw-font-bold tw-mb-4">Heatmap de Agitação</h2>
-            <p class="tw-text-xs tw-opacity-60 tw-mb-2">
+            <p class="tw-text-xs text-hint tw-mb-2">
               Baseado no volume de Sinais de Ritmo por dia.
             </p>
             <HeatmapChart :insights="dashboardStore.insights" />

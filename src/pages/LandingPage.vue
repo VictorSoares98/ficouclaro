@@ -10,7 +10,7 @@
         <span class="tw-text-primary">ficaram para trás</span>
       </h1>
 
-      <p class="tw-text-lg md:tw-text-xl tw-opacity-70 tw-max-w-2xl tw-mx-auto">
+      <p class="tw-text-lg md:tw-text-xl text-muted tw-max-w-2xl tw-mx-auto">
         Acompanhe o ritmo da turma em tempo real. Uma plataforma conectando professores e alunos
         para garantir que todo o conteúdo realmente "ficou claro".
       </p>
