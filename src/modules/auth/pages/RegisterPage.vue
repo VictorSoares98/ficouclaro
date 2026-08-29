@@ -5,6 +5,7 @@ import { useQuasar } from 'quasar';
 import { useAuthStore } from '@/stores/auth.store';
 import type { PapelUsuario } from '@/core/types/auth.types';
 import AuthFormContainer from '@/modules/auth/components/AuthFormContainer.vue';
+import PasswordStrengthMeter from '@/modules/auth/components/PasswordStrengthMeter.vue';
 
 const router = useRouter();
 const $q = useQuasar();
@@ -93,6 +94,7 @@ async function onSubmit() {
         reactive-rules
         :rules="[(val) => !!val || 'O nome é obrigatório']"
         autocomplete="name"
+        enterkeyhint="next"
         color="primary"
       />
 
@@ -107,32 +109,38 @@ async function onSubmit() {
           (val) => /.+@.+\..+/.test(val) || 'E-mail inválido',
         ]"
         autocomplete="email"
+        enterkeyhint="next"
         color="primary"
       />
 
-      <q-input
-        v-model="password"
-        :type="isPasswordVisible ? 'text' : 'password'"
-        label="Senha"
-        outlined
-        reactive-rules
-        :rules="[
-          (val) => !!val || 'A senha é obrigatória',
-          (val) =>
-            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{12,}$/.test(val) ||
-            'A senha deve ter 12+ caracteres, incluir maiúsculas, minúsculas, números e símbolos',
-        ]"
-        autocomplete="new-password"
-        color="primary"
-      >
-        <template v-slot:append>
-          <q-icon
-            :name="isPasswordVisible ? 'visibility_off' : 'visibility'"
-            class="cursor-pointer"
-            @click="isPasswordVisible = !isPasswordVisible"
-          />
-        </template>
-      </q-input>
+      <div>
+        <q-input
+          v-model="password"
+          :type="isPasswordVisible ? 'text' : 'password'"
+          label="Senha"
+          outlined
+          reactive-rules
+          :rules="[
+            (val) => !!val || 'A senha é obrigatória',
+            (val) =>
+              /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{12,}$/.test(val) ||
+              'A senha não atende aos requisitos mínimos de segurança',
+          ]"
+          autocomplete="new-password"
+          enterkeyhint="next"
+          color="primary"
+        >
+          <template v-slot:append>
+            <q-icon
+              :name="isPasswordVisible ? 'visibility_off' : 'visibility'"
+              class="cursor-pointer"
+              @click="isPasswordVisible = !isPasswordVisible"
+            />
+          </template>
+        </q-input>
+
+        <PasswordStrengthMeter :password="password" />
+      </div>
 
       <q-input
         v-model="confirmPassword"
@@ -145,6 +153,7 @@ async function onSubmit() {
           (val) => val === password || 'As senhas não coincidem',
         ]"
         autocomplete="new-password"
+        enterkeyhint="done"
         color="primary"
       >
         <template v-slot:append>

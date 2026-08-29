@@ -7,8 +7,10 @@ defineProps<{
 </script>
 
 <template>
-  <q-page class="tw-flex tw-flex-col tw-items-center tw-justify-center tw-p-4">
-    <q-card class="tw-w-full tw-max-w-md tw-rounded-2xl tw-shadow-xl tw-p-8 tw-relative">
+  <q-page class="tw-flex tw-flex-col tw-items-center tw-justify-center tw-p-4 tw-min-h-[100dvh]">
+    <q-card
+      class="tw-w-full tw-max-w-md tw-rounded-2xl tw-shadow-xl tw-p-8 tw-relative tw-overflow-y-auto tw-max-h-[90dvh]"
+    >
       <div class="tw-text-center tw-mb-8">
         <h2 class="tw-text-3xl tw-font-extrabold tw-mb-2">{{ title }}</h2>
         <p class="tw-opacity-70">{{ subtitle }}</p>
