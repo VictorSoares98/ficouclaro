@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { flashReviewService } from '../services/flashReview.service';
+import { flashReviewService } from '@/modules/flash-review/services/flashReview.service';
 import type { Database } from '@/core/types/database.types';
 import { useAsyncOperation } from '@/core/composables/useAsyncOperation';
 import type { Ref, ComputedRef } from 'vue';

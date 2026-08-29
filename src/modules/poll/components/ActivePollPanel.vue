@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { usePollStore } from '../stores/poll.store';
+import { usePollStore } from '@/modules/poll/stores/poll.store';
 import PollCard from './PollCard.vue';
 
 const pollStore = usePollStore();
