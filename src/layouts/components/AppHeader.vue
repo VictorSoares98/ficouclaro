@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth.store';
 import { useThemeStore } from '@/stores/theme.store';
-import type { AppTheme } from '@/core/types/theme.types';
 import { useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
 import ThemeSwitcher from '@/components/ThemeSwitcher.vue';
@@ -16,14 +15,6 @@ const authStore = useAuthStore();
 const themeStore = useThemeStore();
 const router = useRouter();
 const $q = useQuasar();
-
-function toggleMode() {
-  themeStore.toggleMode();
-}
-
-function selectTheme(theme: AppTheme) {
-  themeStore.setTheme(theme);
-}
 
 async function handleLogout() {
   try {
@@ -85,7 +76,7 @@ function confirmDeleteAccount() {
           <q-item
             clickable
             v-close-popup
-            @click="selectTheme('default')"
+            @click="themeStore.setTheme('default')"
             :active="themeStore.activeTheme === 'default'"
           >
             <q-item-section>Default (Azul)</q-item-section>
@@ -93,7 +84,7 @@ function confirmDeleteAccount() {
           <q-item
             clickable
             v-close-popup
-            @click="selectTheme('ocean')"
+            @click="themeStore.setTheme('ocean')"
             :active="themeStore.activeTheme === 'ocean'"
           >
             <q-item-section>Ocean (Ciano)</q-item-section>
@@ -101,7 +92,7 @@ function confirmDeleteAccount() {
           <q-item
             clickable
             v-close-popup
-            @click="selectTheme('dracula')"
+            @click="themeStore.setTheme('dracula')"
             :active="themeStore.activeTheme === 'dracula'"
           >
             <q-item-section>Dracula (Roxo)</q-item-section>
@@ -109,7 +100,7 @@ function confirmDeleteAccount() {
           <q-item
             clickable
             v-close-popup
-            @click="selectTheme('summer_berries')"
+            @click="themeStore.setTheme('summer_berries')"
             :active="themeStore.activeTheme === 'summer_berries'"
           >
             <q-item-section>Amoras do Verão</q-item-section>
@@ -117,7 +108,7 @@ function confirmDeleteAccount() {
           <q-item
             clickable
             v-close-popup
-            @click="selectTheme('lunar_twilight')"
+            @click="themeStore.setTheme('lunar_twilight')"
             :active="themeStore.activeTheme === 'lunar_twilight'"
           >
             <q-item-section>Crepúsculo Lunar</q-item-section>
@@ -125,7 +116,7 @@ function confirmDeleteAccount() {
           <q-item
             clickable
             v-close-popup
-            @click="selectTheme('nature_terrain')"
+            @click="themeStore.setTheme('nature_terrain')"
             :active="themeStore.activeTheme === 'nature_terrain'"
           >
             <q-item-section>Natura e Terreno</q-item-section>
@@ -149,7 +140,7 @@ function confirmDeleteAccount() {
               ? 'light_mode'
               : 'brightness_auto'
         "
-        @click="toggleMode"
+        @click="themeStore.toggleMode()"
         color="white"
         aria-label="Alternar Iluminação"
       >
