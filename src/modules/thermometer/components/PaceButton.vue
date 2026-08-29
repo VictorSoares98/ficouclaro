@@ -3,9 +3,12 @@ import { onUnmounted } from 'vue';
 import { useThermometerStore } from '@/modules/thermometer/stores/thermometer.store';
 import type { SinalRitmo } from '@/modules/thermometer/services/thermometer.service';
 import { useSessionStore } from '@/modules/session/stores/session.store';
+import { useQuasar } from 'quasar';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
 
 const thermometerStore = useThermometerStore();
 const sessionStore = useSessionStore();
+const $q = useQuasar();
 
 // Garante que o timer de cooldown seja cancelado e o estado seja limpo ao sair da tela
 onUnmounted(() => {
@@ -19,8 +22,15 @@ const options: { value: SinalRitmo; label: string; icon: string; color: string }
   { value: 'muito_devagar', label: 'Muito Devagar', icon: 'slow_motion_video', color: 'info' },
 ];
 
-function handleSignal(sinal: SinalRitmo) {
+async function handleSignal(sinal: SinalRitmo) {
   if (sessionStore.currentSession) {
+    if ($q.platform.is.capacitor) {
+      try {
+        await Haptics.impact({ style: ImpactStyle.Light });
+      } catch (e) {
+        console.warn('Haptics indisponível:', e);
+      }
+    }
     void thermometerStore.sendSignal(sessionStore.currentSession.id, sinal);
   }
 }
@@ -40,7 +50,7 @@ function handleSignal(sinal: SinalRitmo) {
         :key="opt.value"
         :color="opt.color"
         :outline="thermometerStore.lastSignalSent !== opt.value"
-        class="tw-py-6 tw-rounded-xl tw-flex tw-flex-col hover:tw-shadow-md tw-transition-all"
+        class="tw-py-6 tw-rounded-xl tw-flex tw-flex-col hover:tw-shadow-md active:tw-scale-95 tw-transition-all"
         no-caps
         unelevated
         @click="handleSignal(opt.value)"
