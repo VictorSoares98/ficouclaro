@@ -75,8 +75,6 @@ async function handleCreate() {
         map-options
         label="Tipo de Enquete"
         outlined
-        dense
-        options-dense
         class="tw-w-full md:tw-w-1/2"
       />
 
@@ -84,7 +82,6 @@ async function handleCreate() {
         v-model="pergunta"
         label="Pergunta"
         outlined
-        dense
         autofocus
         :rules="[(val) => !!val || 'A pergunta é obrigatória']"
       />
@@ -100,7 +97,6 @@ async function handleCreate() {
             v-model="opcoes[index]"
             :label="`Opção ${index + 1}`"
             outlined
-            dense
             class="tw-flex-1"
             :rules="[(val) => index >= 2 || !!val || 'Obrigatório']"
             hide-bottom-space
@@ -119,7 +115,6 @@ async function handleCreate() {
           label="Adicionar Opção"
           color="primary"
           flat
-          dense
           class="tw-mt-2"
           @click="addOption"
         />
