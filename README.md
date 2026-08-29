@@ -68,6 +68,8 @@ Para mantermos a base de código previsível e escalável, seguimos regras infle
 5. **Concorrência e Estado Assíncrono:** Para aniquilar redundâncias, todas as stores e requisições devem consumir o composable universal `useAsyncOperation`, padronizando _Loading States_ elegantes e engolindo exceções sem estourar _Unhandled Promise Rejections_.
 6. **Conexões Realtime (WebSocket):** Inscrições nativas no Supabase estão proibidas nas views. Qualquer escuta em tempo real deve transacionar exclusivamente via Padrão Singleton pelo `RealtimeManager`, prevenindo _Race Conditions_ e conexões fantasmas.
 7. **Clean Code & UX Resiliente:** Caminhos relativos frágeis (`../../`) são proibidos; usamos sempre o alias absoluto `@/`. O tratamento de exceções assíncronas é centralizado no Quasar Notify, garantindo feedback humanizado ao usuário. O aplicativo possui tratamento ativo contra quedas de rede (banner de aviso e cache de estado).
+8. **Integridade de Dados e Segurança:** O controle de interações únicas (Anti-Duplicidade de Votos) jamais confia no cache do navegador (LocalStorage). O bloqueio ocorre nativamente no PostgreSQL utilizando `Unique Constraints` com Hashes Unidirecionais baseados na identidade do usuário.
+9. **TypeScript Defensivo e Reatividade Estrutural:** É vedado o uso de asserções não-nulas (`!`) para forçar o compilador. Bloqueios de escopo de tipagem (Type Guards) em callbacks assíncronos devem ser feitos através de _Constant Aliasing_. Mutações diretas em arrays (`push/splice`) dão lugar ao destructuring funcional (`= [...]`) assegurando a integridade do Vue Proxy.
 
 ## 🛠️ 5. Scripts & Workflow
 
