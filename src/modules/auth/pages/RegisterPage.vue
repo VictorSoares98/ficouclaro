@@ -13,6 +13,7 @@ const fullName = ref('');
 const email = ref('');
 const password = ref('');
 const role = ref<PapelUsuario>('aluno');
+const acceptTerms = ref(false);
 
 const roleOptions: { label: string; value: PapelUsuario }[] = [
   { label: 'Sou Aluno', value: 'aluno' },
@@ -113,11 +114,29 @@ async function onSubmit() {
           color="primary"
         />
 
+        <q-checkbox v-model="acceptTerms" color="primary" class="tw-w-full tw-mt-2 tw-mb-2">
+          Li e concordo com os
+          <router-link
+            to="/termos"
+            @click.stop
+            class="tw-text-primary tw-font-semibold hover:tw-underline"
+            >Termos de Uso</router-link
+          >
+          e a
+          <router-link
+            to="/privacidade"
+            @click.stop
+            class="tw-text-primary tw-font-semibold hover:tw-underline"
+            >Política de Privacidade</router-link
+          >.
+        </q-checkbox>
+
         <q-btn
           type="submit"
           color="primary"
           class="tw-w-full tw-h-14 tw-rounded-xl tw-text-lg tw-font-bold tw-shadow-md"
           :loading="authStore.isLoading"
+          :disable="!acceptTerms"
           unelevated
           label="Cadastrar"
         />
