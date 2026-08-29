@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted } from 'vue';
-import { usePollStore } from '../stores/poll.store';
+import { usePollStore } from '@/modules/poll/stores/poll.store';
 import { useSessionStore } from '@/modules/session/stores/session.store';
 import PollCreatorForm from './PollCreatorForm.vue';
 import MultipleChoiceResult from './MultipleChoiceResult.vue';

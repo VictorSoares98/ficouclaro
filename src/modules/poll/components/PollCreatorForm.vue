@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { usePollStore } from '../stores/poll.store';
+import { usePollStore } from '@/modules/poll/stores/poll.store';
 import { useSessionStore } from '@/modules/session/stores/session.store';
 import type { Database } from '@/core/types/database.types';
 

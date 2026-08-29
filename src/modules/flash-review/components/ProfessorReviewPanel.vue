@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted } from 'vue';
-import { useFlashReviewStore } from '../stores/flashReview.store';
+import { useFlashReviewStore } from '@/modules/flash-review/stores/flashReview.store';
 
 const props = defineProps<{
   sessionId: string;
