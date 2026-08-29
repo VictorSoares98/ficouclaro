@@ -79,7 +79,7 @@ Lista de comandos disponíveis via `npm run`:
 | `build`    | Executa o Type Check (`vue-tsc`) e gera o bundle de produção estático otimizado.                                  |
 | `lint`     | Roda o ESLint + Prettier para garantir conformidade de tipagem e padronização visual do código em todo o projeto. |
 | `db:build`      | Concatena os snippets da pasta `supabase/snippets` gerando o arquivo consolidado `Master Schema.sql`.             |
-| `build:android` | Gera o build de produção do Quasar e sincroniza com a pasta nativa do Android (usa `.env.production`).    |
+| `build:android` | Gera o build de produção do Quasar injetando explicitamente o `.env.production` via `dotenv-cli`.                |
 
 ### 📱 Desenvolvimento Mobile (Capacitor)
 

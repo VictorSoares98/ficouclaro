@@ -91,10 +91,10 @@ Para gerar o app real que se conectará ao seu banco na web (Supabase Cloud), o 
     ```bash
     npm run build:android
     ```
-    *Diferente do comando `dev`, esse script aciona o `quasar build`. O Vite entende que é uma build de produção e automaticamente ignora o `.env` base, lendo apenas o `.env.production`. As chaves da nuvem serão congeladas (hardcoded) no binário gerado.*
+    *Diferente do comando `dev`, esse script utiliza o `dotenv-cli` para forçar a injeção do `.env.production` no processo do `quasar build`. Isso garante que as chaves da nuvem sejam congeladas (hardcoded) no binário gerado, ignorando as chaves locais.*
 
 3.  **Gere o APK Físico no Android Studio:**
-    - No Android Studio (que se abrirá após o comando anterior), vá em **Build > Build Bundle(s) / APK(s) > Build APK(s)**.
+    - No Android Studio, vá em **Build > Build Bundle(s) / APK(s) > Build APK(s)**.
     - O arquivo final estará na pasta do seu projeto em: `src-capacitor/android/app/build/outputs/apk/debug/app-debug.apk`. Esse é o seu aplicativo cloud!
 
 ---
