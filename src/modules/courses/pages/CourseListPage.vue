@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useCourseStore } from '@/modules/courses/stores/course.store';
 import { useSessionStore } from '@/modules/session/stores/session.store';
 import { useAuthStore } from '@/stores/auth.store';
 import { useQuasar } from 'quasar';
+import type { Disciplina } from '@/modules/courses/services/course.service';
 import CourseCard from '@/modules/courses/components/CourseCard.vue';
 import CourseCardSkeleton from '@/modules/courses/components/CourseCardSkeleton.vue';
+import StartSessionConfirmDialog from '@/modules/courses/components/StartSessionConfirmDialog.vue';
 
 const courseStore = useCourseStore();
 const sessionStore = useSessionStore();
@@ -17,6 +19,14 @@ const $q = useQuasar();
 const isCreating = ref(false);
 const newCourseName = ref('');
 const newCourseDesc = ref('');
+
+const selectedCourseForSession = ref<Disciplina | null>(null);
+const isConfirmDialogOpen = computed({
+  get: () => selectedCourseForSession.value !== null,
+  set: (val) => {
+    if (!val) selectedCourseForSession.value = null;
+  },
+});
 
 onMounted(async () => {
   await courseStore.fetchMyCourses();
@@ -38,16 +48,24 @@ async function handleCreateCourse() {
   }
 }
 
-async function handleStartSession(courseId: string) {
+function openStartSessionDialog(courseId: string) {
+  const course = courseStore.courses.find((c) => c.id === courseId);
+  if (course) {
+    selectedCourseForSession.value = course;
+  }
+}
+
+async function handleConfirmStartSession(topic: string) {
+  if (!selectedCourseForSession.value) return;
+
   try {
     $q.loading.show({ message: 'Preparando Sala...' });
     if (!authStore.user) throw new Error('Não autenticado');
 
-    // Cria uma sessão com tópico "Aula de Hoje" padrão (pode ser editado futuramente)
     const session = await sessionStore.createSession(
       authStore.user.auth.id,
-      courseId,
-      'Aula de Hoje',
+      selectedCourseForSession.value.id,
+      topic,
     );
 
     $q.loading.hide();
@@ -102,7 +120,7 @@ function handleOpenInsights(courseId: string) {
         actionColor="primary"
         :showInviteCode="true"
         :showInsightsBtn="authStore.user?.perfil.papel === 'professor'"
-        @action="handleStartSession"
+        @action="openStartSessionDialog"
         @insights="handleOpenInsights"
       />
     </div>
@@ -137,5 +155,12 @@ function handleOpenInsights(courseId: string) {
         </q-card-actions>
       </q-card>
     </q-dialog>
+
+    <!-- Modal de Confirmação de Início de Aula -->
+    <StartSessionConfirmDialog
+      v-model="isConfirmDialogOpen"
+      :courseName="selectedCourseForSession?.nome || ''"
+      @confirm="handleConfirmStartSession"
+    />
   </q-page>
 </template>
