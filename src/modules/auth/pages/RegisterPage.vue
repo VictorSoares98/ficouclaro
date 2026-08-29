@@ -12,6 +12,8 @@ const authStore = useAuthStore();
 const fullName = ref('');
 const email = ref('');
 const password = ref('');
+const confirmPassword = ref('');
+const isPasswordVisible = ref(false);
 const role = ref<PapelUsuario>('aluno');
 const acceptTerms = ref(false);
 
@@ -21,6 +23,15 @@ const roleOptions: { label: string; value: PapelUsuario }[] = [
 ];
 
 async function onSubmit() {
+  if (password.value !== confirmPassword.value) {
+    $q.notify({
+      type: 'negative',
+      message: 'As senhas não coincidem',
+      position: 'top',
+    });
+    return;
+  }
+
   try {
     await authStore.register({
       email: email.value,
@@ -102,7 +113,7 @@ async function onSubmit() {
 
         <q-input
           v-model="password"
-          type="password"
+          :type="isPasswordVisible ? 'text' : 'password'"
           label="Senha"
           outlined
           lazy-rules
@@ -112,7 +123,37 @@ async function onSubmit() {
           ]"
           autocomplete="new-password"
           color="primary"
-        />
+        >
+          <template v-slot:append>
+            <q-icon
+              :name="isPasswordVisible ? 'visibility_off' : 'visibility'"
+              class="cursor-pointer"
+              @click="isPasswordVisible = !isPasswordVisible"
+            />
+          </template>
+        </q-input>
+
+        <q-input
+          v-model="confirmPassword"
+          :type="isPasswordVisible ? 'text' : 'password'"
+          label="Confirmar Senha"
+          outlined
+          lazy-rules
+          :rules="[
+            (val) => !!val || 'A confirmação é obrigatória',
+            (val) => val === password || 'As senhas não coincidem',
+          ]"
+          autocomplete="new-password"
+          color="primary"
+        >
+          <template v-slot:append>
+            <q-icon
+              :name="isPasswordVisible ? 'visibility_off' : 'visibility'"
+              class="cursor-pointer"
+              @click="isPasswordVisible = !isPasswordVisible"
+            />
+          </template>
+        </q-input>
 
         <q-checkbox v-model="acceptTerms" color="primary" class="tw-w-full tw-mt-2 tw-mb-2">
           Li e concordo com os

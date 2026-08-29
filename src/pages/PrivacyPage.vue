@@ -65,14 +65,7 @@
       </div>
 
       <div class="tw-mt-12 tw-flex tw-justify-start">
-        <q-btn
-          color="primary"
-          unelevated
-          icon="arrow_back"
-          label="Voltar"
-          @click="$router.back()"
-          no-caps
-        />
+        <q-btn color="primary" unelevated icon="arrow_back" label="Voltar" to="/" no-caps />
       </div>
     </div>
   </q-page>
