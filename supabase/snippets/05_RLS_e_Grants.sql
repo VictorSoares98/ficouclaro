@@ -95,3 +95,6 @@ CREATE POLICY "Aluno avalia aula" ON public.avaliacoes_rapidas FOR INSERT WITH C
 CREATE POLICY "Professor lÃª avaliaÃ§Ãµes" ON public.avaliacoes_rapidas FOR SELECT USING (
   EXISTS (SELECT 1 FROM public.sessoes s WHERE s.id = avaliacoes_rapidas.sessao_id AND s.professor_id = auth.uid())
 );
+
+-- GRANT da função analítica (Dashboard)
+GRANT EXECUTE ON FUNCTION public.get_course_insights(UUID) TO authenticated;

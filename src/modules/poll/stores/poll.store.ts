@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { pollService } from '../services/poll.service';
-import type { Database } from '@/core/types/database.types';
+import type { Database, Json } from '@/core/types/database.types';
 import { useAsyncOperation } from '@/core/composables/useAsyncOperation';
 import { realtimeManager } from '@/core/supabase/realtime.manager';
 import type {
@@ -14,7 +14,7 @@ export interface Resposta {
   id: string;
   created_at: string;
   enquete_id: string;
-  resposta: unknown;
+  resposta: Json;
 }
 
 export interface Enquete {
@@ -132,13 +132,12 @@ export const usePollStore = defineStore('poll', () => {
     }, 'Erro ao encerrar enquete');
   }
 
-  async function submitResponse(pollId: string, respostaData: unknown): Promise<void> {
+  async function submitResponse(pollId: string, respostaData: Json): Promise<void> {
     await execute(async (): Promise<void> => {
       if (hasResponded(pollId)) {
         throw new Error('Você já respondeu a esta enquete.');
       }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await pollService.submitResponse({ enquete_id: pollId, resposta: respostaData as any });
+      await pollService.submitResponse({ enquete_id: pollId, resposta: respostaData });
       markAsResponded(pollId);
     }, 'Erro ao enviar resposta');
   }

@@ -24,3 +24,33 @@ BEGIN
   DELETE FROM auth.users WHERE id = auth.uid();
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+
+-- Função para agregar métricas de sessões (Dashboard)
+-- Substitui a necessidade de uma VIEW, mantendo os snippets organizados.
+CREATE OR REPLACE FUNCTION public.get_course_insights(p_disciplina_id UUID)
+RETURNS TABLE (
+  sessao_id UUID,
+  disciplina_id UUID,
+  topico TEXT,
+  iniciada_em TIMESTAMPTZ,
+  status status_sessao,
+  media_estrelas NUMERIC,
+  total_avaliacoes BIGINT,
+  total_duvidas BIGINT,
+  total_sinais BIGINT,
+  total_enquetes BIGINT
+) AS $ $
+  SELECT
+    s.id AS sessao_id,
+    s.disciplina_id,
+    s.topico,
+    s.iniciada_em,
+    s.status,
+    COALESCE((SELECT AVG(nota) FROM public.avaliacoes_rapidas WHERE sessao_id = s.id), 0) AS media_estrelas,
+    (SELECT COUNT(*) FROM public.avaliacoes_rapidas WHERE sessao_id = s.id) AS total_avaliacoes,
+    (SELECT COUNT(*) FROM public.duvidas WHERE sessao_id = s.id) AS total_duvidas,
+    (SELECT COUNT(*) FROM public.sinais_ritmo WHERE sessao_id = s.id) AS total_sinais,
+    (SELECT COUNT(*) FROM public.enquetes WHERE sessao_id = s.id) AS total_enquetes
+  FROM public.sessoes s
+  WHERE s.disciplina_id = p_disciplina_id;
+$ $ LANGUAGE sql STABLE SECURITY DEFINER;
