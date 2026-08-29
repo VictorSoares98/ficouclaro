@@ -84,12 +84,11 @@ Lista de comandos disponíveis via `npm run`:
 
 O aplicativo foi empacotado para execução nativa via Quasar + Capacitor.
 
-Para abrir o projeto diretamente no **Android Studio** e rodar em emuladores ou dispositivos físicos:
+Para gerar a build web e abrir o projeto automaticamente no **Android Studio** (para rodar em emuladores ou exportar o APK/AAB):
 ```bash
-cd src-capacitor
-npx cap open android
+npx quasar build -m capacitor -T android --ide
 ```
-*(Certifique-se de que o SDK do Android esteja devidamente instalado no seu ambiente).*
+*(Certifique-se de executar este comando na raiz do projeto `ficouclaro` e garanta que o SDK do Android esteja devidamente instalado).*
 
 ## 🌟 6. Funcionalidades Principais (Visão do Produto)
 
