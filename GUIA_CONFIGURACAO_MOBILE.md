@@ -88,10 +88,12 @@ Para gerar o app real que se conectará ao seu banco na web (Supabase Cloud), o 
 
 1.  **Configure o `.env.production`:** Crie ou preencha este arquivo na raiz com as chaves do seu projeto hospedado na nuvem.
 2.  **Gere o Build Web de Produção para Android:**
+
     ```bash
     npm run build:android
     ```
-    *Diferente do comando `dev`, esse script utiliza o `dotenv-cli` para forçar a injeção do `.env.production` no processo do `quasar build`. Isso garante que as chaves da nuvem sejam congeladas (hardcoded) no binário gerado, ignorando as chaves locais.*
+
+    _Diferente do comando `dev`, esse script utiliza o `dotenv-cli` para forçar a injeção do `.env.production` no processo do `quasar build`. Isso garante que as chaves da nuvem sejam congeladas (hardcoded) no binário gerado, ignorando as chaves locais._
 
 3.  **Gere o APK Físico no Android Studio:**
     - No Android Studio, vá em **Build > Build Bundle(s) / APK(s) > Build APK(s)**.
