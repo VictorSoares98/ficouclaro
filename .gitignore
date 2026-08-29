@@ -18,6 +18,8 @@ dev/
 # 3. Variáveis de Ambiente e Segredos (CRÍTICO)
 # ==========================================
 .env
+.env.production
+.env.development
 .env.local
 .env.*.local
 

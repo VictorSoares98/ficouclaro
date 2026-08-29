@@ -13,6 +13,7 @@
     "db:stop": "npx supabase stop",
     "dev": "npm run db:start && quasar dev",
     "build": "quasar build",
+    "build:android:prod": "quasar build -m capacitor -T android",
     "typecheck": "vue-tsc --noEmit",
     "postinstall": "quasar prepare --silent",
     "db:build": "node supabase/build-schema.js"
