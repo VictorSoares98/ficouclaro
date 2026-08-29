@@ -33,6 +33,7 @@ export type Database = {
         Row: {
           comentario: string | null;
           created_at: string;
+          hash_eleitor: string;
           id: string;
           nota: number;
           sessao_id: string;
@@ -40,6 +41,7 @@ export type Database = {
         Insert: {
           comentario?: string | null;
           created_at?: string;
+          hash_eleitor?: string;
           id?: string;
           nota: number;
           sessao_id: string;
@@ -47,6 +49,7 @@ export type Database = {
         Update: {
           comentario?: string | null;
           created_at?: string;
+          hash_eleitor?: string;
           id?: string;
           nota?: number;
           sessao_id?: string;
@@ -233,18 +236,21 @@ export type Database = {
         Row: {
           created_at: string;
           enquete_id: string;
+          hash_eleitor: string;
           id: string;
           resposta: Json;
         };
         Insert: {
           created_at?: string;
           enquete_id: string;
+          hash_eleitor?: string;
           id?: string;
           resposta: Json;
         };
         Update: {
           created_at?: string;
           enquete_id?: string;
+          hash_eleitor?: string;
           id?: string;
           resposta?: Json;
         };

@@ -12,6 +12,9 @@ export class FlashReviewService {
     const { error } = await supabaseClient.from('avaliacoes_rapidas').insert(review);
 
     if (error) {
+      if (error.code === '23505') {
+        throw new Error('Você já avaliou esta sessão.');
+      }
       throw new Error(error.message);
     }
   }

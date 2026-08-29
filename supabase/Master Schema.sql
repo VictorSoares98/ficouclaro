@@ -1,7 +1,7 @@
 -- ====================================================================
 -- ⚠️ AVISO: ARQUIVO AUTO-GERADO!
 -- NÃO EDITE ESTE ARQUIVO DIRETAMENTE. ALTERE OS SNIPPETS E RODE db:build
--- Gerado em: 2026-08-29T17:15:51.925Z
+-- Gerado em: 2026-08-29T18:02:07.478Z
 -- ====================================================================
 
 -- >>> INÍCIO DO SNIPPET: 00_Init_Extensions.sql <<<
@@ -94,10 +94,12 @@ CREATE TABLE public.enquetes (
 
 -- respostas_enquete (Respostas dos alunos às enquetes)
 CREATE TABLE public.respostas_enquete (
-  id         UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  enquete_id UUID NOT NULL REFERENCES public.enquetes(id) ON DELETE CASCADE,
-  resposta   JSONB NOT NULL,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  id           UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  enquete_id   UUID NOT NULL REFERENCES public.enquetes(id) ON DELETE CASCADE,
+  resposta     JSONB NOT NULL,
+  hash_eleitor TEXT NOT NULL DEFAULT 'legacy_vote',
+  created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE(enquete_id, hash_eleitor)
 );
 
 -- duvidas (Painel de Q&A — Dúvidas Anônimas)
@@ -121,11 +123,13 @@ CREATE TABLE public.votos_duvida (
 
 -- avaliacoes_rapidas (Avaliação Pós-Aula)
 CREATE TABLE public.avaliacoes_rapidas (
-  id         UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  sessao_id  UUID NOT NULL REFERENCES public.sessoes(id) ON DELETE CASCADE,
-  nota       SMALLINT NOT NULL CHECK (nota BETWEEN 1 AND 5),
-  comentario TEXT,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  id           UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  sessao_id    UUID NOT NULL REFERENCES public.sessoes(id) ON DELETE CASCADE,
+  nota         SMALLINT NOT NULL CHECK (nota BETWEEN 1 AND 5),
+  comentario   TEXT,
+  hash_eleitor TEXT NOT NULL DEFAULT 'legacy_vote',
+  created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE(sessao_id, hash_eleitor)
 );
 
 -- >>> FIM DO SNIPPET: 02_Tabelas.sql <<<
