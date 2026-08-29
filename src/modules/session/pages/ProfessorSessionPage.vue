@@ -84,7 +84,6 @@ function handleEnd() {
           >
             {{ sessionStore.currentSession.status.toUpperCase() }}
           </q-badge>
-          <span class="text-hint">ID: {{ sessionId }}</span>
         </div>
       </div>
       <div v-else>

@@ -57,7 +57,9 @@ async function handleSignal(sinal: SinalRitmo) {
       >
         <div class="tw-flex tw-flex-col tw-items-center tw-gap-1">
           <q-icon :name="opt.icon" size="1.4rem" />
-          <span class="tw-font-bold tw-text-[10px] sm:tw-text-xs tw-leading-tight tw-text-center">{{ opt.label }}</span>
+          <span class="tw-font-bold tw-text-[10px] sm:tw-text-xs tw-leading-tight tw-text-center">{{
+            opt.label
+          }}</span>
         </div>
       </q-btn>
     </div>
