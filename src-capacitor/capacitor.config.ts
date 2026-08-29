@@ -5,5 +5,6 @@ export default defineCapacitorConfig({
   appName: 'Ficou Claro',
   server: {
     cleartext: true,
+    androidScheme: 'http',
   },
 });
