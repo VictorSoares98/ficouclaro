@@ -468,6 +468,15 @@ export type Database = {
         Args: never;
         Returns: Database['public']['Enums']['papel_usuario'];
       };
+      get_thermometer_stats: {
+        Args: { p_sessao_id: string };
+        Returns: {
+          muito_rapido: number;
+          boiando: number;
+          tudo_certo: number;
+          muito_devagar: number;
+        }[];
+      };
     };
     Enums: {
       papel_usuario: 'aluno' | 'professor';
