@@ -64,17 +64,17 @@ async function handleSignal(sinal: SinalRitmo) {
 
     <!-- Feedback Visual de Cooldown -->
     <div class="tw-mt-3 tw-text-center tw-min-h-[20px]">
-      <transition name="q-transition--fade">
+      <transition name="q-transition--fade" mode="out-in">
         <span
           v-if="thermometerStore.isCooldown"
-          class="tw-text-xs tw-text-warning tw-flex tw-items-center tw-justify-center tw-gap-1"
+          class="tw-text-[10px] sm:tw-text-xs tw-text-warning tw-flex tw-items-center tw-justify-center tw-gap-1"
         >
           <q-icon name="timer" />
-          Aguarde alguns segundos para enviar outro feedback...
+          Aguarde para votar novamente...
         </span>
         <span
           v-else-if="thermometerStore.lastSignalSent"
-          class="tw-text-xs tw-text-positive tw-flex tw-items-center tw-justify-center tw-gap-1"
+          class="tw-text-[10px] sm:tw-text-xs tw-text-positive tw-flex tw-items-center tw-justify-center tw-gap-1"
         >
           <q-icon name="check_circle" />
           Feedback enviado!

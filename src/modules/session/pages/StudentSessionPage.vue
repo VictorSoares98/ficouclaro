@@ -95,10 +95,10 @@ onUnmounted(() => {
         <!-- Rodapé Adesivo com Termômetro -->
         <q-page-sticky
           position="bottom"
-          :offset="[0, 16]"
+          :offset="[0, 0]"
           class="tw-z-50"
         >
-          <div class="tw-w-[100vw] sm:tw-max-w-xl tw-px-4">
+          <div class="tw-w-[100vw] sm:tw-max-w-xl tw-px-4 tw-pb-8">
             <BaseSurfaceCard
               variant="elevated"
               class="tw-p-4 tw-w-full tw-shadow-[0_-8px_30px_rgba(0,0,0,0.12)] dark:tw-shadow-[0_-8px_30px_rgba(0,0,0,0.5)] tw-border tw-border-black/5 dark:tw-border-white/5"
