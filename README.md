@@ -83,10 +83,12 @@ Lista de comandos disponíveis via `npm run`:
 
 ### 📱 Desenvolvimento Mobile (Capacitor)
 
-O aplicativo foi empacotado para execução nativa via Quasar + Capacitor.
+O aplicativo foi empacotado para execução nativa via Quasar + Capacitor. Possuímos 2 fluxos estritos:
 
-- **Desenvolvimento Local:** `npx quasar dev -m capacitor -T android -- --address 0.0.0.0`
-- **Build para APK (Nuvem):** `npm run build:android` -> Depois, gere o APK no Android Studio (**Build > Build APKs**).
+- **1. Modo Desenvolvimento (Hot Reload):** Lê as chaves do arquivo `.env` (Supabase Local).
+  `npx quasar dev -m capacitor -T android -- --address 0.0.0.0`
+- **2. Modo Produção (Nuvem):** Lê as chaves do arquivo `.env.production` (Supabase Cloud).
+  `npm run build:android` -> Quando o Android Studio abrir, vá em **Build > Build APKs** para gerar o arquivo final.
 
 > ⚠️ **Nota de Segurança:** As políticas de rede para desenvolvimento local (HTTP) estão configuradas em `src-capacitor/android/app/src/main/res/xml/network_security_config.xml`. Consulte o guia de configuração mobile para saber como atualizar o IP permitido.
 

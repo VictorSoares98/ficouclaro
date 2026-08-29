@@ -59,9 +59,9 @@ Criamos uma lista de exceções para permitir HTTP apenas em domínios de confia
 
 ---
 
-## 📱 3. Workflow de Execução
+## 📱 3. Workflow de Execução (Desenvolvimento Local)
 
-Sempre que quiser rodar o app no dispositivo:
+Sempre que quiser rodar o app no dispositivo testando contra o banco local:
 
 1.  **Sincronizar mudanças web com o nativo:**
     ```bash
@@ -73,7 +73,7 @@ Sempre que quiser rodar o app no dispositivo:
     npx quasar dev -m capacitor -T android -- --address 0.0.0.0
     ```
 
-    _O `--address 0.0.0.0` permite que o celular acesse o servidor do PC._
+    _⚠️ **ATENÇÃO:** O comando `quasar dev` puxa estritamente as chaves do seu arquivo `.env` base (Supabase Local). O `--address 0.0.0.0` permite que o celular acesse o servidor do PC._
 
 3.  **Abrir o projeto no Android Studio:**
     ```bash
@@ -82,20 +82,20 @@ Sempre que quiser rodar o app no dispositivo:
 
 ---
 
-## 📦 4. Build de Produção (Gerando o APK)
+## 📦 4. Build de Produção (Gerando o APK para a Nuvem)
 
-Para distribuir o app fora da Google Play ou conectar à nuvem (Supabase Cloud):
+Para gerar o app real que se conectará ao seu banco na web (Supabase Cloud), o fluxo exige a compilação final:
 
-1.  **Configure o `.env.production`:** Crie este arquivo na raiz com as chaves do Supabase Cloud.
-2.  **Gere o Build Web para Android:**
+1.  **Configure o `.env.production`:** Crie ou preencha este arquivo na raiz com as chaves do seu projeto hospedado na nuvem.
+2.  **Gere o Build Web de Produção para Android:**
     ```bash
     npm run build:android
     ```
-    *Este comando usa o `.env.production` e "congela" as chaves da nuvem dentro do código do app.*
+    *Diferente do comando `dev`, esse script aciona o `quasar build`. O Vite entende que é uma build de produção e automaticamente ignora o `.env` base, lendo apenas o `.env.production`. As chaves da nuvem serão congeladas (hardcoded) no binário gerado.*
 
-3.  **Gere o APK no Android Studio:**
-    - Vá em **Build > Build Bundle(s) / APK(s) > Build APK(s)**.
-    - O arquivo final estará em: `src-capacitor/android/app/build/outputs/apk/debug/app-debug.apk`.
+3.  **Gere o APK Físico no Android Studio:**
+    - No Android Studio (que se abrirá após o comando anterior), vá em **Build > Build Bundle(s) / APK(s) > Build APK(s)**.
+    - O arquivo final estará na pasta do seu projeto em: `src-capacitor/android/app/build/outputs/apk/debug/app-debug.apk`. Esse é o seu aplicativo cloud!
 
 ---
 
