@@ -126,18 +126,20 @@ function handleEnd() {
       <q-tabs
         v-model="tab"
         dense
+        mobile-arrows
+        outside-arrows
         class="tw-text-grey tw-shadow-sm"
         active-color="primary"
         indicator-color="primary"
         align="justify"
       >
-        <q-tab name="termometro" icon="thermostat" label="Termômetro" />
-        <q-tab name="qa" icon="question_answer" label="Dúvidas" />
-        <q-tab name="enquetes" icon="poll" label="Enquetes" />
+        <q-tab name="termometro" icon="thermostat" :label="$q.screen.gt.xs ? 'Clima' : undefined" />
+        <q-tab name="qa" icon="question_answer" :label="$q.screen.gt.xs ? 'Dúvidas' : undefined" />
+        <q-tab name="enquetes" icon="poll" :label="$q.screen.gt.xs ? 'Enquetes' : undefined" />
         <q-tab
           name="avaliacoes"
           icon="star"
-          label="Avaliações"
+          :label="$q.screen.gt.xs ? 'Avaliações' : undefined"
           v-if="sessionStore.currentSession.status === 'encerrada'"
         />
       </q-tabs>
