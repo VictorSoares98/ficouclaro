@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { useFlashReviewStore } from '../stores/flashReview.store';
+import { useFlashReviewStore } from '@/modules/flash-review/stores/flashReview.store';
 import { useSessionStore } from '@/modules/session/stores/session.store';
 import { useQuasar } from 'quasar';
 

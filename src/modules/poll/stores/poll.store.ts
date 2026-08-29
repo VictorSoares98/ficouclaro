@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import { pollService } from '../services/poll.service';
+import { pollService } from '@/modules/poll/services/poll.service';
 import type { Database, Json } from '@/core/types/database.types';
 import { useAsyncOperation } from '@/core/composables/useAsyncOperation';
 import { realtimeManager } from '@/core/supabase/realtime.manager';

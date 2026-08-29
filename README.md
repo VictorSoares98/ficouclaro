@@ -45,7 +45,7 @@ Nossa stack foi rigorosamente escolhida para fornecer um MVP Híbrido, altamente
    VITE_SUPABASE_ANON_KEY="<sua-anon-key>"
    ```
 
-   > 💡 **Para testes mobile na rede local:** Utilize o IP interno da sua máquina/roteador no Supabase Local e no `.env` para permitir que emuladores e dispositivos físicos acessem a API e o websocket do Realtime.
+   > 💡 **Importante para Mobile:** Para testes em dispositivos reais ou emuladores com Supabase Local, utilize o IP do seu computador (ex: `http://192.168.x.xxx:54421`) em vez de `localhost`. Consulte o [GUIA_CONFIGURACAO_MOBILE.md](./GUIA_CONFIGURACAO_MOBILE.md) para detalhes técnicos.
 
 3. **Iniciando a aplicação (Modo Dev):**
    ```bash
@@ -56,7 +56,7 @@ Nossa stack foi rigorosamente escolhida para fornecer um MVP Híbrido, altamente
 
 Para mantermos a base de código previsível e escalável, seguimos regras inflexíveis:
 
-1. **Sem `any` (Type-safety Strict):** O uso de `any` é terminantemente proibido. Garantimos tipagem ponta a ponta. Queries do Supabase recebem tipagem via DB Types gerados pelo CLI (`npx supabase gen types typescript --local`).
+1. **Sem `any` (Type-safety Strict):** O uso de `any` é terminantemente proibido. Garantimos tipagem ponta a ponta. Queries do Supabase recebem tipagem via DB Types gerados pelo CLI e são mapeadas para interfaces de domínio em `src/core/types`.
 2. **Separação de Responsabilidades (FSD - Feature Sliced Design):**
    - **Componentes (`pages/`, `components/`):** São puramente visuais ("burros"). Lidam com layouts e dispatch de actions.
    - **Stores (`stores/` - Pinia):** São "inteligentes". Gerenciam o estado global assíncrono, cache, loading e error state.
@@ -67,6 +67,7 @@ Para mantermos a base de código previsível e escalável, seguimos regras infle
 4. **Arquitetura SQL Modular:** Nada de migrations obscuras baseadas em data e hora para o desenvolvimento do MVP. O schema do Postgres é gerenciado semanticamente por snippets (`00_Init.sql`, `01_Enums.sql`, etc), unificados de forma determinística pelo script `db:build`.
 5. **Concorrência e Estado Assíncrono:** Para aniquilar redundâncias, todas as stores e requisições devem consumir o composable universal `useAsyncOperation`, padronizando _Loading States_ elegantes e engolindo exceções sem estourar _Unhandled Promise Rejections_.
 6. **Conexões Realtime (WebSocket):** Inscrições nativas no Supabase estão proibidas nas views. Qualquer escuta em tempo real deve transacionar exclusivamente via Padrão Singleton pelo `RealtimeManager`, prevenindo _Race Conditions_ e conexões fantasmas.
+7. **Clean Code & UX Resiliente:** Caminhos relativos frágeis (`../../`) são proibidos; usamos sempre o alias absoluto `@/`. O tratamento de exceções assíncronas é centralizado no Quasar Notify, garantindo feedback humanizado ao usuário. O aplicativo possui tratamento ativo contra quedas de rede (banner de aviso e cache de estado).
 
 ## 🛠️ 5. Scripts & Workflow
 
@@ -79,6 +80,15 @@ Lista de comandos disponíveis via `npm run`:
 | `lint`     | Roda o ESLint + Prettier para garantir conformidade de tipagem e padronização visual do código em todo o projeto. |
 | `db:build` | Concatena os snippets da pasta `supabase/snippets` gerando o arquivo consolidado `Master Schema.sql`.             |
 
+### 📱 Desenvolvimento Mobile (Capacitor)
+
+O aplicativo foi empacotado para execução nativa via Quasar + Capacitor.
+
+1. **Sincronize o projeto:** `npx cap sync android`
+2. **Abra no Android Studio:** `npx quasar build -m capacitor -T android --ide`
+
+> ⚠️ **Nota de Segurança:** As políticas de rede para desenvolvimento local (HTTP) estão configuradas em `src-capacitor/android/app/src/main/res/xml/network_security_config.xml`. Consulte o guia de configuração mobile para saber como atualizar o IP permitido.
+
 ## 🌟 6. Funcionalidades Principais (Visão do Produto)
 
 Para garantir o engajamento dos alunos e fornecer dados úteis aos professores, o aplicativo conta com funcionalidades centrais inspiradas em plataformas de interação em tempo real:
@@ -87,7 +97,7 @@ Para garantir o engajamento dos alunos e fornecer dados úteis aos professores, 
 2. **Termômetro de Ritmo da Aula:** Feedback contínuo e visual ("Muito rápido", "Boiando", "Tudo certo") operando via _Supabase Realtime_, com proteção anti-spam via throttle de 10s.
 3. **Painel de Dúvidas com Upvote:** Sistema de Q&A textual 100% anônimo para os alunos (LGPD by design) priorizado pela própria turma.
 4. **Avaliação Flash Pós-Aula:** Sistema de avaliação instantânea pós-sessão para criar um histórico de qualidade da disciplina.
-5. **Insights & Heatmap (O Diferencial):** Dashboard avançado cruzando enquetes, termômetro e notas para o professor visualizar o mapa de calor da sua didática e reformular seu plano de ensino cirurgicamente.
+5. **Insights & Heatmap (O Diferencial):** Dashboard avançado (implementado) que cruza enquetes, termômetro e notas para o professor visualizar o mapa de calor da sua didática e reformular seu plano de ensino cirurgicamente.
 
 ---
 

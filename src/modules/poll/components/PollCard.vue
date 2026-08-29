@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { usePollStore } from '../stores/poll.store';
-import type { Enquete } from '../stores/poll.store';
+import { usePollStore } from '@/modules/poll/stores/poll.store';
+import type { Enquete } from '@/modules/poll/stores/poll.store';
 import { useQuasar } from 'quasar';
 
 const props = defineProps<{

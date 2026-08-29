@@ -27,6 +27,9 @@ dev/
 src-capacitor/node_modules/
 src-capacitor/dist/
 src-capacitor/www/
+src-capacitor/android/app/src/main/assets/public/
+src-capacitor/android/app/build/
+src-capacitor/ios/App/App/public/
 
 # IMPORTANTE: Em Capacitor, as pastas nativas (src-capacitor/android e src-capacitor/ios) 
 # DEVEM ser commitadas, pois elas contêm suas configurações nativas. 

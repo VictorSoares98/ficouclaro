@@ -1,0 +1,13 @@
+# Build artifacts
+.quasar/
+dist/
+dev/
+
+# Capacitor native assets (generated)
+src-capacitor/android/app/src/main/assets/public/
+src-capacitor/android/app/build/
+src-capacitor/ios/App/App/public/
+
+# Dependencies
+node_modules/
+src-capacitor/node_modules/

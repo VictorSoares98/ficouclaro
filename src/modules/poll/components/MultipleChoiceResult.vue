@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import type { Enquete, Resposta } from '../stores/poll.store';
+import type { Enquete, Resposta } from '@/modules/poll/stores/poll.store';
 
 const props = defineProps<{
   poll: Enquete;
