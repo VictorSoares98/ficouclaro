@@ -30,6 +30,10 @@ const routes: RouteRecordRaw[] = [
         path: 'session/:id',
         component: () => import('@/modules/session/pages/ProfessorSessionPage.vue'),
       },
+      {
+        path: 'curso/:cursoId/dashboard',
+        component: () => import('@/modules/dashboard/pages/DashboardPage.vue'),
+      },
     ],
   },
   {

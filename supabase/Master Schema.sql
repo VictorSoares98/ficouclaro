@@ -1,7 +1,7 @@
 -- ====================================================================
 -- ⚠️ AVISO: ARQUIVO AUTO-GERADO!
 -- NÃO EDITE ESTE ARQUIVO DIRETAMENTE. ALTERE OS SNIPPETS E RODE db:build
--- Gerado em: 2026-08-28T05:11:14.686Z
+-- Gerado em: 2026-08-28T23:07:14.112Z
 -- ====================================================================
 
 -- >>> INÍCIO DO SNIPPET: 00_Init_Extensions.sql <<<
@@ -158,6 +158,36 @@ BEGIN
   DELETE FROM auth.users WHERE id = auth.uid();
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+
+-- Fun��o para agregar m�tricas de sess�es (Dashboard)
+-- Substitui a necessidade de uma VIEW, mantendo os snippets organizados.
+CREATE OR REPLACE FUNCTION public.get_course_insights(p_disciplina_id UUID)
+RETURNS TABLE (
+  sessao_id UUID,
+  disciplina_id UUID,
+  topico TEXT,
+  iniciada_em TIMESTAMPTZ,
+  status status_sessao,
+  media_estrelas NUMERIC,
+  total_avaliacoes BIGINT,
+  total_duvidas BIGINT,
+  total_sinais BIGINT,
+  total_enquetes BIGINT
+) AS $ $
+  SELECT
+    s.id AS sessao_id,
+    s.disciplina_id,
+    s.topico,
+    s.iniciada_em,
+    s.status,
+    COALESCE((SELECT AVG(nota) FROM public.avaliacoes_rapidas WHERE sessao_id = s.id), 0) AS media_estrelas,
+    (SELECT COUNT(*) FROM public.avaliacoes_rapidas WHERE sessao_id = s.id) AS total_avaliacoes,
+    (SELECT COUNT(*) FROM public.duvidas WHERE sessao_id = s.id) AS total_duvidas,
+    (SELECT COUNT(*) FROM public.sinais_ritmo WHERE sessao_id = s.id) AS total_sinais,
+    (SELECT COUNT(*) FROM public.enquetes WHERE sessao_id = s.id) AS total_enquetes
+  FROM public.sessoes s
+  WHERE s.disciplina_id = p_disciplina_id;
+$ $ LANGUAGE sql STABLE SECURITY DEFINER;
 
 -- >>> FIM DO SNIPPET: 03_Funcoes.sql <<<
 
@@ -317,6 +347,9 @@ CREATE POLICY "Aluno avalia aula" ON public.avaliacoes_rapidas FOR INSERT WITH C
 CREATE POLICY "Professor lê avaliações" ON public.avaliacoes_rapidas FOR SELECT USING (
   EXISTS (SELECT 1 FROM public.sessoes s WHERE s.id = avaliacoes_rapidas.sessao_id AND s.professor_id = auth.uid())
 );
+
+-- GRANT da fun��o anal�tica (Dashboard)
+GRANT EXECUTE ON FUNCTION public.get_course_insights(UUID) TO authenticated;
 
 -- >>> FIM DO SNIPPET: 05_RLS_e_Grants.sql <<<
 

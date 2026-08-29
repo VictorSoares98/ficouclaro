@@ -56,9 +56,13 @@ async function handleStartSession(courseId: string) {
     $q.loading.hide();
     $q.notify({
       color: 'negative',
-      message: err instanceof Error ? err.message : 'Erro ao criar sala',
+      message: err instanceof Error ? err.message : 'Erro ao iniciar aula',
     });
   }
+}
+
+function handleOpenInsights(courseId: string) {
+  void router.push(`/professor/curso/${courseId}/dashboard`);
 }
 </script>
 
@@ -97,7 +101,9 @@ async function handleStartSession(courseId: string) {
         actionIcon="play_arrow"
         actionColor="primary"
         :showInviteCode="true"
+        :showInsightsBtn="authStore.user?.perfil.papel === 'professor'"
         @action="handleStartSession"
+        @insights="handleOpenInsights"
       />
     </div>
 
