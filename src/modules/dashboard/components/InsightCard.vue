@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import BaseSurfaceCard from '@/core/components/BaseSurfaceCard.vue';
+
 defineProps<{
   title: string;
   value: string | number;
@@ -9,9 +11,7 @@ defineProps<{
 </script>
 
 <template>
-  <q-card
-    class="tw-bg-white/10 tw-backdrop-blur-md tw-border tw-border-white/20 tw-shadow-sm tw-rounded-xl"
-  >
+  <BaseSurfaceCard variant="glass">
     <q-card-section class="tw-flex tw-items-center tw-justify-between">
       <div>
         <div class="tw-text-sm tw-opacity-70 tw-font-medium">{{ title }}</div>
@@ -20,5 +20,5 @@ defineProps<{
       </div>
       <q-avatar :color="color || 'primary'" text-color="white" :icon="icon" rounded size="md" />
     </q-card-section>
-  </q-card>
+  </BaseSurfaceCard>
 </template>

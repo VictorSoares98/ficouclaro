@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Disciplina } from '@/modules/courses/services/course.service';
+import BaseSurfaceCard from '@/core/components/BaseSurfaceCard.vue';
 
 defineProps<{
   course: Disciplina;
@@ -17,7 +18,7 @@ defineEmits<{
 </script>
 
 <template>
-  <q-card class="tw-shadow-sm hover:tw-shadow-md tw-transition-shadow">
+  <BaseSurfaceCard class="tw-h-full">
     <q-card-section>
       <div class="tw-flex tw-justify-between tw-items-start">
         <h2 class="tw-text-xl tw-font-bold">{{ course.nome }}</h2>
@@ -49,5 +50,5 @@ defineEmits<{
         @click="$emit('action', course.id)"
       />
     </q-card-actions>
-  </q-card>
+  </BaseSurfaceCard>
 </template>

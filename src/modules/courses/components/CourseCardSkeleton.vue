@@ -1,12 +1,12 @@
 <script setup lang="ts">
-// Skeleton de loading para o CourseCard
+import BaseSurfaceCard from '@/core/components/BaseSurfaceCard.vue';
 </script>
 
 <template>
-  <q-card class="tw-shadow-sm">
+  <BaseSurfaceCard class="tw-h-full">
     <q-card-section>
       <q-skeleton type="text" class="tw-text-xl tw-mb-2" />
       <q-skeleton type="text" width="60%" />
     </q-card-section>
-  </q-card>
+  </BaseSurfaceCard>
 </template>

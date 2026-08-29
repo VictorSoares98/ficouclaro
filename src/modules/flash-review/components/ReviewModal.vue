@@ -3,6 +3,7 @@ import { ref, watch } from 'vue';
 import { useFlashReviewStore } from '@/modules/flash-review/stores/flashReview.store';
 import { useSessionStore } from '@/modules/session/stores/session.store';
 import { useQuasar } from 'quasar';
+import BaseSurfaceCard from '@/core/components/BaseSurfaceCard.vue';
 
 const flashReviewStore = useFlashReviewStore();
 const sessionStore = useSessionStore();
@@ -74,7 +75,7 @@ function skip() {
     transition-show="slide-up"
     transition-hide="slide-down"
   >
-    <q-card class="tw-w-full tw-max-w-md tw-rounded-2xl q-pa-md">
+    <BaseSurfaceCard class="tw-w-full tw-max-w-md q-pa-md">
       <q-card-section class="tw-text-center">
         <div class="tw-text-2xl tw-font-bold tw-mb-2">A aula foi encerrada!</div>
         <div class="tw-text-sm tw-opacity-70 tw-mb-6">
@@ -112,6 +113,6 @@ function skip() {
           class="tw-rounded-xl tw-px-6"
         />
       </q-card-actions>
-    </q-card>
+    </BaseSurfaceCard>
   </q-dialog>
 </template>

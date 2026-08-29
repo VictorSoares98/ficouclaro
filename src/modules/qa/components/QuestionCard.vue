@@ -3,6 +3,7 @@ import type { Duvida } from '@/modules/qa/services/qa.service';
 import { useAuthStore } from '@/stores/auth.store';
 import { computed } from 'vue';
 import BaseIconButton from '@/core/components/BaseIconButton.vue';
+import BaseSurfaceCard from '@/core/components/BaseSurfaceCard.vue';
 
 const props = defineProps<{
   question: Duvida;
@@ -31,10 +32,9 @@ function handleAnswered() {
 </script>
 
 <template>
-  <q-card
-    flat
-    bordered
-    class="tw-rounded-xl tw-p-4 tw-w-full"
+  <BaseSurfaceCard
+    variant="flat"
+    class="tw-p-4 tw-w-full"
     :class="{ 'tw-opacity-60': question.foi_respondida }"
   >
     <div class="tw-flex tw-gap-3">
@@ -75,5 +75,5 @@ function handleAnswered() {
         />
       </div>
     </div>
-  </q-card>
+  </BaseSurfaceCard>
 </template>
