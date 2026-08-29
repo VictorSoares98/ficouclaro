@@ -1,5 +1,6 @@
 import { supabaseClient } from '@/core/supabase/client';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import type { Database } from '@/core/types/database.types';
 
 export interface SessionInsights {
   sessao_id: string;
@@ -20,8 +21,20 @@ export class DashboardService {
    * utilizando a view vw_course_insights.
    */
   async getCourseInsights(cursoId: string): Promise<SessionInsights[]> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const client = supabaseClient as SupabaseClient<any, 'public', any>;
+    const client = supabaseClient as unknown as SupabaseClient<
+      Database & {
+        public: {
+          Views: {
+            vw_course_insights: {
+              Row: SessionInsights;
+              Insert: Record<string, never>;
+              Update: Record<string, never>;
+              Relationships: [];
+            };
+          };
+        };
+      }
+    >;
     const { data, error } = await client
       .from('vw_course_insights')
       .select('*')

@@ -11,6 +11,7 @@ import {
   type VisualMapComponentOption,
   type CalendarComponentOption,
 } from 'echarts/components';
+import type { CallbackDataParams } from 'echarts/types/dist/shared';
 import { CanvasRenderer } from 'echarts/renderers';
 import VChart from 'vue-echarts';
 import { computed } from 'vue';
@@ -63,9 +64,11 @@ const chartOptions = computed<EChartsOption>(() => {
   return {
     tooltip: {
       position: 'top',
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      formatter: function (params: any) {
-        const val = params.value;
+      formatter: function (params: CallbackDataParams | CallbackDataParams[]) {
+        const p = Array.isArray(params) ? params[0] : params;
+        if (!p) return '';
+        const val = p.value as [string, number, string, string];
+        if (!val) return '';
         return `<b>${val[0]}</b><br/>${val[3]}<br/>Agitação (sinais): ${val[1]}`;
       },
     },
