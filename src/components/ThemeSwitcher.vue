@@ -12,6 +12,15 @@ function toggleMode() {
 function selectTheme(theme: AppTheme) {
   themeStore.setTheme(theme);
 }
+
+const themeOptions: { value: AppTheme; label: string }[] = [
+  { value: 'default', label: 'Default (Azul)' },
+  { value: 'ocean', label: 'Ocean (Ciano)' },
+  { value: 'dracula', label: 'Dracula (Roxo)' },
+  { value: 'summer_berries', label: 'Amoras do Verão' },
+  { value: 'lunar_twilight', label: 'Crepúsculo Lunar' },
+  { value: 'nature_terrain', label: 'Natura e Terreno' },
+];
 </script>
 
 <template>
@@ -27,52 +36,14 @@ function selectTheme(theme: AppTheme) {
     >
       <q-list>
         <q-item
+          v-for="option in themeOptions"
+          :key="option.value"
           clickable
           v-close-popup
-          @click="selectTheme('default')"
-          :active="themeStore.activeTheme === 'default'"
+          @click="selectTheme(option.value)"
+          :active="themeStore.activeTheme === option.value"
         >
-          <q-item-section>Default (Azul)</q-item-section>
-        </q-item>
-        <q-item
-          clickable
-          v-close-popup
-          @click="selectTheme('ocean')"
-          :active="themeStore.activeTheme === 'ocean'"
-        >
-          <q-item-section>Ocean (Ciano)</q-item-section>
-        </q-item>
-        <q-item
-          clickable
-          v-close-popup
-          @click="selectTheme('dracula')"
-          :active="themeStore.activeTheme === 'dracula'"
-        >
-          <q-item-section>Dracula (Roxo)</q-item-section>
-        </q-item>
-        <q-item
-          clickable
-          v-close-popup
-          @click="selectTheme('summer_berries')"
-          :active="themeStore.activeTheme === 'summer_berries'"
-        >
-          <q-item-section>Amoras do Verão</q-item-section>
-        </q-item>
-        <q-item
-          clickable
-          v-close-popup
-          @click="selectTheme('lunar_twilight')"
-          :active="themeStore.activeTheme === 'lunar_twilight'"
-        >
-          <q-item-section>Crepúsculo Lunar</q-item-section>
-        </q-item>
-        <q-item
-          clickable
-          v-close-popup
-          @click="selectTheme('nature_terrain')"
-          :active="themeStore.activeTheme === 'nature_terrain'"
-        >
-          <q-item-section>Natura e Terreno</q-item-section>
+          <q-item-section>{{ option.label }}</q-item-section>
         </q-item>
       </q-list>
     </q-btn-dropdown>
