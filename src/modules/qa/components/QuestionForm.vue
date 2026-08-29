@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
+defineProps<{
+  loading?: boolean;
+}>();
+
 const emit = defineEmits<{
   (e: 'submit', text: string): void;
 }>();
@@ -26,9 +30,13 @@ function handleSubmit() {
       type="textarea"
       autogrow
       outlined
-      dense
-      placeholder="Digite sua dúvida aqui (mínimo 10 caracteres)..."
-      :rules="[(val) => val.trim().length >= 10 || 'A dúvida deve ter pelo menos 10 caracteres']"
+      counter
+      maxlength="500"
+      placeholder="Ex: Professor, não entendi a diferença entre mitose e meiose na fase final..."
+      :rules="[
+        (val) => val.trim().length >= 10 || 'A dúvida deve ter pelo menos 10 caracteres',
+        (val) => val.trim().length <= 500 || 'Limite máximo de 500 caracteres excedido',
+      ]"
       lazy-rules
     />
     <div class="tw-flex tw-justify-end tw-mt-2">
@@ -38,6 +46,7 @@ function handleSubmit() {
         unelevated
         no-caps
         :disable="text.trim().length < 10"
+        :loading="loading"
         @click="handleSubmit"
       />
     </div>
