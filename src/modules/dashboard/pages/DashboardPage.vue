@@ -5,6 +5,7 @@ import { useDashboardStore } from '@/modules/dashboard/stores/dashboard.store';
 import InsightCard from '@/modules/dashboard/components/InsightCard.vue';
 import HeatmapChart from '@/modules/dashboard/components/HeatmapChart.vue';
 import CourseEvolutionChart from '@/modules/dashboard/components/CourseEvolutionChart.vue';
+import BaseSkeletonList from '@/core/components/BaseSkeletonList.vue';
 import { useCourseStore } from '@/modules/courses/stores/course.store';
 
 const route = useRoute();
@@ -46,8 +47,8 @@ onUnmounted(() => {
     </div>
 
     <!-- Loading State -->
-    <div v-if="dashboardStore.isLoading" class="tw-flex tw-justify-center tw-py-20">
-      <q-spinner-dots size="3rem" color="primary" />
+    <div v-if="dashboardStore.isLoading" class="tw-mt-8">
+      <BaseSkeletonList :count="3" type="card" />
     </div>
 
     <!-- Error State -->
@@ -71,7 +72,7 @@ onUnmounted(() => {
     <!-- Dashboard Content -->
     <div v-else class="tw-space-y-8">
       <!-- Cards de Métricas Rápidas -->
-      <div class="tw-grid tw-grid-cols-1 sm:tw-grid-cols-2 lg:tw-grid-cols-4 tw-gap-4">
+      <div class="tw-grid tw-grid-cols-2 lg:tw-grid-cols-4 tw-gap-3 sm:tw-gap-4">
         <InsightCard
           title="Média Global"
           :value="dashboardStore.globalAverageRating + ' ★'"

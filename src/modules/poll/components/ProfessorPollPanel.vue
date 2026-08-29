@@ -4,6 +4,7 @@ import { usePollStore } from '@/modules/poll/stores/poll.store';
 import { useSessionStore } from '@/modules/session/stores/session.store';
 import PollCreatorForm from './PollCreatorForm.vue';
 import MultipleChoiceResult from './MultipleChoiceResult.vue';
+import BaseSkeletonList from '@/core/components/BaseSkeletonList.vue';
 import { useQuasar } from 'quasar';
 
 const pollStore = usePollStore();
@@ -57,8 +58,12 @@ async function activatePoll(pollId: string) {
     <!-- Criar Nova -->
     <PollCreatorForm />
 
+    <div v-if="pollStore.isLoading" class="tw-mt-4">
+      <BaseSkeletonList :count="2" type="card" />
+    </div>
+
     <!-- Ativas -->
-    <div v-if="pollStore.activePolls.length > 0">
+    <div v-else-if="pollStore.activePolls.length > 0">
       <h2 class="tw-text-xl tw-font-bold tw-text-positive tw-mb-4">Em Andamento</h2>
       <div class="tw-space-y-4">
         <q-card

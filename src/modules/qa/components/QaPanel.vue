@@ -5,6 +5,7 @@ import { useSessionStore } from '@/modules/session/stores/session.store';
 import { useAuthStore } from '@/stores/auth.store';
 import QuestionForm from '@/modules/qa/components/QuestionForm.vue';
 import QuestionCard from '@/modules/qa/components/QuestionCard.vue';
+import BaseSkeletonList from '@/core/components/BaseSkeletonList.vue';
 
 const qaStore = useQaStore();
 const sessionStore = useSessionStore();
@@ -36,8 +37,8 @@ function handleSubmit(texto: string) {
     <!-- Form Aluno -->
     <QuestionForm v-if="!isProfessor" @submit="handleSubmit" />
 
-    <div v-if="qaStore.isLoading" class="tw-flex tw-justify-center tw-p-8">
-      <q-spinner color="primary" size="2em" />
+    <div v-if="qaStore.isLoading" class="tw-flex tw-justify-center tw-p-4">
+      <BaseSkeletonList :count="3" type="card" />
     </div>
 
     <!-- Lista de Dúvidas -->
