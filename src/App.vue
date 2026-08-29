@@ -54,5 +54,9 @@ onUnmounted(() => {
   >
     <strong>Sem conexão com a internet</strong>. O aplicativo pode não funcionar corretamente.
   </q-banner>
-  <router-view />
+  <router-view v-slot="{ Component }">
+    <transition name="q-transition--fade" mode="out-in">
+      <component :is="Component" />
+    </transition>
+  </router-view>
 </template>

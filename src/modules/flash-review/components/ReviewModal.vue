@@ -67,7 +67,13 @@ function skip() {
 
 <template>
   <!-- persistent impede fechamento acidental clicando fora, mas o botão Pular permite saída intencional -->
-  <q-dialog v-model="isOpen" persistent backdrop-filter="blur(4px)">
+  <q-dialog
+    v-model="isOpen"
+    persistent
+    backdrop-filter="blur(4px)"
+    transition-show="slide-up"
+    transition-hide="slide-down"
+  >
     <q-card class="tw-w-full tw-max-w-md tw-rounded-2xl q-pa-md">
       <q-card-section class="tw-text-center">
         <div class="tw-text-2xl tw-font-bold tw-mb-2">A aula foi encerrada!</div>
