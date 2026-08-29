@@ -2,6 +2,7 @@
 import type { Duvida } from '@/modules/qa/services/qa.service';
 import { useAuthStore } from '@/stores/auth.store';
 import { computed } from 'vue';
+import BaseIconButton from '@/core/components/BaseIconButton.vue';
 
 const props = defineProps<{
   question: Duvida;
@@ -39,13 +40,11 @@ function handleAnswered() {
     <div class="tw-flex tw-gap-3">
       <!-- Votos -->
       <div class="tw-flex tw-flex-col tw-items-center tw-justify-start tw-w-12">
-        <q-btn
-          flat
-          round
-          dense
+        <BaseIconButton
           :icon="hasUpvoted ? 'thumb_up' : 'thumb_up_off_alt'"
           :color="hasUpvoted ? 'primary' : 'grey'"
           :disable="isProfessor || question.foi_respondida || hasUpvoted"
+          ariaLabel="Votar nesta dúvida"
           @click="handleUpvote"
         />
         <span class="tw-font-bold tw-text-lg" :class="{ 'tw-text-primary': hasUpvoted }">
@@ -66,14 +65,12 @@ function handleAnswered() {
           Respondida
         </q-badge>
 
-        <q-btn
+        <BaseIconButton
           v-if="isProfessor && !question.foi_respondida"
-          flat
-          round
-          dense
           icon="check_circle"
           color="positive"
           title="Marcar como respondida"
+          ariaLabel="Marcar dúvida como respondida"
           @click="handleAnswered"
         />
       </div>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useThemeStore } from '@/stores/theme.store';
 import type { AppTheme } from '@/core/types/theme.types';
+import BaseIconButton from '@/core/components/BaseIconButton.vue';
 
 const themeStore = useThemeStore();
 
@@ -77,10 +78,7 @@ function selectTheme(theme: AppTheme) {
     </q-btn-dropdown>
 
     <!-- Toggle de Iluminação (Mode) -->
-    <q-btn
-      flat
-      round
-      dense
+    <BaseIconButton
       :icon="
         themeStore.activeMode === 'dark'
           ? 'dark_mode'
@@ -90,9 +88,9 @@ function selectTheme(theme: AppTheme) {
       "
       @click="toggleMode"
       color="white"
-      aria-label="Alternar Iluminação"
+      ariaLabel="Alternar Iluminação"
     >
       <q-tooltip>Iluminação: {{ themeStore.activeMode }}</q-tooltip>
-    </q-btn>
+    </BaseIconButton>
   </div>
 </template>

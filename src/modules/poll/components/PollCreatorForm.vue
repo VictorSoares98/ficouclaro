@@ -3,6 +3,7 @@ import { ref, computed } from 'vue';
 import { usePollStore } from '@/modules/poll/stores/poll.store';
 import { useSessionStore } from '@/modules/session/stores/session.store';
 import type { Database } from '@/core/types/database.types';
+import BaseIconButton from '@/core/components/BaseIconButton.vue';
 
 const pollStore = usePollStore();
 const sessionStore = useSessionStore();
@@ -104,12 +105,10 @@ async function handleCreate() {
             :rules="[(val) => index >= 2 || !!val || 'Obrigatório']"
             hide-bottom-space
           />
-          <q-btn
+          <BaseIconButton
             icon="delete"
             color="negative"
-            flat
-            dense
-            round
+            ariaLabel="Remover Opção"
             @click="removeOption(index)"
             :disable="opcoes.length <= 2"
           />
