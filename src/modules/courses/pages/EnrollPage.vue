@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router';
 import { useCourseStore } from '@/modules/courses/stores/course.store';
 import { useSessionStore } from '@/modules/session/stores/session.store';
 import { useQuasar } from 'quasar';
+import { sessionService, type StatusSessao } from '@/modules/session/services/session.service';
 import CourseCard from '@/modules/courses/components/CourseCard.vue';
 import CourseCardSkeleton from '@/modules/courses/components/CourseCardSkeleton.vue';
 
@@ -14,9 +15,29 @@ const $q = useQuasar();
 
 const isEnrolling = ref(false);
 const inviteCode = ref('');
+const isRefreshing = ref(false);
+const activeSessions = ref<Record<string, StatusSessao | 'nenhuma'>>({});
+
+async function loadSessionStatuses() {
+  if (courseStore.courses.length === 0) return;
+  const courseIds = courseStore.courses.map((c) => c.id);
+  const statuses = await sessionService.getActiveSessionsForCourses(courseIds);
+
+  // Mapeia garantindo que mesmo sem aula tenha a marcação 'nenhuma'
+  courseIds.forEach((id) => {
+    activeSessions.value[id] = statuses[id] || 'nenhuma';
+  });
+}
+
+async function handleRefresh() {
+  isRefreshing.value = true;
+  await courseStore.fetchMyCourses();
+  await loadSessionStatuses();
+  isRefreshing.value = false;
+}
 
 onMounted(async () => {
-  await courseStore.fetchMyCourses();
+  await handleRefresh();
 });
 
 async function handleEnroll() {
@@ -58,9 +79,21 @@ async function handleJoinActiveSession(courseId: string) {
     <div class="tw-flex tw-justify-between tw-items-center tw-mb-8">
       <div>
         <h1 class="tw-text-2xl tw-font-bold tw-text-primary">Minhas Disciplinas</h1>
-        <p class="tw-opacity-70">Acesse suas turmas e entre nas aulas ao vivo.</p>
+        <p class="text-muted">Acesse suas turmas e entre nas aulas ao vivo.</p>
       </div>
-      <q-btn color="primary" icon="add" label="Entrar em Turma" @click="isEnrolling = true" />
+      <div class="tw-flex tw-gap-2">
+        <q-btn
+          flat
+          round
+          color="primary"
+          icon="refresh"
+          :loading="isRefreshing"
+          @click="handleRefresh"
+        >
+          <q-tooltip>Atualizar Status das Aulas</q-tooltip>
+        </q-btn>
+        <q-btn color="primary" icon="add" label="Entrar em Turma" @click="isEnrolling = true" />
+      </div>
     </div>
 
     <!-- Loading State -->
@@ -72,7 +105,7 @@ async function handleJoinActiveSession(courseId: string) {
     <div v-else-if="courseStore.courses.length === 0" class="tw-text-center tw-py-12">
       <q-icon name="cast_for_education" size="4rem" class="tw-opacity-20 tw-mb-4" />
       <h2 class="tw-text-xl tw-font-bold">Nenhuma matrícula encontrada</h2>
-      <p class="tw-opacity-70 tw-mb-4">
+      <p class="text-muted tw-mb-4">
         Peça o código de convite ao seu professor para se matricular.
       </p>
       <q-btn color="primary" outline label="Usar Código de Convite" @click="isEnrolling = true" />
@@ -84,6 +117,7 @@ async function handleJoinActiveSession(courseId: string) {
         v-for="course in courseStore.courses"
         :key="course.id"
         :course="course"
+        :sessionStatus="activeSessions[course.id] || 'nenhuma'"
         actionLabel="Entrar na Aula"
         actionIcon="login"
         actionColor="positive"
@@ -95,11 +129,11 @@ async function handleJoinActiveSession(courseId: string) {
     <q-dialog v-model="isEnrolling">
       <q-card style="min-width: 350px">
         <q-card-section>
-          <div class="text-h6 tw-font-bold">Matricular-se</div>
-          <p class="tw-text-sm tw-opacity-70 tw-mt-1">Insira o código fornecido pelo professor.</p>
+          <div class="tw-text-lg tw-font-bold">Matricular-se</div>
+          <p class="tw-text-sm text-muted tw-mt-1">Insira o código fornecido pelo professor.</p>
         </q-card-section>
 
-        <q-card-section class="q-pt-none tw-space-y-4">
+        <q-card-section class="tw-pt-0 tw-space-y-4">
           <q-input
             outlined
             v-model="inviteCode"

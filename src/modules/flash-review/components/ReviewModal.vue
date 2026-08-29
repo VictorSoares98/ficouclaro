@@ -3,6 +3,7 @@ import { ref, watch } from 'vue';
 import { useFlashReviewStore } from '@/modules/flash-review/stores/flashReview.store';
 import { useSessionStore } from '@/modules/session/stores/session.store';
 import { useQuasar } from 'quasar';
+import BaseSurfaceCard from '@/core/components/BaseSurfaceCard.vue';
 
 const flashReviewStore = useFlashReviewStore();
 const sessionStore = useSessionStore();
@@ -67,11 +68,17 @@ function skip() {
 
 <template>
   <!-- persistent impede fechamento acidental clicando fora, mas o botão Pular permite saída intencional -->
-  <q-dialog v-model="isOpen" persistent backdrop-filter="blur(4px)">
-    <q-card class="tw-w-full tw-max-w-md tw-rounded-2xl q-pa-md">
+  <q-dialog
+    v-model="isOpen"
+    persistent
+    backdrop-filter="blur(4px)"
+    transition-show="slide-up"
+    transition-hide="slide-down"
+  >
+    <BaseSurfaceCard class="tw-w-full tw-max-w-md tw-p-4">
       <q-card-section class="tw-text-center">
         <div class="tw-text-2xl tw-font-bold tw-mb-2">A aula foi encerrada!</div>
-        <div class="tw-text-sm tw-opacity-70 tw-mb-6">
+        <div class="tw-text-sm text-muted tw-mb-6">
           O que você achou da sessão de hoje? Seu feedback é anônimo e ajuda o professor a melhorar.
         </div>
 
@@ -106,6 +113,6 @@ function skip() {
           class="tw-rounded-xl tw-px-6"
         />
       </q-card-actions>
-    </q-card>
+    </BaseSurfaceCard>
   </q-dialog>
 </template>

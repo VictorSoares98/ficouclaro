@@ -19,7 +19,7 @@ onMounted(() => {
     <div
       class="tw-bg-white dark:tw-bg-dark tw-rounded-2xl tw-p-6 tw-shadow-sm tw-mb-4 tw-text-center"
     >
-      <div class="tw-text-lg tw-font-medium tw-opacity-80">Média da Aula</div>
+      <div class="tw-text-lg tw-font-medium text-muted">Média da Aula</div>
       <div class="tw-text-5xl tw-font-bold tw-text-primary tw-my-2">
         {{ flashReviewStore.averageRating.toFixed(1) }}
       </div>
@@ -32,7 +32,7 @@ onMounted(() => {
         icon-selected="star"
         icon-half="star_half"
       />
-      <div class="tw-text-sm tw-opacity-60 tw-mt-2">
+      <div class="tw-text-sm text-hint tw-mt-2">
         baseado em {{ flashReviewStore.sessionReviews.length }} avaliações
       </div>
     </div>
@@ -45,7 +45,7 @@ onMounted(() => {
 
       <div
         v-else-if="flashReviewStore.sessionReviews.length === 0"
-        class="tw-text-center tw-opacity-50 tw-p-8"
+        class="tw-text-center text-hint tw-p-8"
       >
         Nenhuma avaliação recebida ainda.
       </div>
@@ -61,7 +61,7 @@ onMounted(() => {
           <q-card-section>
             <div class="tw-flex tw-justify-between tw-items-start tw-mb-2">
               <q-rating :model-value="review.nota" size="1.2em" color="warning" readonly />
-              <span class="tw-text-xs tw-opacity-50">
+              <span class="tw-text-xs text-hint">
                 {{ new Date(review.created_at).toLocaleTimeString() }}
               </span>
             </div>

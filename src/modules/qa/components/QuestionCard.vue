@@ -2,6 +2,8 @@
 import type { Duvida } from '@/modules/qa/services/qa.service';
 import { useAuthStore } from '@/stores/auth.store';
 import { computed } from 'vue';
+import BaseIconButton from '@/core/components/BaseIconButton.vue';
+import BaseSurfaceCard from '@/core/components/BaseSurfaceCard.vue';
 
 const props = defineProps<{
   question: Duvida;
@@ -30,22 +32,19 @@ function handleAnswered() {
 </script>
 
 <template>
-  <q-card
-    flat
-    bordered
-    class="tw-rounded-xl tw-p-4 tw-w-full"
-    :class="{ 'tw-opacity-60': question.foi_respondida }"
+  <BaseSurfaceCard
+    variant="flat"
+    class="tw-p-4 tw-w-full"
+    :class="{ 'text-hint': question.foi_respondida }"
   >
     <div class="tw-flex tw-gap-3">
       <!-- Votos -->
       <div class="tw-flex tw-flex-col tw-items-center tw-justify-start tw-w-12">
-        <q-btn
-          flat
-          round
-          dense
+        <BaseIconButton
           :icon="hasUpvoted ? 'thumb_up' : 'thumb_up_off_alt'"
           :color="hasUpvoted ? 'primary' : 'grey'"
           :disable="isProfessor || question.foi_respondida || hasUpvoted"
+          ariaLabel="Votar nesta dúvida"
           @click="handleUpvote"
         />
         <span class="tw-font-bold tw-text-lg" :class="{ 'tw-text-primary': hasUpvoted }">
@@ -66,17 +65,15 @@ function handleAnswered() {
           Respondida
         </q-badge>
 
-        <q-btn
+        <BaseIconButton
           v-if="isProfessor && !question.foi_respondida"
-          flat
-          round
-          dense
           icon="check_circle"
           color="positive"
           title="Marcar como respondida"
+          ariaLabel="Marcar dúvida como respondida"
           @click="handleAnswered"
         />
       </div>
     </div>
-  </q-card>
+  </BaseSurfaceCard>
 </template>

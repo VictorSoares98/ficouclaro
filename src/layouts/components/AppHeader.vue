@@ -4,6 +4,7 @@ import { useThemeStore } from '@/stores/theme.store';
 import { useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
 import ThemeSwitcher from '@/components/ThemeSwitcher.vue';
+import BaseIconButton from '@/core/components/BaseIconButton.vue';
 
 defineProps<{
   subtitle?: string;
@@ -57,9 +58,7 @@ function confirmDeleteAccount() {
     <q-toolbar class="tw-h-16">
       <q-toolbar-title class="tw-font-bold tw-tracking-tight tw-text-white tw-text-2xl">
         Ficou Claro?
-        <span v-if="subtitle" class="tw-text-sm tw-font-normal tw-opacity-80"
-          >| {{ subtitle }}</span
-        >
+        <span v-if="subtitle" class="tw-text-sm tw-font-normal text-muted">| {{ subtitle }}</span>
       </q-toolbar-title>
 
       <!-- Dropdown de Temas (Branding) -->
@@ -128,11 +127,8 @@ function confirmDeleteAccount() {
       <ThemeSwitcher v-if="!showBrandingMenu" />
 
       <!-- Toggle Simples de Iluminação (Usado na Área Pública) -->
-      <q-btn
+      <BaseIconButton
         v-if="showBrandingMenu"
-        flat
-        round
-        dense
         :icon="
           themeStore.activeMode === 'dark'
             ? 'dark_mode'
@@ -142,10 +138,10 @@ function confirmDeleteAccount() {
         "
         @click="themeStore.toggleMode()"
         color="white"
-        aria-label="Alternar Iluminação"
+        ariaLabel="Alternar Iluminação"
       >
         <q-tooltip>Iluminação: {{ themeStore.activeMode }}</q-tooltip>
-      </q-btn>
+      </BaseIconButton>
 
       <!-- Menu de Perfil (Áreas Restritas) -->
       <q-btn-dropdown

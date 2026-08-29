@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import { usePollStore } from '@/modules/poll/stores/poll.store';
 import type { Enquete } from '@/modules/poll/stores/poll.store';
 import { useQuasar } from 'quasar';
+import BaseSurfaceCard from '@/core/components/BaseSurfaceCard.vue';
 
 const props = defineProps<{
   poll: Enquete;
@@ -48,7 +49,7 @@ async function submit() {
 </script>
 
 <template>
-  <q-card class="tw-w-full tw-max-w-md tw-rounded-2xl tw-shadow-xl">
+  <BaseSurfaceCard class="tw-w-full tw-max-w-md">
     <q-card-section class="tw-bg-primary tw-text-white tw-flex tw-items-center tw-gap-3">
       <q-icon name="poll" size="2rem" />
       <div class="tw-text-xl tw-font-bold">Nova Enquete</div>
@@ -86,7 +87,7 @@ async function submit() {
               :max="5"
             />
           </div>
-          <div class="tw-flex tw-justify-between tw-text-xs tw-opacity-60 tw-mt-2">
+          <div class="tw-flex tw-justify-between tw-text-xs text-hint tw-mt-2">
             <span>Nada Claro</span>
             <span>Muito Claro</span>
           </div>
@@ -126,5 +127,5 @@ async function submit() {
         :loading="pollStore.isLoading"
       />
     </q-card-actions>
-  </q-card>
+  </BaseSurfaceCard>
 </template>
