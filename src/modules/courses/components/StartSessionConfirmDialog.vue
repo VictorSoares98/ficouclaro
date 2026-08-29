@@ -52,7 +52,7 @@ function handleCancel() {
         </div>
       </q-card-section>
 
-      <q-card-section class="q-pt-none tw-mt-2">
+      <q-card-section class="tw-pt-0 tw-mt-2">
         <p class="tw-text-sm tw-mb-4">
           Qual será o tópico principal desta aula? Isso organizará o histórico e os insights gerados
           no Dashboard.

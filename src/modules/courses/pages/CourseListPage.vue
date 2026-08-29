@@ -129,10 +129,10 @@ function handleOpenInsights(courseId: string) {
     <q-dialog v-model="isCreating">
       <q-card style="min-width: 350px">
         <q-card-section>
-          <div class="text-h6 tw-font-bold">Nova Disciplina</div>
+          <div class="tw-text-lg tw-font-bold">Nova Disciplina</div>
         </q-card-section>
 
-        <q-card-section class="q-pt-none tw-space-y-4">
+        <q-card-section class="tw-pt-0 tw-space-y-4">
           <q-input
             outlined
             v-model="newCourseName"

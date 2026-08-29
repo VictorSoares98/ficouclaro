@@ -129,11 +129,11 @@ async function handleJoinActiveSession(courseId: string) {
     <q-dialog v-model="isEnrolling">
       <q-card style="min-width: 350px">
         <q-card-section>
-          <div class="text-h6 tw-font-bold">Matricular-se</div>
+          <div class="tw-text-lg tw-font-bold">Matricular-se</div>
           <p class="tw-text-sm text-muted tw-mt-1">Insira o código fornecido pelo professor.</p>
         </q-card-section>
 
-        <q-card-section class="q-pt-none tw-space-y-4">
+        <q-card-section class="tw-pt-0 tw-space-y-4">
           <q-input
             outlined
             v-model="inviteCode"

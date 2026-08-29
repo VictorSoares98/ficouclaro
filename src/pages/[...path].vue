@@ -1,19 +1,13 @@
 <template>
-  <div class="fullscreen bg-blue text-white text-center q-pa-md flex flex-center">
+  <div
+    class="tw-min-h-screen tw-bg-white dark:tw-bg-dark tw-text-dark dark:tw-text-white tw-flex tw-flex-col tw-items-center tw-justify-center tw-p-4 tw-text-center"
+  >
     <div>
-      <div style="font-size: 30vh">404</div>
+      <div class="tw-text-[30vh] tw-font-bold tw-text-primary tw-leading-none">404</div>
 
-      <div class="text-h2" style="opacity: 0.4">Oops. Nothing here...</div>
+      <div class="tw-text-4xl tw-font-bold tw-opacity-40 tw-mt-4">Oops. Nada por aqui...</div>
 
-      <q-btn
-        class="q-mt-xl"
-        color="white"
-        text-color="blue"
-        unelevated
-        to="/"
-        label="Go Home"
-        no-caps
-      />
+      <q-btn class="tw-mt-8" color="primary" unelevated to="/" label="Voltar ao Início" no-caps />
     </div>
   </div>
 </template>

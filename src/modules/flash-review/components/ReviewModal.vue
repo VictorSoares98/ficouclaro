@@ -75,7 +75,7 @@ function skip() {
     transition-show="slide-up"
     transition-hide="slide-down"
   >
-    <BaseSurfaceCard class="tw-w-full tw-max-w-md q-pa-md">
+    <BaseSurfaceCard class="tw-w-full tw-max-w-md tw-p-4">
       <q-card-section class="tw-text-center">
         <div class="tw-text-2xl tw-font-bold tw-mb-2">A aula foi encerrada!</div>
         <div class="tw-text-sm text-muted tw-mb-6">
