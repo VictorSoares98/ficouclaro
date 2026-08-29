@@ -119,7 +119,9 @@ async function onSubmit() {
           lazy-rules
           :rules="[
             (val) => !!val || 'A senha é obrigatória',
-            (val) => val.length >= 6 || 'A senha deve ter no mínimo 6 caracteres',
+            (val) =>
+              /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{12,}$/.test(val) ||
+              'A senha deve ter 12+ caracteres, incluir maiúsculas, minúsculas, números e símbolos',
           ]"
           autocomplete="new-password"
           color="primary"
