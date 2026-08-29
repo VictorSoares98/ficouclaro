@@ -19,7 +19,6 @@ export class DashboardService {
    * utilizando a view vw_course_insights.
    */
   async getCourseInsights(cursoId: string): Promise<SessionInsights[]> {
-    // @ts-expect-error - RPC 'get_course_insights' pendente de regen no database.types.ts (Task HIGH-04)
     const { data, error } = await supabaseClient.rpc('get_course_insights', {
       p_disciplina_id: cursoId,
     });
