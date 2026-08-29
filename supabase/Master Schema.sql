@@ -1,7 +1,7 @@
 -- ====================================================================
 -- ⚠️ AVISO: ARQUIVO AUTO-GERADO!
 -- NÃO EDITE ESTE ARQUIVO DIRETAMENTE. ALTERE OS SNIPPETS E RODE db:build
--- Gerado em: 2026-08-28T23:07:14.112Z
+-- Gerado em: 2026-08-29T07:02:44.462Z
 -- ====================================================================
 
 -- >>> INÍCIO DO SNIPPET: 00_Init_Extensions.sql <<<
@@ -250,15 +250,12 @@ CREATE TRIGGER ao_alterar_voto
 
 
 -- >>> INÍCIO DO SNIPPET: 05_RLS_e_Grants.sql <<<
--- ============================================================
+﻿-- ============================================================
 -- 05 - ROW LEVEL SECURITY (RLS) E POLÍTICAS
 -- ============================================================
--- Role: anon (Apenas leitura/execução, RLS cuida do resto)
-GRANT SELECT ON ALL TABLES IN SCHEMA public TO anon;
-GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon;
-GRANT EXECUTE ON ALL ROUTINES IN SCHEMA public TO anon;
+-- Nota: A role 'anon' não possui grants no schema public (Zero-Trust).
 
--- Role: authenticated & service_role (Mantêm ALL)
+-- Role: authenticated & service_role (Mantém ALL)
 GRANT ALL ON ALL TABLES IN SCHEMA public TO authenticated, service_role;
 GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO authenticated, service_role;
 GRANT ALL ON ALL ROUTINES IN SCHEMA public TO authenticated, service_role;
@@ -348,9 +345,8 @@ CREATE POLICY "Professor lê avaliações" ON public.avaliacoes_rapidas FOR SELE
   EXISTS (SELECT 1 FROM public.sessoes s WHERE s.id = avaliacoes_rapidas.sessao_id AND s.professor_id = auth.uid())
 );
 
--- GRANT da fun��o anal�tica (Dashboard)
+-- GRANT da função analítica (Dashboard)
 GRANT EXECUTE ON FUNCTION public.get_course_insights(UUID) TO authenticated;
-
 -- >>> FIM DO SNIPPET: 05_RLS_e_Grants.sql <<<
 
 
