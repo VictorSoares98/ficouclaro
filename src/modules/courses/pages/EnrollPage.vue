@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router';
 import { useCourseStore } from '@/modules/courses/stores/course.store';
 import { useSessionStore } from '@/modules/session/stores/session.store';
 import { useQuasar } from 'quasar';
+import { sessionService, type StatusSessao } from '@/modules/session/services/session.service';
 import CourseCard from '@/modules/courses/components/CourseCard.vue';
 import CourseCardSkeleton from '@/modules/courses/components/CourseCardSkeleton.vue';
 
@@ -14,9 +15,29 @@ const $q = useQuasar();
 
 const isEnrolling = ref(false);
 const inviteCode = ref('');
+const isRefreshing = ref(false);
+const activeSessions = ref<Record<string, StatusSessao | 'nenhuma'>>({});
+
+async function loadSessionStatuses() {
+  if (courseStore.courses.length === 0) return;
+  const courseIds = courseStore.courses.map((c) => c.id);
+  const statuses = await sessionService.getActiveSessionsForCourses(courseIds);
+
+  // Mapeia garantindo que mesmo sem aula tenha a marcação 'nenhuma'
+  courseIds.forEach((id) => {
+    activeSessions.value[id] = statuses[id] || 'nenhuma';
+  });
+}
+
+async function handleRefresh() {
+  isRefreshing.value = true;
+  await courseStore.fetchMyCourses();
+  await loadSessionStatuses();
+  isRefreshing.value = false;
+}
 
 onMounted(async () => {
-  await courseStore.fetchMyCourses();
+  await handleRefresh();
 });
 
 async function handleEnroll() {
@@ -60,7 +81,19 @@ async function handleJoinActiveSession(courseId: string) {
         <h1 class="tw-text-2xl tw-font-bold tw-text-primary">Minhas Disciplinas</h1>
         <p class="text-muted">Acesse suas turmas e entre nas aulas ao vivo.</p>
       </div>
-      <q-btn color="primary" icon="add" label="Entrar em Turma" @click="isEnrolling = true" />
+      <div class="tw-flex tw-gap-2">
+        <q-btn
+          flat
+          round
+          color="primary"
+          icon="refresh"
+          :loading="isRefreshing"
+          @click="handleRefresh"
+        >
+          <q-tooltip>Atualizar Status das Aulas</q-tooltip>
+        </q-btn>
+        <q-btn color="primary" icon="add" label="Entrar em Turma" @click="isEnrolling = true" />
+      </div>
     </div>
 
     <!-- Loading State -->
@@ -84,6 +117,7 @@ async function handleJoinActiveSession(courseId: string) {
         v-for="course in courseStore.courses"
         :key="course.id"
         :course="course"
+        :sessionStatus="activeSessions[course.id] || 'nenhuma'"
         actionLabel="Entrar na Aula"
         actionIcon="login"
         actionColor="positive"

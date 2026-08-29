@@ -91,6 +91,36 @@ export class SessionService {
 
     return data.id;
   }
+
+  /**
+   * Busca o status atual da sessão mais recente para uma lista de cursos.
+   * Retorna um mapa { [courseId]: StatusSessao }
+   */
+  async getActiveSessionsForCourses(courseIds: string[]): Promise<Record<string, StatusSessao>> {
+    if (courseIds.length === 0) return {};
+
+    const { data, error } = await supabase
+      .from('sessoes')
+      .select('disciplina_id, status')
+      .in('disciplina_id', courseIds)
+      .in('status', ['aguardando', 'ativa'])
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Erro ao buscar status em lote:', error);
+      return {};
+    }
+
+    const statusMap: Record<string, StatusSessao> = {};
+    // Como está ordenado decrescente, o primeiro que aparecer de cada disciplina é o mais recente
+    data?.forEach((sessao) => {
+      if (!statusMap[sessao.disciplina_id]) {
+        statusMap[sessao.disciplina_id] = sessao.status;
+      }
+    });
+
+    return statusMap;
+  }
 }
 
 export const sessionService = new SessionService();
