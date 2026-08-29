@@ -70,7 +70,7 @@ Sempre que quiser rodar o app no dispositivo:
 2.  **Rodar em modo Desenvolvimento (com Live Reload):**
 
     ```bash
-    quasar dev -m capacitor -T android -- --address 0.0.0.0
+    npx quasar dev -m capacitor -T android -- --address 0.0.0.0
     ```
 
     _O `--address 0.0.0.0` permite que o celular acesse o servidor do PC._
@@ -82,7 +82,24 @@ Sempre que quiser rodar o app no dispositivo:
 
 ---
 
-## 🧹 4. Manutenção de Linter
+## 📦 4. Build de Produção (Gerando o APK)
+
+Para distribuir o app fora da Google Play ou conectar à nuvem (Supabase Cloud):
+
+1.  **Configure o `.env.production`:** Crie este arquivo na raiz com as chaves do Supabase Cloud.
+2.  **Gere o Build Web para Android:**
+    ```bash
+    npm run build:android
+    ```
+    *Este comando usa o `.env.production` e "congela" as chaves da nuvem dentro do código do app.*
+
+3.  **Gere o APK no Android Studio:**
+    - Vá em **Build > Build Bundle(s) / APK(s) > Build APK(s)**.
+    - O arquivo final estará em: `src-capacitor/android/app/build/outputs/apk/debug/app-debug.apk`.
+
+---
+
+## 🧹 5. Manutenção de Linter
 
 Para evitar que o Prettier aponte erros em arquivos gerados pelo build do Android, configuramos o `.prettierignore` para ignorar:
 
@@ -91,7 +108,7 @@ Para evitar que o Prettier aponte erros em arquivos gerados pelo build do Androi
 
 ---
 
-## 🕵️‍♂️ 5. Dicas do Agent Sagaz
+## 🕵️‍♂️ 6. Dicas do Agent Sagaz
 
 1.  **Logs no Android Studio:** Use a aba **Logcat** e filtre por `Capacitor/Console` para debugar o JavaScript como um ninja.
 2.  **IP Dinâmico:** Se o seu IP mudar, você deve atualizar o arquivo `.env` e o `network_security_config.xml`.

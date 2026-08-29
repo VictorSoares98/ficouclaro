@@ -78,14 +78,15 @@ Lista de comandos disponíveis via `npm run`:
 | `dev`      | Inicia o servidor de desenvolvimento do Quasar CLI (HMR ativado).                                                 |
 | `build`    | Executa o Type Check (`vue-tsc`) e gera o bundle de produção estático otimizado.                                  |
 | `lint`     | Roda o ESLint + Prettier para garantir conformidade de tipagem e padronização visual do código em todo o projeto. |
-| `db:build` | Concatena os snippets da pasta `supabase/snippets` gerando o arquivo consolidado `Master Schema.sql`.             |
+| `db:build`      | Concatena os snippets da pasta `supabase/snippets` gerando o arquivo consolidado `Master Schema.sql`.             |
+| `build:android` | Gera o build de produção do Quasar e sincroniza com a pasta nativa do Android (usa `.env.production`).    |
 
 ### 📱 Desenvolvimento Mobile (Capacitor)
 
 O aplicativo foi empacotado para execução nativa via Quasar + Capacitor.
 
-1. **Sincronize o projeto:** `npx cap sync android`
-2. **Abra no Android Studio:** `npx quasar build -m capacitor -T android --ide`
+- **Desenvolvimento Local:** `npx quasar dev -m capacitor -T android -- --address 0.0.0.0`
+- **Build para APK (Nuvem):** `npm run build:android` -> Depois, gere o APK no Android Studio (**Build > Build APKs**).
 
 > ⚠️ **Nota de Segurança:** As políticas de rede para desenvolvimento local (HTTP) estão configuradas em `src-capacitor/android/app/src/main/res/xml/network_security_config.xml`. Consulte o guia de configuração mobile para saber como atualizar o IP permitido.
 
