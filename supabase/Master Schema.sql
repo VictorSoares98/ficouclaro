@@ -1,7 +1,7 @@
 -- ====================================================================
 -- ⚠️ AVISO: ARQUIVO AUTO-GERADO!
 -- NÃO EDITE ESTE ARQUIVO DIRETAMENTE. ALTERE OS SNIPPETS E RODE db:build
--- Gerado em: 2026-08-28T23:07:14.112Z
+-- Gerado em: 2026-08-29T18:02:07.478Z
 -- ====================================================================
 
 -- >>> INÍCIO DO SNIPPET: 00_Init_Extensions.sql <<<
@@ -94,10 +94,12 @@ CREATE TABLE public.enquetes (
 
 -- respostas_enquete (Respostas dos alunos às enquetes)
 CREATE TABLE public.respostas_enquete (
-  id         UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  enquete_id UUID NOT NULL REFERENCES public.enquetes(id) ON DELETE CASCADE,
-  resposta   JSONB NOT NULL,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  id           UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  enquete_id   UUID NOT NULL REFERENCES public.enquetes(id) ON DELETE CASCADE,
+  resposta     JSONB NOT NULL,
+  hash_eleitor TEXT NOT NULL DEFAULT 'legacy_vote',
+  created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE(enquete_id, hash_eleitor)
 );
 
 -- duvidas (Painel de Q&A — Dúvidas Anônimas)
@@ -121,11 +123,13 @@ CREATE TABLE public.votos_duvida (
 
 -- avaliacoes_rapidas (Avaliação Pós-Aula)
 CREATE TABLE public.avaliacoes_rapidas (
-  id         UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  sessao_id  UUID NOT NULL REFERENCES public.sessoes(id) ON DELETE CASCADE,
-  nota       SMALLINT NOT NULL CHECK (nota BETWEEN 1 AND 5),
-  comentario TEXT,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  id           UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  sessao_id    UUID NOT NULL REFERENCES public.sessoes(id) ON DELETE CASCADE,
+  nota         SMALLINT NOT NULL CHECK (nota BETWEEN 1 AND 5),
+  comentario   TEXT,
+  hash_eleitor TEXT NOT NULL DEFAULT 'legacy_vote',
+  created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE(sessao_id, hash_eleitor)
 );
 
 -- >>> FIM DO SNIPPET: 02_Tabelas.sql <<<
@@ -189,6 +193,23 @@ RETURNS TABLE (
   WHERE s.disciplina_id = p_disciplina_id;
 $ $ LANGUAGE sql STABLE SECURITY DEFINER;
 
+-- Função para contagem agregada de sinais do termômetro (Performance)
+CREATE OR REPLACE FUNCTION public.get_thermometer_stats(p_sessao_id UUID)
+RETURNS TABLE (
+  muito_rapido BIGINT,
+  boiando BIGINT,
+  tudo_certo BIGINT,
+  muito_devagar BIGINT
+) AS $$
+  SELECT 
+    COUNT(*) FILTER (WHERE sinal = 'muito_rapido') AS muito_rapido,
+    COUNT(*) FILTER (WHERE sinal = 'boiando') AS boiando,
+    COUNT(*) FILTER (WHERE sinal = 'tudo_certo') AS tudo_certo,
+    COUNT(*) FILTER (WHERE sinal = 'muito_devagar') AS muito_devagar
+  FROM public.sinais_ritmo
+  WHERE sessao_id = p_sessao_id;
+$$ LANGUAGE sql STABLE SECURITY DEFINER;
+
 -- >>> FIM DO SNIPPET: 03_Funcoes.sql <<<
 
 
@@ -250,15 +271,12 @@ CREATE TRIGGER ao_alterar_voto
 
 
 -- >>> INÍCIO DO SNIPPET: 05_RLS_e_Grants.sql <<<
--- ============================================================
+﻿-- ============================================================
 -- 05 - ROW LEVEL SECURITY (RLS) E POLÍTICAS
 -- ============================================================
--- Role: anon (Apenas leitura/execução, RLS cuida do resto)
-GRANT SELECT ON ALL TABLES IN SCHEMA public TO anon;
-GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon;
-GRANT EXECUTE ON ALL ROUTINES IN SCHEMA public TO anon;
+-- Nota: A role 'anon' não possui grants no schema public (Zero-Trust).
 
--- Role: authenticated & service_role (Mantêm ALL)
+-- Role: authenticated & service_role (Mantém ALL)
 GRANT ALL ON ALL TABLES IN SCHEMA public TO authenticated, service_role;
 GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO authenticated, service_role;
 GRANT ALL ON ALL ROUTINES IN SCHEMA public TO authenticated, service_role;
@@ -348,9 +366,8 @@ CREATE POLICY "Professor lê avaliações" ON public.avaliacoes_rapidas FOR SELE
   EXISTS (SELECT 1 FROM public.sessoes s WHERE s.id = avaliacoes_rapidas.sessao_id AND s.professor_id = auth.uid())
 );
 
--- GRANT da fun��o anal�tica (Dashboard)
+-- GRANT da função analítica (Dashboard)
 GRANT EXECUTE ON FUNCTION public.get_course_insights(UUID) TO authenticated;
-
 -- >>> FIM DO SNIPPET: 05_RLS_e_Grants.sql <<<
 
 

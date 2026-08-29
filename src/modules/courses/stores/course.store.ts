@@ -11,29 +11,32 @@ export const useCourseStore = defineStore('course', () => {
   const authStore = useAuthStore();
 
   async function fetchMyCourses() {
-    if (!authStore.user) return;
+    const user = authStore.user;
+    if (!user) return;
 
     return execute(async () => {
-      const isProfessor = authStore.user!.perfil.papel === 'professor';
-      courses.value = await courseService.getMyCourses(authStore.user!.auth.id, isProfessor);
+      const isProfessor = user.perfil.papel === 'professor';
+      courses.value = await courseService.getMyCourses(user.auth.id, isProfessor);
     }, 'Erro ao carregar disciplinas.');
   }
 
   async function createCourse(nome: string, descricao?: string) {
-    if (!authStore.user) throw new Error('Não autenticado');
+    const user = authStore.user;
+    if (!user) throw new Error('Não autenticado');
 
     return execute(async () => {
-      const newCourse = await courseService.createCourse(authStore.user!.auth.id, nome, descricao);
-      courses.value.unshift(newCourse); // Adiciona no início da lista
+      const newCourse = await courseService.createCourse(user.auth.id, nome, descricao);
+      courses.value = [newCourse, ...courses.value];
       return newCourse;
     }, 'Erro ao criar disciplina.');
   }
 
   async function enroll(codigoConvite: string) {
-    if (!authStore.user) throw new Error('Não autenticado');
+    const user = authStore.user;
+    if (!user) throw new Error('Não autenticado');
 
     return execute(async () => {
-      await courseService.enrollByCode(authStore.user!.auth.id, codigoConvite);
+      await courseService.enrollByCode(user.auth.id, codigoConvite);
       // Após matricular, recarrega a lista
       await fetchMyCourses();
     }, 'Erro ao matricular na disciplina.');

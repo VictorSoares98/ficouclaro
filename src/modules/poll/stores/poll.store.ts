@@ -8,6 +8,8 @@ import type {
   RealtimePostgresInsertPayload,
   RealtimePostgresUpdatePayload,
 } from '@supabase/supabase-js';
+import { useAuthStore } from '@/stores/auth.store';
+import { generateVoterHash } from '@/modules/qa/utils/hash';
 
 // Anti-corruption layer: Tipos locais planos para evitar limite de recursão (TS2589) no Pinia
 export interface Resposta {
@@ -31,6 +33,7 @@ export interface Enquete {
 export type EnqueteInsertRow = Database['public']['Tables']['enquetes']['Insert'];
 
 export const usePollStore = defineStore('poll', () => {
+  const authStore = useAuthStore();
   const activePolls = ref<Enquete[]>([]);
   const pastPolls = ref<Enquete[]>([]);
   const pollResults = ref<Record<string, Resposta[]>>({});
@@ -137,7 +140,18 @@ export const usePollStore = defineStore('poll', () => {
       if (hasResponded(pollId)) {
         throw new Error('Você já respondeu a esta enquete.');
       }
-      await pollService.submitResponse({ enquete_id: pollId, resposta: respostaData });
+
+      const userId = authStore.user?.auth.id;
+      if (!userId) throw new Error('Usuário não autenticado.');
+
+      const hash = await generateVoterHash(`${userId}-${pollId}`);
+
+      await pollService.submitResponse({
+        enquete_id: pollId,
+        resposta: respostaData,
+        hash_eleitor: hash,
+      });
+
       markAsResponded(pollId);
     }, 'Erro ao enviar resposta');
   }
@@ -171,7 +185,7 @@ export const usePollStore = defineStore('poll', () => {
     if (currentSessionId.value === sessionId) return;
     currentSessionId.value = sessionId;
 
-    const channelName = `poll-${sessionId}`;
+    const channelName = `room-${sessionId}`;
     const channel = realtimeManager.getChannel(channelName);
 
     // Escutar por novas enquetes ou alterações de status
@@ -250,7 +264,7 @@ export const usePollStore = defineStore('poll', () => {
     if (currentSessionId.value !== sessionId) return;
     currentSessionId.value = null;
 
-    realtimeManager.releaseChannel(`poll-${sessionId}`);
+    realtimeManager.releaseChannel(`room-${sessionId}`);
     activePolls.value = [];
     pastPolls.value = [];
     pollResults.value = {};

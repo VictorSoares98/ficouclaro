@@ -54,3 +54,20 @@ RETURNS TABLE (
   FROM public.sessoes s
   WHERE s.disciplina_id = p_disciplina_id;
 $ $ LANGUAGE sql STABLE SECURITY DEFINER;
+
+-- Função para contagem agregada de sinais do termômetro (Performance)
+CREATE OR REPLACE FUNCTION public.get_thermometer_stats(p_sessao_id UUID)
+RETURNS TABLE (
+  muito_rapido BIGINT,
+  boiando BIGINT,
+  tudo_certo BIGINT,
+  muito_devagar BIGINT
+) AS $$
+  SELECT 
+    COUNT(*) FILTER (WHERE sinal = 'muito_rapido') AS muito_rapido,
+    COUNT(*) FILTER (WHERE sinal = 'boiando') AS boiando,
+    COUNT(*) FILTER (WHERE sinal = 'tudo_certo') AS tudo_certo,
+    COUNT(*) FILTER (WHERE sinal = 'muito_devagar') AS muito_devagar
+  FROM public.sinais_ritmo
+  WHERE sessao_id = p_sessao_id;
+$$ LANGUAGE sql STABLE SECURITY DEFINER;

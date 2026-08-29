@@ -13,6 +13,7 @@
     "db:stop": "npx supabase stop",
     "dev": "npm run db:start && quasar dev",
     "build": "quasar build",
+    "build:android": "dotenv -e .env.production -- quasar build -m capacitor -T android",
     "typecheck": "vue-tsc --noEmit",
     "postinstall": "quasar prepare --silent",
     "db:build": "node supabase/build-schema.js"
@@ -39,6 +40,7 @@
     "@vue/eslint-config-typescript": "^14.7.0",
     "autoprefixer": "^10.4.27",
     "dotenv": "^17.4.2",
+    "dotenv-cli": "^11.0.0",
     "eslint": "^10.8.0",
     "eslint-plugin-vue": "^10.8.0",
     "globals": "^17.4.0",

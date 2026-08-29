@@ -28,7 +28,7 @@ export const useSessionStore = defineStore('session', () => {
       // Assinar as mudanças dessa sessão específica
       if (!hasSubscribed.value) {
         hasSubscribed.value = true;
-        const channel = realtimeManager.getChannel(`session-${sessionId}`);
+        const channel = realtimeManager.getChannel(`room-${sessionId}`);
         channel.on(
           'postgres_changes',
           {
@@ -54,7 +54,7 @@ export const useSessionStore = defineStore('session', () => {
   function leaveSession() {
     if (currentSession.value) {
       if (hasSubscribed.value) {
-        realtimeManager.releaseChannel(`session-${currentSession.value.id}`);
+        realtimeManager.releaseChannel(`room-${currentSession.value.id}`);
         hasSubscribed.value = false;
       }
       currentSession.value = null;
@@ -68,22 +68,28 @@ export const useSessionStore = defineStore('session', () => {
   }
 
   async function startSession() {
-    if (!currentSession.value) throw new Error('Nenhuma sessão carregada');
+    const session = currentSession.value;
+    if (!session) throw new Error('Nenhuma sessão carregada');
 
     return execute(async () => {
-      const updated = await sessionService.startSession(currentSession.value!.id);
-      currentSession.value!.status = updated.status;
-      currentSession.value!.iniciada_em = updated.iniciada_em;
+      const updated = await sessionService.startSession(session.id);
+      if (currentSession.value) {
+        currentSession.value.status = updated.status;
+        currentSession.value.iniciada_em = updated.iniciada_em;
+      }
     }, 'Erro ao iniciar aula.');
   }
 
   async function endSession() {
-    if (!currentSession.value) throw new Error('Nenhuma sessão carregada');
+    const session = currentSession.value;
+    if (!session) throw new Error('Nenhuma sessão carregada');
 
     return execute(async () => {
-      const updated = await sessionService.endSession(currentSession.value!.id);
-      currentSession.value!.status = updated.status;
-      currentSession.value!.encerrada_em = updated.encerrada_em;
+      const updated = await sessionService.endSession(session.id);
+      if (currentSession.value) {
+        currentSession.value.status = updated.status;
+        currentSession.value.encerrada_em = updated.encerrada_em;
+      }
     }, 'Erro ao encerrar sessão.');
   }
 

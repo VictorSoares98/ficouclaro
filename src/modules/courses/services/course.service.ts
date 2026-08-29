@@ -16,7 +16,7 @@ export class CourseService {
         .eq('professor_id', userId)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) throw new Error(error.message);
       return data;
     } else {
       // É aluno, busca as matrículas com inner join (usando sintaxe do PostgREST)
@@ -25,7 +25,7 @@ export class CourseService {
         .select('disciplinas(*)')
         .eq('aluno_id', userId);
 
-      if (error) throw error;
+      if (error) throw new Error(error.message);
 
       // Mapeia o resultado para extrair o array de disciplinas
       const courses = data
@@ -46,7 +46,7 @@ export class CourseService {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) throw new Error(error.message);
     return data;
   }
 
@@ -76,7 +76,7 @@ export class CourseService {
       if (error.code === '23505') {
         throw new Error('Você já está matriculado nesta disciplina.');
       }
-      throw error;
+      throw new Error(error.message);
     }
 
     return data;

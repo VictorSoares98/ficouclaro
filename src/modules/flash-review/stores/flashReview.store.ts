@@ -4,6 +4,8 @@ import { flashReviewService } from '@/modules/flash-review/services/flashReview.
 import type { Database } from '@/core/types/database.types';
 import { useAsyncOperation } from '@/core/composables/useAsyncOperation';
 import type { Ref, ComputedRef } from 'vue';
+import { useAuthStore } from '@/stores/auth.store';
+import { generateVoterHash } from '@/modules/qa/utils/hash';
 
 // ACL (Anti-Corruption Layer)
 export interface AvaliacaoRapida {
@@ -28,6 +30,7 @@ export interface FlashReviewStore {
 }
 
 export const useFlashReviewStore = defineStore('flashReview', (): FlashReviewStore => {
+  const authStore = useAuthStore();
   const sessionReviews = ref<AvaliacaoRapida[]>([]);
   const { isLoading, error, execute } = useAsyncOperation();
 
@@ -59,7 +62,18 @@ export const useFlashReviewStore = defineStore('flashReview', (): FlashReviewSto
 
   async function submitReview(review: AvaliacaoInsertRow): Promise<void> {
     await execute(async (): Promise<void> => {
-      await flashReviewService.submitReview(review);
+      const userId = authStore.user?.auth.id;
+      if (!userId) throw new Error('Usuário não autenticado.');
+
+      const hash = await generateVoterHash(`${userId}-${review.sessao_id}`);
+
+      // Injerta o hash gerado no payload da avaliação
+      const reviewPayload = {
+        ...review,
+        hash_eleitor: hash,
+      };
+
+      await flashReviewService.submitReview(reviewPayload);
       if (!reviewedSessions.value.includes(review.sessao_id)) {
         reviewedSessions.value.push(review.sessao_id);
         saveReviewedToStorage();

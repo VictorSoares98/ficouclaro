@@ -12,7 +12,7 @@ export class QaService {
       .order('votos', { ascending: false })
       .order('created_at', { ascending: true });
 
-    if (error) throw error;
+    if (error) throw new Error(error.message);
     return data || [];
   }
 
@@ -28,7 +28,7 @@ export class QaService {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) throw new Error(error.message);
     return data;
   }
 
@@ -42,7 +42,7 @@ export class QaService {
       // Se o erro for de duplicação, o unique constraint de (duvida_id, hash_eleitor) vai estourar
       // 23505 = unique_violation
       if (error.code !== '23505') {
-        throw error;
+        throw new Error(error.message);
       }
     }
   }
@@ -53,7 +53,7 @@ export class QaService {
       .update({ foi_respondida: true })
       .eq('id', questionId);
 
-    if (error) throw error;
+    if (error) throw new Error(error.message);
   }
 }
 

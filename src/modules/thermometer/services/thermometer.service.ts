@@ -14,7 +14,7 @@ export class ThermometerService {
       sinal: sinal,
     });
 
-    if (error) throw error;
+    if (error) throw new Error(error.message);
   }
 
   /**
@@ -22,31 +22,30 @@ export class ThermometerService {
    * Ideal para carregar o histórico de uma aula em andamento antes de assinar o Realtime.
    */
   async getInitialCounts(sessionId: string): Promise<Record<SinalRitmo, number>> {
-    const counts: Record<SinalRitmo, number> = {
+    const { data, error } = await supabaseClient.rpc('get_thermometer_stats', {
+      p_sessao_id: sessionId,
+    });
+
+    if (error) throw new Error(error.message);
+
+    if (data && Array.isArray(data) && data.length > 0) {
+      const stats = data[0];
+      if (stats) {
+        return {
+          muito_rapido: Number(stats.muito_rapido || 0),
+          boiando: Number(stats.boiando || 0),
+          tudo_certo: Number(stats.tudo_certo || 0),
+          muito_devagar: Number(stats.muito_devagar || 0),
+        };
+      }
+    }
+
+    return {
       muito_rapido: 0,
       boiando: 0,
       tudo_certo: 0,
       muito_devagar: 0,
     };
-
-    const { data, error } = await supabaseClient
-      .from('sinais_ritmo')
-      .select('sinal')
-      .eq('sessao_id', sessionId);
-
-    if (error) throw error;
-
-    if (data) {
-      const rows = data;
-      for (const row of rows) {
-        const sinal = row.sinal;
-        if (counts[sinal] !== undefined) {
-          counts[sinal]++;
-        }
-      }
-    }
-
-    return counts;
   }
 }
 
