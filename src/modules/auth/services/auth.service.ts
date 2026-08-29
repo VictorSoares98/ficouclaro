@@ -8,24 +8,24 @@ import type {
 class AuthService {
   async signIn(credentials: SignInWithPasswordCredentials) {
     const { data, error } = await supabaseClient.auth.signInWithPassword(credentials);
-    if (error) throw error;
+    if (error) throw new Error(error.message);
     return data;
   }
 
   async signUp(credentials: SignUpWithPasswordCredentials) {
     const { data, error } = await supabaseClient.auth.signUp(credentials);
-    if (error) throw error;
+    if (error) throw new Error(error.message);
     return data;
   }
 
   async signOut() {
     const { error } = await supabaseClient.auth.signOut();
-    if (error) throw error;
+    if (error) throw new Error(error.message);
   }
 
   async deleteAccount() {
     const { error } = await supabaseClient.rpc('delete_own_account');
-    if (error) throw error;
+    if (error) throw new Error(error.message);
     // Também forçamos o signout no cliente para limpar cache
     await supabaseClient.auth.signOut();
   }
@@ -40,7 +40,7 @@ class AuthService {
       .eq('id', userId)
       .single();
 
-    if (error) throw error;
+    if (error) throw new Error(error.message);
     return data;
   }
 

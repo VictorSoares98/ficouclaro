@@ -14,7 +14,7 @@ export class ThermometerService {
       sinal: sinal,
     });
 
-    if (error) throw error;
+    if (error) throw new Error(error.message);
   }
 
   /**
@@ -22,10 +22,11 @@ export class ThermometerService {
    * Ideal para carregar o histórico de uma aula em andamento antes de assinar o Realtime.
    */
   async getInitialCounts(sessionId: string): Promise<Record<SinalRitmo, number>> {
-    const { data, error } = await supabaseClient
-      .rpc('get_thermometer_stats', { p_sessao_id: sessionId });
+    const { data, error } = await supabaseClient.rpc('get_thermometer_stats', {
+      p_sessao_id: sessionId,
+    });
 
-    if (error) throw error;
+    if (error) throw new Error(error.message);
 
     if (data && Array.isArray(data) && data.length > 0) {
       const stats = data[0];
