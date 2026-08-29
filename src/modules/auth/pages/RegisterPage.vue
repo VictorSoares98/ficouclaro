@@ -94,6 +94,7 @@ async function onSubmit() {
         reactive-rules
         :rules="[(val) => !!val || 'O nome é obrigatório']"
         autocomplete="name"
+        name="name"
         enterkeyhint="next"
         color="primary"
       />
@@ -109,6 +110,7 @@ async function onSubmit() {
           (val) => /.+@.+\..+/.test(val) || 'E-mail inválido',
         ]"
         autocomplete="email"
+        name="email"
         enterkeyhint="next"
         color="primary"
       />
@@ -127,6 +129,7 @@ async function onSubmit() {
               'A senha não atende aos requisitos mínimos de segurança',
           ]"
           autocomplete="new-password"
+          name="password"
           enterkeyhint="next"
           color="primary"
         >
