@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import BaseSurfaceCard from '@/core/components/BaseSurfaceCard.vue';
+
 defineProps<{
   title: string;
   value: string | number;
@@ -9,16 +11,25 @@ defineProps<{
 </script>
 
 <template>
-  <q-card
-    class="tw-bg-white/10 tw-backdrop-blur-md tw-border tw-border-white/20 tw-shadow-sm tw-rounded-xl"
-  >
-    <q-card-section class="tw-flex tw-items-center tw-justify-between">
-      <div>
-        <div class="tw-text-sm tw-opacity-70 tw-font-medium">{{ title }}</div>
-        <div class="tw-text-2xl tw-font-bold tw-mt-1">{{ value }}</div>
-        <div v-if="subtitle" class="tw-text-xs tw-opacity-60 tw-mt-1">{{ subtitle }}</div>
+  <BaseSurfaceCard variant="glass">
+    <q-card-section class="tw-flex tw-items-center tw-justify-between tw-gap-2 tw-p-3 sm:tw-p-4">
+      <div class="tw-flex-1 tw-min-w-0">
+        <div class="tw-text-xs sm:tw-text-sm text-muted tw-font-medium tw-truncate">
+          {{ title }}
+        </div>
+        <div class="tw-text-xl sm:tw-text-2xl tw-font-bold tw-mt-1 tw-truncate">{{ value }}</div>
+        <div v-if="subtitle" class="tw-text-[10px] sm:tw-text-xs text-hint tw-mt-1 tw-truncate">
+          {{ subtitle }}
+        </div>
       </div>
-      <q-avatar :color="color || 'primary'" text-color="white" :icon="icon" rounded size="md" />
+      <q-avatar
+        :color="color || 'primary'"
+        text-color="white"
+        :icon="icon"
+        rounded
+        size="md"
+        class="tw-shrink-0"
+      />
     </q-card-section>
-  </q-card>
+  </BaseSurfaceCard>
 </template>

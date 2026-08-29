@@ -5,6 +5,7 @@ import { useDashboardStore } from '@/modules/dashboard/stores/dashboard.store';
 import InsightCard from '@/modules/dashboard/components/InsightCard.vue';
 import HeatmapChart from '@/modules/dashboard/components/HeatmapChart.vue';
 import CourseEvolutionChart from '@/modules/dashboard/components/CourseEvolutionChart.vue';
+import BaseSkeletonList from '@/core/components/BaseSkeletonList.vue';
 import { useCourseStore } from '@/modules/courses/stores/course.store';
 
 const route = useRoute();
@@ -38,7 +39,7 @@ onUnmounted(() => {
     <div class="tw-flex tw-justify-between tw-items-center tw-mb-8">
       <div>
         <h1 class="tw-text-2xl sm:tw-text-3xl tw-font-bold tw-text-primary">Insights Analíticos</h1>
-        <p class="tw-opacity-70 tw-mt-1 tw-text-sm sm:tw-text-base">
+        <p class="text-muted tw-mt-1 tw-text-sm sm:tw-text-base">
           {{ courseTitle }}
         </p>
       </div>
@@ -46,8 +47,8 @@ onUnmounted(() => {
     </div>
 
     <!-- Loading State -->
-    <div v-if="dashboardStore.isLoading" class="tw-flex tw-justify-center tw-py-20">
-      <q-spinner-dots size="3rem" color="primary" />
+    <div v-if="dashboardStore.isLoading" class="tw-mt-8">
+      <BaseSkeletonList :count="3" type="card" />
     </div>
 
     <!-- Error State -->
@@ -64,14 +65,14 @@ onUnmounted(() => {
 
     <!-- Empty State -->
     <div v-else-if="dashboardStore.insights.length === 0" class="tw-text-center tw-py-20">
-      <q-icon name="insights" size="4rem" color="grey" class="tw-opacity-50" />
-      <p class="tw-opacity-70 tw-mt-4">Nenhuma sessão registrada para analisar métricas ainda.</p>
+      <q-icon name="insights" size="4rem" color="grey" class="text-hint" />
+      <p class="text-muted tw-mt-4">Nenhuma sessão registrada para analisar métricas ainda.</p>
     </div>
 
     <!-- Dashboard Content -->
     <div v-else class="tw-space-y-8">
       <!-- Cards de Métricas Rápidas -->
-      <div class="tw-grid tw-grid-cols-1 sm:tw-grid-cols-2 lg:tw-grid-cols-4 tw-gap-4">
+      <div class="tw-grid tw-grid-cols-2 lg:tw-grid-cols-4 tw-gap-3 sm:tw-gap-4">
         <InsightCard
           title="Média Global"
           :value="dashboardStore.globalAverageRating + ' ★'"
@@ -121,7 +122,7 @@ onUnmounted(() => {
         >
           <q-card-section>
             <h2 class="tw-text-lg tw-font-bold tw-mb-4">Heatmap de Agitação</h2>
-            <p class="tw-text-xs tw-opacity-60 tw-mb-2">
+            <p class="tw-text-xs text-hint tw-mb-2">
               Baseado no volume de Sinais de Ritmo por dia.
             </p>
             <HeatmapChart :insights="dashboardStore.insights" />

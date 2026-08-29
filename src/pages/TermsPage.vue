@@ -7,7 +7,7 @@
     <div class="tw-mt-8 tw-mb-12">
       <h1 class="tw-text-4xl tw-font-bold tw-mb-6 tw-text-primary">Termos de Uso</h1>
 
-      <div class="tw-text-lg tw-opacity-80 tw-space-y-6">
+      <div class="tw-text-lg text-muted tw-space-y-6">
         <p>
           Bem-vindo ao <strong>Ficou Claro?</strong>. Ao acessar e utilizar nossa plataforma, você
           concorda com os termos e condições descritos abaixo. Leia-os atentamente antes de

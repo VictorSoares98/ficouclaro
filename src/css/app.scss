@@ -24,6 +24,21 @@ body.body--dark {
   // Fundo Escuro (Dark Mode)
   --q-dark: #1e293b;
   --q-dark-page: #0f172a;
+
+  .text-muted {
+    opacity: 0.85 !important;
+  }
+  .text-hint {
+    opacity: 0.7 !important;
+  }
+}
+
+// --- Classes Semânticas Globais (Acessibilidade e Contraste) ---
+.text-muted {
+  opacity: 0.7 !important;
+}
+.text-hint {
+  opacity: 0.5 !important;
 }
 
 // --- Eixo 2: Branding (Cores da Marca) ---
@@ -56,8 +71,7 @@ body[data-theme='ocean'] {
 body[data-theme='dracula'] {
   --q-primary: #bd93f9;
   --q-secondary: #ff79c6;
-  --q-accent: #f1fa8c;
-
+  --q-accent: #b8a925;
   --q-positive: #50fa7b;
   --q-negative: #ff5555;
   --q-info: #8be9fd;
@@ -70,7 +84,7 @@ body[data-theme='summer_berries'] {
   --q-secondary: #824ca7;
   --q-accent: #a882c1;
   --q-warning: #b9c406;
-  --q-info: #f4f3f4;
+  --q-info: #2563eb;
   --q-positive: #21ba45;
   --q-negative: #c10015;
 }
@@ -81,14 +95,14 @@ body[data-theme='lunar_twilight'] {
   --q-secondary: #d75404;
   --q-accent: #8a2c02;
   --q-warning: #eecc8d;
-  --q-info: #07000e;
+  --q-info: #581c87;
   --q-positive: #21ba45;
   --q-negative: #c10015;
 }
 
 // 6. Tema: Natura e Terreno
 body[data-theme='nature_terrain'] {
-  --q-primary: #52733b;
+  --q-primary: #3d5a2a;
   --q-secondary: #84a45a;
   --q-accent: #818a6f;
   --q-warning: #715e4e;

@@ -3,6 +3,7 @@ import { ref, computed } from 'vue';
 import { usePollStore } from '@/modules/poll/stores/poll.store';
 import { useSessionStore } from '@/modules/session/stores/session.store';
 import type { Database } from '@/core/types/database.types';
+import BaseIconButton from '@/core/components/BaseIconButton.vue';
 
 const pollStore = usePollStore();
 const sessionStore = useSessionStore();
@@ -74,8 +75,6 @@ async function handleCreate() {
         map-options
         label="Tipo de Enquete"
         outlined
-        dense
-        options-dense
         class="tw-w-full md:tw-w-1/2"
       />
 
@@ -83,7 +82,6 @@ async function handleCreate() {
         v-model="pergunta"
         label="Pergunta"
         outlined
-        dense
         autofocus
         :rules="[(val) => !!val || 'A pergunta é obrigatória']"
       />
@@ -92,24 +90,21 @@ async function handleCreate() {
         v-if="needsOptions"
         class="tw-pl-4 tw-border-l-2 tw-border-gray-200 dark:tw-border-gray-700 tw-space-y-2"
       >
-        <div class="tw-text-sm tw-opacity-70 tw-mb-2">Opções (Mínimo 2)</div>
+        <div class="tw-text-sm text-muted tw-mb-2">Opções (Mínimo 2)</div>
 
         <div v-for="(opcao, index) in opcoes" :key="index" class="tw-flex tw-items-center tw-gap-2">
           <q-input
             v-model="opcoes[index]"
             :label="`Opção ${index + 1}`"
             outlined
-            dense
             class="tw-flex-1"
             :rules="[(val) => index >= 2 || !!val || 'Obrigatório']"
             hide-bottom-space
           />
-          <q-btn
+          <BaseIconButton
             icon="delete"
             color="negative"
-            flat
-            dense
-            round
+            ariaLabel="Remover Opção"
             @click="removeOption(index)"
             :disable="opcoes.length <= 2"
           />
@@ -120,7 +115,6 @@ async function handleCreate() {
           label="Adicionar Opção"
           color="primary"
           flat
-          dense
           class="tw-mt-2"
           @click="addOption"
         />

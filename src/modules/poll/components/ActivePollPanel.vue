@@ -14,7 +14,13 @@ const isModalOpen = computed(() => !!pendingPoll.value);
 </script>
 
 <template>
-  <q-dialog v-model="isModalOpen" persistent backdrop-filter="blur(4px)">
+  <q-dialog
+    v-model="isModalOpen"
+    persistent
+    backdrop-filter="blur(4px)"
+    transition-show="slide-up"
+    transition-hide="slide-down"
+  >
     <PollCard v-if="pendingPoll" :poll="pendingPoll" @close="() => {}" />
   </q-dialog>
 </template>

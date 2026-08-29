@@ -7,7 +7,7 @@
     <div class="tw-mt-8 tw-mb-12">
       <h1 class="tw-text-4xl tw-font-bold tw-mb-6 tw-text-primary">Política de Privacidade</h1>
 
-      <div class="tw-text-lg tw-opacity-80 tw-space-y-6">
+      <div class="tw-text-lg text-muted tw-space-y-6">
         <p>
           A privacidade dos usuários da plataforma <strong>Ficou Claro?</strong> é uma prioridade.
           Esta política foi elaborada em conformidade com a Lei Geral de Proteção de Dados (LGPD -
