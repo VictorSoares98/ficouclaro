@@ -74,7 +74,7 @@ export const useThermometerStore = defineStore('thermometer', () => {
       signalCounts.value = await thermometerService.getInitialCounts(sessionId);
 
       // Escuta novos inserts na tabela sinais_ritmo apenas para esta sessão
-      const channel = realtimeManager.getChannel(`thermometer-${sessionId}`);
+      const channel = realtimeManager.getChannel(`room-${sessionId}`);
       channel.on(
         'postgres_changes',
         {
@@ -102,7 +102,7 @@ export const useThermometerStore = defineStore('thermometer', () => {
     if (currentSessionId.value !== sessionId) return;
     currentSessionId.value = null;
 
-    realtimeManager.releaseChannel(`thermometer-${sessionId}`);
+    realtimeManager.releaseChannel(`room-${sessionId}`);
     signalCounts.value = {
       muito_rapido: 0,
       boiando: 0,

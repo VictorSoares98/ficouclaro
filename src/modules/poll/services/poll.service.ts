@@ -57,7 +57,12 @@ export class PollService {
   async submitResponse(resposta: RespostaEnqueteInsert): Promise<void> {
     const { error } = await supabaseClient.from('respostas_enquete').insert(resposta);
 
-    if (error) throw new Error(error.message);
+    if (error) {
+      if (error.code === '23505') {
+        throw new Error('Você já respondeu a esta enquete.');
+      }
+      throw new Error(error.message);
+    }
   }
 
   async getPollResults(

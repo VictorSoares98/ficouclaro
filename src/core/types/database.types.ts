@@ -33,6 +33,7 @@ export type Database = {
         Row: {
           comentario: string | null;
           created_at: string;
+          hash_eleitor: string;
           id: string;
           nota: number;
           sessao_id: string;
@@ -40,6 +41,7 @@ export type Database = {
         Insert: {
           comentario?: string | null;
           created_at?: string;
+          hash_eleitor?: string;
           id?: string;
           nota: number;
           sessao_id: string;
@@ -47,6 +49,7 @@ export type Database = {
         Update: {
           comentario?: string | null;
           created_at?: string;
+          hash_eleitor?: string;
           id?: string;
           nota?: number;
           sessao_id?: string;
@@ -58,6 +61,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'sessoes';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'avaliacoes_rapidas_sessao_id_fkey';
+            columns: ['sessao_id'];
+            isOneToOne: false;
+            referencedRelation: 'vw_course_insights';
+            referencedColumns: ['sessao_id'];
           },
         ];
       };
@@ -129,6 +139,13 @@ export type Database = {
             referencedRelation: 'sessoes';
             referencedColumns: ['id'];
           },
+          {
+            foreignKeyName: 'duvidas_sessao_id_fkey';
+            columns: ['sessao_id'];
+            isOneToOne: false;
+            referencedRelation: 'vw_course_insights';
+            referencedColumns: ['sessao_id'];
+          },
         ];
       };
       enquetes: {
@@ -169,6 +186,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'sessoes';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'enquetes_sessao_id_fkey';
+            columns: ['sessao_id'];
+            isOneToOne: false;
+            referencedRelation: 'vw_course_insights';
+            referencedColumns: ['sessao_id'];
           },
         ];
       };
@@ -212,18 +236,21 @@ export type Database = {
         Row: {
           created_at: string;
           enquete_id: string;
+          hash_eleitor: string;
           id: string;
           resposta: Json;
         };
         Insert: {
           created_at?: string;
           enquete_id: string;
+          hash_eleitor?: string;
           id?: string;
           resposta: Json;
         };
         Update: {
           created_at?: string;
           enquete_id?: string;
+          hash_eleitor?: string;
           id?: string;
           resposta?: Json;
         };
@@ -312,6 +339,13 @@ export type Database = {
             referencedRelation: 'sessoes';
             referencedColumns: ['id'];
           },
+          {
+            foreignKeyName: 'sinais_ritmo_sessao_id_fkey';
+            columns: ['sessao_id'];
+            isOneToOne: false;
+            referencedRelation: 'vw_course_insights';
+            referencedColumns: ['sessao_id'];
+          },
         ];
       };
       usuarios: {
@@ -369,14 +403,84 @@ export type Database = {
       };
     };
     Views: {
-      [_ in never]: never;
+      vw_course_insights: {
+        Row: {
+          disciplina_id: string | null;
+          iniciada_em: string | null;
+          media_estrelas: number | null;
+          sessao_id: string | null;
+          status: Database['public']['Enums']['status_sessao'] | null;
+          topico: string | null;
+          total_avaliacoes: number | null;
+          total_duvidas: number | null;
+          total_enquetes: number | null;
+          total_sinais: number | null;
+        };
+        Insert: {
+          disciplina_id?: string | null;
+          iniciada_em?: string | null;
+          media_estrelas?: never;
+          sessao_id?: string | null;
+          status?: Database['public']['Enums']['status_sessao'] | null;
+          topico?: string | null;
+          total_avaliacoes?: never;
+          total_duvidas?: never;
+          total_enquetes?: never;
+          total_sinais?: never;
+        };
+        Update: {
+          disciplina_id?: string | null;
+          iniciada_em?: string | null;
+          media_estrelas?: never;
+          sessao_id?: string | null;
+          status?: Database['public']['Enums']['status_sessao'] | null;
+          topico?: string | null;
+          total_avaliacoes?: never;
+          total_duvidas?: never;
+          total_enquetes?: never;
+          total_sinais?: never;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'sessoes_disciplina_id_fkey';
+            columns: ['disciplina_id'];
+            isOneToOne: false;
+            referencedRelation: 'disciplinas';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
     };
     Functions: {
       delete_own_account: { Args: never; Returns: undefined };
       esta_matriculado: { Args: { p_disciplina_id: string }; Returns: boolean };
+      get_course_insights: {
+        Args: { p_disciplina_id: string };
+        Returns: {
+          disciplina_id: string;
+          iniciada_em: string;
+          media_estrelas: number;
+          sessao_id: string;
+          status: Database['public']['Enums']['status_sessao'];
+          topico: string;
+          total_avaliacoes: number;
+          total_duvidas: number;
+          total_enquetes: number;
+          total_sinais: number;
+        }[];
+      };
       obter_meu_papel: {
         Args: never;
         Returns: Database['public']['Enums']['papel_usuario'];
+      };
+      get_thermometer_stats: {
+        Args: { p_sessao_id: string };
+        Returns: {
+          muito_rapido: number;
+          boiando: number;
+          tudo_certo: number;
+          muito_devagar: number;
+        }[];
       };
     };
     Enums: {

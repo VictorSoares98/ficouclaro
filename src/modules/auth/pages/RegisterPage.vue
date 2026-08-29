@@ -12,7 +12,10 @@ const authStore = useAuthStore();
 const fullName = ref('');
 const email = ref('');
 const password = ref('');
+const confirmPassword = ref('');
+const isPasswordVisible = ref(false);
 const role = ref<PapelUsuario>('aluno');
+const acceptTerms = ref(false);
 
 const roleOptions: { label: string; value: PapelUsuario }[] = [
   { label: 'Sou Aluno', value: 'aluno' },
@@ -20,6 +23,15 @@ const roleOptions: { label: string; value: PapelUsuario }[] = [
 ];
 
 async function onSubmit() {
+  if (password.value !== confirmPassword.value) {
+    $q.notify({
+      type: 'negative',
+      message: 'As senhas não coincidem',
+      position: 'top',
+    });
+    return;
+  }
+
   try {
     await authStore.register({
       email: email.value,
@@ -101,23 +113,73 @@ async function onSubmit() {
 
         <q-input
           v-model="password"
-          type="password"
+          :type="isPasswordVisible ? 'text' : 'password'"
           label="Senha"
           outlined
           lazy-rules
           :rules="[
             (val) => !!val || 'A senha é obrigatória',
-            (val) => val.length >= 6 || 'A senha deve ter no mínimo 6 caracteres',
+            (val) =>
+              /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{12,}$/.test(val) ||
+              'A senha deve ter 12+ caracteres, incluir maiúsculas, minúsculas, números e símbolos',
           ]"
           autocomplete="new-password"
           color="primary"
-        />
+        >
+          <template v-slot:append>
+            <q-icon
+              :name="isPasswordVisible ? 'visibility_off' : 'visibility'"
+              class="cursor-pointer"
+              @click="isPasswordVisible = !isPasswordVisible"
+            />
+          </template>
+        </q-input>
+
+        <q-input
+          v-model="confirmPassword"
+          :type="isPasswordVisible ? 'text' : 'password'"
+          label="Confirmar Senha"
+          outlined
+          lazy-rules
+          :rules="[
+            (val) => !!val || 'A confirmação é obrigatória',
+            (val) => val === password || 'As senhas não coincidem',
+          ]"
+          autocomplete="new-password"
+          color="primary"
+        >
+          <template v-slot:append>
+            <q-icon
+              :name="isPasswordVisible ? 'visibility_off' : 'visibility'"
+              class="cursor-pointer"
+              @click="isPasswordVisible = !isPasswordVisible"
+            />
+          </template>
+        </q-input>
+
+        <q-checkbox v-model="acceptTerms" color="primary" class="tw-w-full tw-mt-2 tw-mb-2">
+          Li e concordo com os
+          <router-link
+            to="/termos"
+            @click.stop
+            class="tw-text-primary tw-font-semibold hover:tw-underline"
+            >Termos de Uso</router-link
+          >
+          e a
+          <router-link
+            to="/privacidade"
+            @click.stop
+            class="tw-text-primary tw-font-semibold hover:tw-underline"
+            >Política de Privacidade</router-link
+          >.
+        </q-checkbox>
 
         <q-btn
           type="submit"
           color="primary"
           class="tw-w-full tw-h-14 tw-rounded-xl tw-text-lg tw-font-bold tw-shadow-md"
           :loading="authStore.isLoading"
+          :disable="!acceptTerms"
           unelevated
           label="Cadastrar"
         />

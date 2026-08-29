@@ -21,7 +21,7 @@ export class SessionService {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) throw new Error(error.message);
     return data;
   }
 
@@ -39,7 +39,7 @@ export class SessionService {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) throw new Error(error.message);
     return data;
   }
 
@@ -57,7 +57,7 @@ export class SessionService {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) throw new Error(error.message);
     return data;
   }
 
@@ -67,7 +67,7 @@ export class SessionService {
   async getSessionById(sessionId: string): Promise<Sessao> {
     const { data, error } = await supabase.from('sessoes').select('*').eq('id', sessionId).single();
 
-    if (error) throw error;
+    if (error) throw new Error(error.message);
     return data;
   }
 
