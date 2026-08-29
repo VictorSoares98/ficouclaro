@@ -67,6 +67,7 @@ Para mantermos a base de código previsível e escalável, seguimos regras infle
 4. **Arquitetura SQL Modular:** Nada de migrations obscuras baseadas em data e hora para o desenvolvimento do MVP. O schema do Postgres é gerenciado semanticamente por snippets (`00_Init.sql`, `01_Enums.sql`, etc), unificados de forma determinística pelo script `db:build`.
 5. **Concorrência e Estado Assíncrono:** Para aniquilar redundâncias, todas as stores e requisições devem consumir o composable universal `useAsyncOperation`, padronizando _Loading States_ elegantes e engolindo exceções sem estourar _Unhandled Promise Rejections_.
 6. **Conexões Realtime (WebSocket):** Inscrições nativas no Supabase estão proibidas nas views. Qualquer escuta em tempo real deve transacionar exclusivamente via Padrão Singleton pelo `RealtimeManager`, prevenindo _Race Conditions_ e conexões fantasmas.
+7. **Clean Code & UX Resiliente:** Caminhos relativos frágeis (`../../`) são proibidos; usamos sempre o alias absoluto `@/`. O tratamento de exceções assíncronas é centralizado no Quasar Notify, garantindo feedback humanizado ao usuário, e o aplicativo possui tratamento ativo contra quedas de rede (Modo Offline).
 
 ## 🛠️ 5. Scripts & Workflow
 
@@ -78,6 +79,17 @@ Lista de comandos disponíveis via `npm run`:
 | `build`    | Executa o Type Check (`vue-tsc`) e gera o bundle de produção estático otimizado.                                  |
 | `lint`     | Roda o ESLint + Prettier para garantir conformidade de tipagem e padronização visual do código em todo o projeto. |
 | `db:build` | Concatena os snippets da pasta `supabase/snippets` gerando o arquivo consolidado `Master Schema.sql`.             |
+
+### 📱 Desenvolvimento Mobile (Capacitor)
+
+O aplicativo foi empacotado para execução nativa via Quasar + Capacitor.
+
+Para abrir o projeto diretamente no **Android Studio** e rodar em emuladores ou dispositivos físicos:
+```bash
+cd src-capacitor
+npx cap open android
+```
+*(Certifique-se de que o SDK do Android esteja devidamente instalado no seu ambiente).*
 
 ## 🌟 6. Funcionalidades Principais (Visão do Produto)
 
