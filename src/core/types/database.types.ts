@@ -482,6 +482,18 @@ export type Database = {
           muito_devagar: number;
         }[];
       };
+      submit_poll_vote: {
+        Args: { p_enquete_id: string; p_resposta: Json };
+        Returns: undefined;
+      };
+      submit_qa_upvote: {
+        Args: { p_duvida_id: string };
+        Returns: undefined;
+      };
+      submit_flash_review: {
+        Args: { p_sessao_id: string; p_nota: number; p_comentario: string | null };
+        Returns: undefined;
+      };
     };
     Enums: {
       papel_usuario: 'aluno' | 'professor';

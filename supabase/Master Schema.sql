@@ -1,7 +1,7 @@
 -- ====================================================================
 -- ⚠️ AVISO: ARQUIVO AUTO-GERADO!
 -- NÃO EDITE ESTE ARQUIVO DIRETAMENTE. ALTERE OS SNIPPETS E RODE db:build
--- Gerado em: 2026-08-29T18:02:07.478Z
+-- Gerado em: 2026-08-30T00:40:20.326Z
 -- ====================================================================
 
 -- >>> INÍCIO DO SNIPPET: 00_Init_Extensions.sql <<<
@@ -97,7 +97,7 @@ CREATE TABLE public.respostas_enquete (
   id           UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   enquete_id   UUID NOT NULL REFERENCES public.enquetes(id) ON DELETE CASCADE,
   resposta     JSONB NOT NULL,
-  hash_eleitor TEXT NOT NULL DEFAULT 'legacy_vote',
+  hash_eleitor TEXT NOT NULL,
   created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   UNIQUE(enquete_id, hash_eleitor)
 );
@@ -127,7 +127,7 @@ CREATE TABLE public.avaliacoes_rapidas (
   sessao_id    UUID NOT NULL REFERENCES public.sessoes(id) ON DELETE CASCADE,
   nota         SMALLINT NOT NULL CHECK (nota BETWEEN 1 AND 5),
   comentario   TEXT,
-  hash_eleitor TEXT NOT NULL DEFAULT 'legacy_vote',
+  hash_eleitor TEXT NOT NULL,
   created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   UNIQUE(sessao_id, hash_eleitor)
 );
@@ -209,6 +209,70 @@ RETURNS TABLE (
   FROM public.sinais_ritmo
   WHERE sessao_id = p_sessao_id;
 $$ LANGUAGE sql STABLE SECURITY DEFINER;
+
+-- ============================================================
+-- RPCs PARA INSERÇÃO DE VOTOS E AVALIAÇÕES (LGPD - Geração de Hash Segura)
+-- ============================================================
+
+-- 1. Resposta de Enquete
+CREATE OR REPLACE FUNCTION public.submit_poll_vote(p_enquete_id UUID, p_resposta JSONB)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY INVOKER SET search_path = public
+AS $ $
+DECLARE
+  v_hash TEXT;
+BEGIN
+  IF auth.uid() IS NULL THEN
+    RAISE EXCEPTION 'Usuário não autenticado.';
+  END IF;
+
+  v_hash := encode(digest(auth.uid()::text || 'mvp_ficou_claro_secret_salt_993', 'sha256'), 'hex');
+
+  INSERT INTO public.respostas_enquete (enquete_id, resposta, hash_eleitor)
+  VALUES (p_enquete_id, p_resposta, v_hash);
+END;
+$ $;
+
+-- 2. Upvote em Dúvidas (Painel Q&A)
+CREATE OR REPLACE FUNCTION public.submit_qa_upvote(p_duvida_id UUID)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY INVOKER SET search_path = public
+AS $ $
+DECLARE
+  v_hash TEXT;
+BEGIN
+  IF auth.uid() IS NULL THEN
+    RAISE EXCEPTION 'Usuário não autenticado.';
+  END IF;
+
+  v_hash := encode(digest(auth.uid()::text || 'mvp_ficou_claro_secret_salt_993', 'sha256'), 'hex');
+
+  INSERT INTO public.votos_duvida (duvida_id, hash_eleitor)
+  VALUES (p_duvida_id, v_hash);
+END;
+$ $;
+
+-- 3. Avaliação Rápida (Pós-Aula)
+CREATE OR REPLACE FUNCTION public.submit_flash_review(p_sessao_id UUID, p_nota SMALLINT, p_comentario TEXT)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY INVOKER SET search_path = public
+AS $ $
+DECLARE
+  v_hash TEXT;
+BEGIN
+  IF auth.uid() IS NULL THEN
+    RAISE EXCEPTION 'Usuário não autenticado.';
+  END IF;
+
+  v_hash := encode(digest(auth.uid()::text || 'mvp_ficou_claro_secret_salt_993', 'sha256'), 'hex');
+
+  INSERT INTO public.avaliacoes_rapidas (sessao_id, nota, comentario, hash_eleitor)
+  VALUES (p_sessao_id, p_nota, p_comentario, v_hash);
+END;
+$ $;
 
 -- >>> FIM DO SNIPPET: 03_Funcoes.sql <<<
 

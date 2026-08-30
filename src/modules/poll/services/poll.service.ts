@@ -54,8 +54,13 @@ export class PollService {
     if (error) throw new Error(error.message);
   }
 
-  async submitResponse(resposta: RespostaEnqueteInsert): Promise<void> {
-    const { error } = await supabaseClient.from('respostas_enquete').insert(resposta);
+  async submitResponse(
+    resposta: Omit<RespostaEnqueteInsert, 'hash_eleitor' | 'created_at'>,
+  ): Promise<void> {
+    const { error } = await supabaseClient.rpc('submit_poll_vote', {
+      p_enquete_id: resposta.enquete_id,
+      p_resposta: resposta.resposta,
+    });
 
     if (error) {
       if (error.code === '23505') {
