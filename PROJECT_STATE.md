@@ -19,7 +19,7 @@
 
 ## 3. Architecture Decision Records (ADRs)
 
-*Registro das diretrizes arquiteturais e de engenharia atualmente estabelecidas no projeto.*
+_Registro das diretrizes arquiteturais e de engenharia atualmente estabelecidas no projeto._
 
 - **ADR-001 (Accepted): Strict Type-safety.**  
   É proibido o uso de `any`, asserções não-nulas (`!`) e mutações diretas em arrays. Devem ser utilizados DB Types e Destructuring conforme os padrões estabelecidos no projeto.
@@ -46,7 +46,7 @@
 
 ## 4. Definition of Done (DoD) Universal
 
-*Uma tarefa só é considerada concluída quando os critérios aplicáveis tiverem sido atendidos e verificados.*
+_Uma tarefa só é considerada concluída quando os critérios aplicáveis tiverem sido atendidos e verificados._
 
 - [ ] O código utiliza caminhos absolutos (`@/`) em vez de caminhos relativos frágeis (`../../`).
 - [ ] A análise estática através de `npm run lint` e a checagem de tipagem através de `vue-tsc` retornaram aprovação real, sem erros.
@@ -59,7 +59,7 @@
 
 ## 5. Rastreabilidade da Sprint Atual
 
-*Esta seção é atualizada durante o ciclo de execução dos prompts.*
+_Esta seção é atualizada durante o ciclo de execução dos prompts._
 
 - **Sprint Ativa:** [A DEFINIR PELO FLUXO DA TAREFA]
 - **Tarefa Atual:** [A DEFINIR NO PROMPT 3]
