@@ -11,6 +11,7 @@ const authStore = useAuthStore();
 
 const email = ref('');
 const password = ref('');
+const isPasswordVisible = ref(false);
 
 async function onSubmit() {
   try {
@@ -79,7 +80,15 @@ async function onSubmit() {
         enterkeyhint="done"
         color="primary"
         class="tw-text-lg"
-      />
+      >
+        <template v-slot:append>
+          <q-icon
+            :name="isPasswordVisible ? 'visibility_off' : 'visibility'"
+            class="cursor-pointer"
+            @click="isPasswordVisible = !isPasswordVisible"
+          />
+        </template>
+      </q-input>
 
       <q-btn
         type="submit"
