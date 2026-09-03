@@ -50,3 +50,33 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE TRIGGER ao_alterar_voto
   AFTER INSERT OR DELETE ON public.votos_duvida
   FOR EACH ROW EXECUTE FUNCTION public.atualizar_contagem_votos();
+
+-- Trigger: Atualizar updated_at automaticamente
+CREATE OR REPLACE FUNCTION public.handle_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE TRIGGER ao_atualizar_usuario
+  BEFORE UPDATE ON public.usuarios
+  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+
+CREATE TRIGGER ao_atualizar_disciplina
+  BEFORE UPDATE ON public.disciplinas
+  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+
+CREATE TRIGGER ao_atualizar_sessao
+  BEFORE UPDATE ON public.sessoes
+  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+
+CREATE TRIGGER ao_atualizar_enquete
+  BEFORE UPDATE ON public.enquetes
+  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+
+CREATE TRIGGER ao_atualizar_duvida
+  BEFORE UPDATE ON public.duvidas
+  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+

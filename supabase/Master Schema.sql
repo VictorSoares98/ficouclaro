@@ -1,7 +1,7 @@
 -- ====================================================================
 -- ⚠️ AVISO: ARQUIVO AUTO-GERADO!
 -- NÃO EDITE ESTE ARQUIVO DIRETAMENTE. ALTERE OS SNIPPETS E RODE db:build
--- Gerado em: 2026-08-30T00:40:20.326Z
+-- Gerado em: 2026-09-03T20:45:26.756Z
 -- ====================================================================
 
 -- >>> INÍCIO DO SNIPPET: 00_Init_Extensions.sql <<<
@@ -38,7 +38,8 @@ CREATE TABLE public.usuarios (
   papel          papel_usuario NOT NULL DEFAULT 'aluno',
   nome_completo  TEXT,
   url_avatar     TEXT,
-  created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- disciplinas (Disciplinas do professor)
@@ -48,7 +49,8 @@ CREATE TABLE public.disciplinas (
   nome           TEXT NOT NULL,
   descricao      TEXT,
   codigo_convite TEXT UNIQUE NOT NULL DEFAULT encode(gen_random_bytes(4), 'hex'),
-  created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- matriculas (Aluno ↔ Disciplina)
@@ -69,7 +71,8 @@ CREATE TABLE public.sessoes (
   status        status_sessao NOT NULL DEFAULT 'aguardando',
   iniciada_em   TIMESTAMPTZ,
   encerrada_em  TIMESTAMPTZ,
-  created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- sinais_ritmo (Termômetro de Ritmo — Alta Frequência)
@@ -89,7 +92,8 @@ CREATE TABLE public.enquetes (
   opcoes       JSONB,
   status       status_enquete NOT NULL DEFAULT 'rascunho',
   encerrada_em TIMESTAMPTZ,
-  created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- respostas_enquete (Respostas dos alunos às enquetes)
@@ -109,7 +113,8 @@ CREATE TABLE public.duvidas (
   texto          TEXT NOT NULL,
   votos          INTEGER NOT NULL DEFAULT 0,
   foi_respondida BOOLEAN NOT NULL DEFAULT FALSE,
-  created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- votos_duvida (Controle de upvote único por aluno)
@@ -330,6 +335,36 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE TRIGGER ao_alterar_voto
   AFTER INSERT OR DELETE ON public.votos_duvida
   FOR EACH ROW EXECUTE FUNCTION public.atualizar_contagem_votos();
+
+-- Trigger: Atualizar updated_at automaticamente
+CREATE OR REPLACE FUNCTION public.handle_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE TRIGGER ao_atualizar_usuario
+  BEFORE UPDATE ON public.usuarios
+  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+
+CREATE TRIGGER ao_atualizar_disciplina
+  BEFORE UPDATE ON public.disciplinas
+  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+
+CREATE TRIGGER ao_atualizar_sessao
+  BEFORE UPDATE ON public.sessoes
+  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+
+CREATE TRIGGER ao_atualizar_enquete
+  BEFORE UPDATE ON public.enquetes
+  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+
+CREATE TRIGGER ao_atualizar_duvida
+  BEFORE UPDATE ON public.duvidas
+  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+
 
 -- >>> FIM DO SNIPPET: 04_Triggers.sql <<<
 
