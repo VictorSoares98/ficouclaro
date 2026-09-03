@@ -36,18 +36,32 @@ export class CourseService {
   }
 
   async createCourse(professorId: string, nome: string, descricao?: string): Promise<Disciplina> {
-    const { data, error } = await supabase
-      .from('disciplinas')
-      .insert({
-        professor_id: professorId,
-        nome,
-        descricao: descricao || null,
-      })
-      .select()
-      .single();
+    const MAX_RETRIES = 3;
+    let attempts = 0;
 
-    if (error) throw new Error(error.message);
-    return data;
+    while (attempts < MAX_RETRIES) {
+      const { data, error } = await supabase
+        .from('disciplinas')
+        .insert({
+          professor_id: professorId,
+          nome,
+          descricao: descricao || null,
+        })
+        .select()
+        .single();
+
+      if (error) {
+        // Se o erro for Violação de Unique Constraint (23505) em codigo_convite
+        if (error.code === '23505' && error.message.includes('codigo_convite')) {
+          attempts++;
+          continue;
+        }
+        throw new Error(error.message);
+      }
+      return data;
+    }
+
+    throw new Error('Não foi possível gerar um código de convite único. Tente novamente.');
   }
 
   async enrollByCode(alunoId: string, codigoConvite: string): Promise<Matricula> {
