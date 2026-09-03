@@ -1,7 +1,7 @@
 -- ====================================================================
 -- ⚠️ AVISO: ARQUIVO AUTO-GERADO!
 -- NÃO EDITE ESTE ARQUIVO DIRETAMENTE. ALTERE OS SNIPPETS E RODE db:build
--- Gerado em: 2026-09-03T20:45:26.756Z
+-- Gerado em: 2026-09-03T22:06:30.181Z
 -- ====================================================================
 
 -- >>> INÍCIO DO SNIPPET: 00_Init_Extensions.sql <<<
@@ -141,15 +141,17 @@ CREATE TABLE public.avaliacoes_rapidas (
 
 
 -- >>> INÍCIO DO SNIPPET: 03_Funcoes.sql <<<
--- ============================================================
+﻿-- ============================================================
 -- 03 - FUNÇÕES GLOBAIS
 -- ============================================================
 
 -- Retorna o papel do usuário autenticado
-CREATE OR REPLACE FUNCTION public.obter_meu_papel()
+CREATE SCHEMA IF NOT EXISTS private;
+
+CREATE OR REPLACE FUNCTION private.obter_meu_papel()
 RETURNS papel_usuario AS $$
   SELECT papel FROM public.usuarios WHERE id = auth.uid();
-$$ LANGUAGE sql STABLE SECURITY DEFINER;
+$$ LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public;
 
 -- Verifica se usuário está matriculado em uma disciplina
 CREATE OR REPLACE FUNCTION public.esta_matriculado(p_disciplina_id UUID)
@@ -158,7 +160,7 @@ RETURNS BOOLEAN AS $$
     SELECT 1 FROM public.matriculas
     WHERE disciplina_id = p_disciplina_id AND aluno_id = auth.uid()
   );
-$$ LANGUAGE sql STABLE SECURITY DEFINER;
+$$ LANGUAGE sql STABLE SECURITY INVOKER SET search_path = public;
 
 -- Exclui a conta do próprio usuário autenticado (Direito ao Esquecimento - LGPD)
 CREATE OR REPLACE FUNCTION public.delete_own_account()
@@ -168,7 +170,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
--- Fun��o para agregar m�tricas de sess�es (Dashboard)
+-- Função para agregar métricas de sessões (Dashboard)
 -- Substitui a necessidade de uma VIEW, mantendo os snippets organizados.
 CREATE OR REPLACE FUNCTION public.get_course_insights(p_disciplina_id UUID)
 RETURNS TABLE (
@@ -182,7 +184,7 @@ RETURNS TABLE (
   total_duvidas BIGINT,
   total_sinais BIGINT,
   total_enquetes BIGINT
-) AS $ $
+) AS $$
   SELECT
     s.id AS sessao_id,
     s.disciplina_id,
@@ -196,7 +198,7 @@ RETURNS TABLE (
     (SELECT COUNT(*) FROM public.enquetes WHERE sessao_id = s.id) AS total_enquetes
   FROM public.sessoes s
   WHERE s.disciplina_id = p_disciplina_id;
-$ $ LANGUAGE sql STABLE SECURITY DEFINER;
+$$ LANGUAGE sql STABLE SECURITY INVOKER SET search_path = public;
 
 -- Função para contagem agregada de sinais do termômetro (Performance)
 CREATE OR REPLACE FUNCTION public.get_thermometer_stats(p_sessao_id UUID)
@@ -213,7 +215,7 @@ RETURNS TABLE (
     COUNT(*) FILTER (WHERE sinal = 'muito_devagar') AS muito_devagar
   FROM public.sinais_ritmo
   WHERE sessao_id = p_sessao_id;
-$$ LANGUAGE sql STABLE SECURITY DEFINER;
+$$ LANGUAGE sql STABLE SECURITY INVOKER SET search_path = public;
 
 -- ============================================================
 -- RPCs PARA INSERÇÃO DE VOTOS E AVALIAÇÕES (LGPD - Geração de Hash Segura)
@@ -224,7 +226,7 @@ CREATE OR REPLACE FUNCTION public.submit_poll_vote(p_enquete_id UUID, p_resposta
 RETURNS void
 LANGUAGE plpgsql
 SECURITY INVOKER SET search_path = public
-AS $ $
+AS $$
 DECLARE
   v_hash TEXT;
 BEGIN
@@ -237,14 +239,14 @@ BEGIN
   INSERT INTO public.respostas_enquete (enquete_id, resposta, hash_eleitor)
   VALUES (p_enquete_id, p_resposta, v_hash);
 END;
-$ $;
+$$;
 
 -- 2. Upvote em Dúvidas (Painel Q&A)
 CREATE OR REPLACE FUNCTION public.submit_qa_upvote(p_duvida_id UUID)
 RETURNS void
 LANGUAGE plpgsql
 SECURITY INVOKER SET search_path = public
-AS $ $
+AS $$
 DECLARE
   v_hash TEXT;
 BEGIN
@@ -257,14 +259,14 @@ BEGIN
   INSERT INTO public.votos_duvida (duvida_id, hash_eleitor)
   VALUES (p_duvida_id, v_hash);
 END;
-$ $;
+$$;
 
 -- 3. Avaliação Rápida (Pós-Aula)
 CREATE OR REPLACE FUNCTION public.submit_flash_review(p_sessao_id UUID, p_nota SMALLINT, p_comentario TEXT)
 RETURNS void
 LANGUAGE plpgsql
 SECURITY INVOKER SET search_path = public
-AS $ $
+AS $$
 DECLARE
   v_hash TEXT;
 BEGIN
@@ -277,21 +279,21 @@ BEGIN
   INSERT INTO public.avaliacoes_rapidas (sessao_id, nota, comentario, hash_eleitor)
   VALUES (p_sessao_id, p_nota, p_comentario, v_hash);
 END;
-$ $;
+$$;
 
 -- >>> FIM DO SNIPPET: 03_Funcoes.sql <<<
 
 
 -- >>> INÍCIO DO SNIPPET: 04_Triggers.sql <<<
--- ============================================================
+﻿-- ============================================================
 -- 04 - TRIGGERS
 -- ============================================================
 
 -- Trigger: Auto-criar perfil após registro no Auth
-CREATE OR REPLACE FUNCTION public.processar_novo_usuario()
+CREATE OR REPLACE FUNCTION private.processar_novo_usuario()
 RETURNS TRIGGER
 LANGUAGE plpgsql
-SECURITY DEFINER SET search_path = public
+SECURITY INVOKER SET search_path = public
 AS $$
 DECLARE
   v_papel public.papel_usuario;
@@ -317,10 +319,10 @@ $$;
 
 CREATE TRIGGER ao_criar_usuario_auth
   AFTER INSERT ON auth.users
-  FOR EACH ROW EXECUTE FUNCTION public.processar_novo_usuario();
+  FOR EACH ROW EXECUTE FUNCTION private.processar_novo_usuario();
 
 -- Trigger: Atualizar contador de votos na tabela duvidas
-CREATE OR REPLACE FUNCTION public.atualizar_contagem_votos()
+CREATE OR REPLACE FUNCTION private.atualizar_contagem_votos()
 RETURNS TRIGGER AS $$
 BEGIN
   IF TG_OP = 'INSERT' THEN
@@ -334,10 +336,10 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 CREATE TRIGGER ao_alterar_voto
   AFTER INSERT OR DELETE ON public.votos_duvida
-  FOR EACH ROW EXECUTE FUNCTION public.atualizar_contagem_votos();
+  FOR EACH ROW EXECUTE FUNCTION private.atualizar_contagem_votos();
 
 -- Trigger: Atualizar updated_at automaticamente
-CREATE OR REPLACE FUNCTION public.handle_updated_at()
+CREATE OR REPLACE FUNCTION private.handle_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN
   NEW.updated_at = NOW();
@@ -347,23 +349,23 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 CREATE TRIGGER ao_atualizar_usuario
   BEFORE UPDATE ON public.usuarios
-  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+  FOR EACH ROW EXECUTE FUNCTION private.handle_updated_at();
 
 CREATE TRIGGER ao_atualizar_disciplina
   BEFORE UPDATE ON public.disciplinas
-  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+  FOR EACH ROW EXECUTE FUNCTION private.handle_updated_at();
 
 CREATE TRIGGER ao_atualizar_sessao
   BEFORE UPDATE ON public.sessoes
-  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+  FOR EACH ROW EXECUTE FUNCTION private.handle_updated_at();
 
 CREATE TRIGGER ao_atualizar_enquete
   BEFORE UPDATE ON public.enquetes
-  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+  FOR EACH ROW EXECUTE FUNCTION private.handle_updated_at();
 
 CREATE TRIGGER ao_atualizar_duvida
   BEFORE UPDATE ON public.duvidas
-  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+  FOR EACH ROW EXECUTE FUNCTION private.handle_updated_at();
 
 
 -- >>> FIM DO SNIPPET: 04_Triggers.sql <<<
@@ -376,6 +378,9 @@ CREATE TRIGGER ao_atualizar_duvida
 -- Nota: A role 'anon' não possui grants no schema public (Zero-Trust).
 
 -- Role: authenticated & service_role (Mantém ALL)
+REVOKE ALL ON ALL ROUTINES IN SCHEMA public FROM PUBLIC;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE ALL ON ROUTINES FROM PUBLIC;
+
 GRANT ALL ON ALL TABLES IN SCHEMA public TO authenticated, service_role;
 GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO authenticated, service_role;
 GRANT ALL ON ALL ROUTINES IN SCHEMA public TO authenticated, service_role;
@@ -395,7 +400,7 @@ ALTER TABLE public.avaliacoes_rapidas ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Usuário lê o próprio perfil" ON public.usuarios FOR SELECT USING (id = auth.uid());
 CREATE POLICY "Usuário atualiza o próprio perfil" ON public.usuarios FOR UPDATE USING (id = auth.uid());
 CREATE POLICY "Professor vê perfis de alunos matriculados" ON public.usuarios FOR SELECT USING (
-  obter_meu_papel() = 'professor' AND EXISTS (
+  private.obter_meu_papel() = 'professor' AND EXISTS (
     SELECT 1 FROM public.matriculas m
     JOIN public.disciplinas d ON m.disciplina_id = d.id
     WHERE m.aluno_id = usuarios.id AND d.professor_id = auth.uid()
@@ -505,5 +510,18 @@ ALTER PUBLICATION supabase_realtime ADD TABLE public.duvidas;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.enquetes;
 
 -- >>> FIM DO SNIPPET: 07_Realtime.sql <<<
+
+
+-- >>> INÍCIO DO SNIPPET: Untitled query 151.sql <<<
+-- Remove o acesso padrão da role PUBLIC a todas as funções atuais
+REVOKE ALL ON ALL ROUTINES IN SCHEMA public FROM PUBLIC;
+
+-- Garante que NENHUMA função criada no futuro nasça com acesso PUBLIC
+ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE ALL ON ROUTINES FROM PUBLIC;
+
+-- Concede execução restrita APENAS a usuários logados e ao sistema (service_role)
+GRANT ALL ON ALL ROUTINES IN SCHEMA public TO authenticated, service_role;
+
+-- >>> FIM DO SNIPPET: Untitled query 151.sql <<<
 
 

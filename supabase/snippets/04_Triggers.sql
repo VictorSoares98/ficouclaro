@@ -1,12 +1,12 @@
--- ============================================================
+﻿-- ============================================================
 -- 04 - TRIGGERS
 -- ============================================================
 
 -- Trigger: Auto-criar perfil após registro no Auth
-CREATE OR REPLACE FUNCTION public.processar_novo_usuario()
+CREATE OR REPLACE FUNCTION private.processar_novo_usuario()
 RETURNS TRIGGER
 LANGUAGE plpgsql
-SECURITY DEFINER SET search_path = public
+SECURITY INVOKER SET search_path = public
 AS $$
 DECLARE
   v_papel public.papel_usuario;
@@ -32,10 +32,10 @@ $$;
 
 CREATE TRIGGER ao_criar_usuario_auth
   AFTER INSERT ON auth.users
-  FOR EACH ROW EXECUTE FUNCTION public.processar_novo_usuario();
+  FOR EACH ROW EXECUTE FUNCTION private.processar_novo_usuario();
 
 -- Trigger: Atualizar contador de votos na tabela duvidas
-CREATE OR REPLACE FUNCTION public.atualizar_contagem_votos()
+CREATE OR REPLACE FUNCTION private.atualizar_contagem_votos()
 RETURNS TRIGGER AS $$
 BEGIN
   IF TG_OP = 'INSERT' THEN
@@ -49,10 +49,10 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 CREATE TRIGGER ao_alterar_voto
   AFTER INSERT OR DELETE ON public.votos_duvida
-  FOR EACH ROW EXECUTE FUNCTION public.atualizar_contagem_votos();
+  FOR EACH ROW EXECUTE FUNCTION private.atualizar_contagem_votos();
 
 -- Trigger: Atualizar updated_at automaticamente
-CREATE OR REPLACE FUNCTION public.handle_updated_at()
+CREATE OR REPLACE FUNCTION private.handle_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN
   NEW.updated_at = NOW();
@@ -62,21 +62,21 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 CREATE TRIGGER ao_atualizar_usuario
   BEFORE UPDATE ON public.usuarios
-  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+  FOR EACH ROW EXECUTE FUNCTION private.handle_updated_at();
 
 CREATE TRIGGER ao_atualizar_disciplina
   BEFORE UPDATE ON public.disciplinas
-  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+  FOR EACH ROW EXECUTE FUNCTION private.handle_updated_at();
 
 CREATE TRIGGER ao_atualizar_sessao
   BEFORE UPDATE ON public.sessoes
-  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+  FOR EACH ROW EXECUTE FUNCTION private.handle_updated_at();
 
 CREATE TRIGGER ao_atualizar_enquete
   BEFORE UPDATE ON public.enquetes
-  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+  FOR EACH ROW EXECUTE FUNCTION private.handle_updated_at();
 
 CREATE TRIGGER ao_atualizar_duvida
   BEFORE UPDATE ON public.duvidas
-  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+  FOR EACH ROW EXECUTE FUNCTION private.handle_updated_at();
 
