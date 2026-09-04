@@ -134,9 +134,12 @@ async function onSubmit() {
           color="primary"
         >
           <template v-slot:append>
-            <q-icon
-              :name="isPasswordVisible ? 'visibility_off' : 'visibility'"
-              class="cursor-pointer"
+            <q-btn
+              round
+              dense
+              flat
+              :icon="isPasswordVisible ? 'visibility_off' : 'visibility'"
+              :aria-label="isPasswordVisible ? 'Ocultar senha' : 'Mostrar senha'"
               @click="isPasswordVisible = !isPasswordVisible"
             />
           </template>
@@ -160,9 +163,12 @@ async function onSubmit() {
         color="primary"
       >
         <template v-slot:append>
-          <q-icon
-            :name="isPasswordVisible ? 'visibility_off' : 'visibility'"
-            class="cursor-pointer"
+          <q-btn
+            round
+            dense
+            flat
+            :icon="isPasswordVisible ? 'visibility_off' : 'visibility'"
+            :aria-label="isPasswordVisible ? 'Ocultar senha' : 'Mostrar senha'"
             @click="isPasswordVisible = !isPasswordVisible"
           />
         </template>

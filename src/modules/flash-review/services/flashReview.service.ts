@@ -8,8 +8,12 @@ export class FlashReviewService {
   /**
    * Envia a avaliação anônima do aluno para uma sessão encerrada.
    */
-  async submitReview(review: AvaliacaoInsert): Promise<void> {
-    const { error } = await supabaseClient.from('avaliacoes_rapidas').insert(review);
+  async submitReview(review: Omit<AvaliacaoInsert, 'hash_eleitor' | 'created_at'>): Promise<void> {
+    const { error } = await supabaseClient.rpc('submit_flash_review', {
+      p_sessao_id: review.sessao_id,
+      p_nota: review.nota,
+      p_comentario: review.comentario || null,
+    });
 
     if (error) {
       if (error.code === '23505') {

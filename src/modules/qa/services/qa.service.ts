@@ -32,14 +32,12 @@ export class QaService {
     return data;
   }
 
-  async upvoteQuestion(questionId: string, voterHash: string): Promise<void> {
-    const { error } = await supabaseClient.from('votos_duvida').insert({
-      duvida_id: questionId,
-      hash_eleitor: voterHash,
+  async upvoteQuestion(questionId: string): Promise<void> {
+    const { error } = await supabaseClient.rpc('submit_qa_upvote', {
+      p_duvida_id: questionId,
     });
 
     if (error) {
-      // Se o erro for de duplicação, o unique constraint de (duvida_id, hash_eleitor) vai estourar
       // 23505 = unique_violation
       if (error.code !== '23505') {
         throw new Error(error.message);

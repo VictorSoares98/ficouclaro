@@ -5,7 +5,7 @@ import { useDashboardStore } from '@/modules/dashboard/stores/dashboard.store';
 import InsightCard from '@/modules/dashboard/components/InsightCard.vue';
 import HeatmapChart from '@/modules/dashboard/components/HeatmapChart.vue';
 import CourseEvolutionChart from '@/modules/dashboard/components/CourseEvolutionChart.vue';
-import BaseSkeletonList from '@/core/components/BaseSkeletonList.vue';
+import DashboardSkeleton from '@/modules/dashboard/components/DashboardSkeleton.vue';
 import { useCourseStore } from '@/modules/courses/stores/course.store';
 
 const route = useRoute();
@@ -47,8 +47,8 @@ onUnmounted(() => {
     </div>
 
     <!-- Loading State -->
-    <div v-if="dashboardStore.isLoading" class="tw-mt-8">
-      <BaseSkeletonList :count="3" type="card" />
+    <div v-if="dashboardStore.isLoading">
+      <DashboardSkeleton />
     </div>
 
     <!-- Error State -->

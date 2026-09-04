@@ -19,7 +19,7 @@
     "db:build": "node supabase/build-schema.js"
   },
   "dependencies": {
-    "@capacitor/cli": "^8.5.0",
+    "@capacitor/cli": "^8.4.3",
     "@capacitor/core": "^8.5.0",
     "@capacitor/haptics": "^8.0.2",
     "@quasar/extras": "^2.0.3",
@@ -63,6 +63,6 @@
     "vuejs"
   ],
   "engines": {
-    "node": ">= 26 || ^24 || ^22.12"
+    "node": ">= 26 || ^24 || ^22.22.0"
   }
 }

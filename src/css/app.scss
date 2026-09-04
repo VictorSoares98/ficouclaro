@@ -9,15 +9,27 @@
 // --- Eixo 1: Iluminação (Dark / Light Mode) ---
 // O Quasar injeta a classe .body--dark no <body> dinamicamente.
 body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  
   // Fundo Claro (Light Mode)
   --q-dark: #1d1d1d;
   --q-dark-page: #121212;
 
-  // Safe area do Capacitor para Notch (Mobile)
-  padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
-  padding-left: env(safe-area-inset-left);
-  padding-right: env(safe-area-inset-right);
+  // Safe area nativa exposta como variáveis do CSS (Capacitor)
+  // Removido o padding do body para não conflitar com componentes fixed (AppHeader)
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  
+  // Design System Tokens (Glassmorphism & Vercel/Linear like)
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-pill: 999px;
+  
+  --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.07);
 }
 
 body.body--dark {

@@ -117,10 +117,16 @@ function handleEnd() {
       </div>
     </div>
 
+    <!-- Loading State -->
+    <div v-if="sessionStore.isLoading" class="tw-flex-1 tw-flex tw-flex-col tw-p-4">
+      <q-skeleton type="rect" height="40px" class="tw-w-full tw-mb-4" />
+      <q-skeleton type="rect" class="tw-flex-1 tw-w-full tw-rounded-xl" />
+    </div>
+
     <!-- Abas de Ferramentas (Apenas Visível se Ativa ou Encerrada) -->
     <div
       class="tw-flex-1 tw-flex tw-flex-col"
-      v-if="sessionStore.currentSession && sessionStore.currentSession.status !== 'aguardando'"
+      v-else-if="sessionStore.currentSession && sessionStore.currentSession.status !== 'aguardando'"
     >
       <q-tabs
         v-model="tab"

@@ -8,6 +8,9 @@ export default {
   },
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['Inter', 'sans-serif'],
+      },
       colors: {
         // Single Source of Truth para Temas (Regra 9)
         // Herda exatamente as variáveis nativas geradas pelo Quasar/Nosso Sistema

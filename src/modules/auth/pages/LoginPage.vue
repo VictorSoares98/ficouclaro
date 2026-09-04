@@ -11,6 +11,7 @@ const authStore = useAuthStore();
 
 const email = ref('');
 const password = ref('');
+const isPasswordVisible = ref(false);
 
 async function onSubmit() {
   try {
@@ -66,7 +67,7 @@ async function onSubmit() {
 
       <q-input
         v-model="password"
-        type="password"
+        :type="isPasswordVisible ? 'text' : 'password'"
         label="Senha"
         outlined
         reactive-rules
@@ -79,7 +80,18 @@ async function onSubmit() {
         enterkeyhint="done"
         color="primary"
         class="tw-text-lg"
-      />
+      >
+        <template v-slot:append>
+          <q-btn
+            round
+            dense
+            flat
+            :icon="isPasswordVisible ? 'visibility_off' : 'visibility'"
+            :aria-label="isPasswordVisible ? 'Ocultar senha' : 'Mostrar senha'"
+            @click="isPasswordVisible = !isPasswordVisible"
+          />
+        </template>
+      </q-input>
 
       <q-btn
         type="submit"
