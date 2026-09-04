@@ -1,7 +1,7 @@
 -- ====================================================================
 -- ⚠️ AVISO: ARQUIVO AUTO-GERADO!
 -- NÃO EDITE ESTE ARQUIVO DIRETAMENTE. ALTERE OS SNIPPETS E RODE db:build
--- Gerado em: 2026-09-03T22:06:30.181Z
+-- Gerado em: 2026-09-04T21:19:33.212Z
 -- ====================================================================
 
 -- >>> INÍCIO DO SNIPPET: 00_Init_Extensions.sql <<<
@@ -141,7 +141,7 @@ CREATE TABLE public.avaliacoes_rapidas (
 
 
 -- >>> INÍCIO DO SNIPPET: 03_Funcoes.sql <<<
-﻿-- ============================================================
+-- ============================================================
 -- 03 - FUNÇÕES GLOBAIS
 -- ============================================================
 
@@ -233,8 +233,7 @@ BEGIN
   IF auth.uid() IS NULL THEN
     RAISE EXCEPTION 'Usuário não autenticado.';
   END IF;
-
-  v_hash := encode(digest(auth.uid()::text || 'mvp_ficou_claro_secret_salt_993', 'sha256'), 'hex');
+  v_hash := encode(digest(auth.uid()::text || p_enquete_id::text, 'sha256'), 'hex');
 
   INSERT INTO public.respostas_enquete (enquete_id, resposta, hash_eleitor)
   VALUES (p_enquete_id, p_resposta, v_hash);
@@ -253,8 +252,7 @@ BEGIN
   IF auth.uid() IS NULL THEN
     RAISE EXCEPTION 'Usuário não autenticado.';
   END IF;
-
-  v_hash := encode(digest(auth.uid()::text || 'mvp_ficou_claro_secret_salt_993', 'sha256'), 'hex');
+  v_hash := encode(digest(auth.uid()::text || p_duvida_id::text, 'sha256'), 'hex');
 
   INSERT INTO public.votos_duvida (duvida_id, hash_eleitor)
   VALUES (p_duvida_id, v_hash);
@@ -273,8 +271,7 @@ BEGIN
   IF auth.uid() IS NULL THEN
     RAISE EXCEPTION 'Usuário não autenticado.';
   END IF;
-
-  v_hash := encode(digest(auth.uid()::text || 'mvp_ficou_claro_secret_salt_993', 'sha256'), 'hex');
+  v_hash := encode(digest(auth.uid()::text || p_sessao_id::text, 'sha256'), 'hex');
 
   INSERT INTO public.avaliacoes_rapidas (sessao_id, nota, comentario, hash_eleitor)
   VALUES (p_sessao_id, p_nota, p_comentario, v_hash);
@@ -285,7 +282,7 @@ $$;
 
 
 -- >>> INÍCIO DO SNIPPET: 04_Triggers.sql <<<
-﻿-- ============================================================
+-- ============================================================
 -- 04 - TRIGGERS
 -- ============================================================
 
@@ -293,7 +290,7 @@ $$;
 CREATE OR REPLACE FUNCTION private.processar_novo_usuario()
 RETURNS TRIGGER
 LANGUAGE plpgsql
-SECURITY INVOKER SET search_path = public
+SECURITY DEFINER SET search_path = public
 AS $$
 DECLARE
   v_papel public.papel_usuario;
@@ -372,7 +369,7 @@ CREATE TRIGGER ao_atualizar_duvida
 
 
 -- >>> INÍCIO DO SNIPPET: 05_RLS_e_Grants.sql <<<
-﻿-- ============================================================
+-- ============================================================
 -- 05 - ROW LEVEL SECURITY (RLS) E POLÍTICAS
 -- ============================================================
 -- Nota: A role 'anon' não possui grants no schema public (Zero-Trust).
@@ -384,6 +381,10 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE ALL ON ROUTINES FROM PUBLIC;
 GRANT ALL ON ALL TABLES IN SCHEMA public TO authenticated, service_role;
 GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO authenticated, service_role;
 GRANT ALL ON ALL ROUTINES IN SCHEMA public TO authenticated, service_role;
+
+-- Grants para o schema private (necessário para as políticas RLS)
+GRANT USAGE ON SCHEMA private TO authenticated, service_role;
+GRANT EXECUTE ON ALL ROUTINES IN SCHEMA private TO authenticated, service_role;
 
 ALTER TABLE public.usuarios ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.disciplinas ENABLE ROW LEVEL SECURITY;
@@ -510,18 +511,5 @@ ALTER PUBLICATION supabase_realtime ADD TABLE public.duvidas;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.enquetes;
 
 -- >>> FIM DO SNIPPET: 07_Realtime.sql <<<
-
-
--- >>> INÍCIO DO SNIPPET: Untitled query 151.sql <<<
--- Remove o acesso padrão da role PUBLIC a todas as funções atuais
-REVOKE ALL ON ALL ROUTINES IN SCHEMA public FROM PUBLIC;
-
--- Garante que NENHUMA função criada no futuro nasça com acesso PUBLIC
-ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE ALL ON ROUTINES FROM PUBLIC;
-
--- Concede execução restrita APENAS a usuários logados e ao sistema (service_role)
-GRANT ALL ON ALL ROUTINES IN SCHEMA public TO authenticated, service_role;
-
--- >>> FIM DO SNIPPET: Untitled query 151.sql <<<
 
 
