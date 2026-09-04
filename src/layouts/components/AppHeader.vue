@@ -54,7 +54,10 @@ function confirmDeleteAccount() {
 </script>
 
 <template>
-  <q-header elevated class="tw-bg-primary tw-text-white tw-transition-colors tw-duration-300">
+  <q-header
+    elevated
+    class="tw-bg-primary tw-text-white tw-transition-colors tw-duration-300 tw-pt-[var(--safe-top)]"
+  >
     <q-toolbar class="tw-h-16">
       <q-toolbar-title class="tw-font-bold tw-tracking-tight tw-text-white tw-text-2xl">
         Ficou Claro?
