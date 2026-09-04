@@ -52,7 +52,7 @@ export class CourseService {
 
       if (error) {
         // Se o erro for Violação de Unique Constraint (23505) em codigo_convite
-        if (error.code === '23505' && error.message.includes('codigo_convite')) {
+        if (error.code === '23505') {
           attempts++;
           continue;
         }

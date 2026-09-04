@@ -67,7 +67,7 @@ async function onSubmit() {
 
       <q-input
         v-model="password"
-        type="password"
+        :type="isPasswordVisible ? 'text' : 'password'"
         label="Senha"
         outlined
         reactive-rules
@@ -82,9 +82,12 @@ async function onSubmit() {
         class="tw-text-lg"
       >
         <template v-slot:append>
-          <q-icon
-            :name="isPasswordVisible ? 'visibility_off' : 'visibility'"
-            class="cursor-pointer"
+          <q-btn
+            round
+            dense
+            flat
+            :icon="isPasswordVisible ? 'visibility_off' : 'visibility'"
+            :aria-label="isPasswordVisible ? 'Ocultar senha' : 'Mostrar senha'"
             @click="isPasswordVisible = !isPasswordVisible"
           />
         </template>
