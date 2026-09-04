@@ -106,4 +106,4 @@ Para garantir o engajamento dos alunos e fornecer dados úteis aos professores, 
 
 ---
 
-**Equipe Responsável:** Victor Soares e Luan Victor Ogeda
+**Equipe Responsável:** Victor Soares

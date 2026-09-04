@@ -40,9 +40,13 @@ onUnmounted(() => {
     <ActivePollPanel />
 
     <!-- Esqueleto de loading -->
-    <div v-if="sessionStore.isLoading" class="tw-w-full">
-      <q-skeleton type="text" class="tw-text-3xl tw-mb-4" />
-      <q-skeleton type="rect" height="150px" />
+    <div v-if="sessionStore.isLoading" class="tw-w-full tw-flex tw-flex-col tw-gap-4 tw-mt-4">
+      <q-skeleton type="rect" height="60px" class="tw-w-full tw-rounded-lg" />
+      <div class="tw-w-full tw-mt-4">
+        <q-skeleton type="text" width="150px" class="tw-mb-2" />
+        <q-skeleton type="rect" height="100px" class="tw-w-full tw-rounded-lg tw-mb-2" />
+        <q-skeleton type="rect" height="100px" class="tw-w-full tw-rounded-lg" />
+      </div>
     </div>
 
     <!-- Sessão Carregada -->

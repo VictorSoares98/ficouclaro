@@ -8,7 +8,8 @@ CREATE TABLE public.usuarios (
   papel          papel_usuario NOT NULL DEFAULT 'aluno',
   nome_completo  TEXT,
   url_avatar     TEXT,
-  created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- disciplinas (Disciplinas do professor)
@@ -18,7 +19,8 @@ CREATE TABLE public.disciplinas (
   nome           TEXT NOT NULL,
   descricao      TEXT,
   codigo_convite TEXT UNIQUE NOT NULL DEFAULT encode(gen_random_bytes(4), 'hex'),
-  created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- matriculas (Aluno ↔ Disciplina)
@@ -39,7 +41,8 @@ CREATE TABLE public.sessoes (
   status        status_sessao NOT NULL DEFAULT 'aguardando',
   iniciada_em   TIMESTAMPTZ,
   encerrada_em  TIMESTAMPTZ,
-  created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- sinais_ritmo (Termômetro de Ritmo — Alta Frequência)
@@ -59,7 +62,8 @@ CREATE TABLE public.enquetes (
   opcoes       JSONB,
   status       status_enquete NOT NULL DEFAULT 'rascunho',
   encerrada_em TIMESTAMPTZ,
-  created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- respostas_enquete (Respostas dos alunos às enquetes)
@@ -67,7 +71,7 @@ CREATE TABLE public.respostas_enquete (
   id           UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   enquete_id   UUID NOT NULL REFERENCES public.enquetes(id) ON DELETE CASCADE,
   resposta     JSONB NOT NULL,
-  hash_eleitor TEXT NOT NULL DEFAULT 'legacy_vote',
+  hash_eleitor TEXT NOT NULL,
   created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   UNIQUE(enquete_id, hash_eleitor)
 );
@@ -79,7 +83,8 @@ CREATE TABLE public.duvidas (
   texto          TEXT NOT NULL,
   votos          INTEGER NOT NULL DEFAULT 0,
   foi_respondida BOOLEAN NOT NULL DEFAULT FALSE,
-  created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- votos_duvida (Controle de upvote único por aluno)
@@ -97,7 +102,7 @@ CREATE TABLE public.avaliacoes_rapidas (
   sessao_id    UUID NOT NULL REFERENCES public.sessoes(id) ON DELETE CASCADE,
   nota         SMALLINT NOT NULL CHECK (nota BETWEEN 1 AND 5),
   comentario   TEXT,
-  hash_eleitor TEXT NOT NULL DEFAULT 'legacy_vote',
+  hash_eleitor TEXT NOT NULL,
   created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   UNIQUE(sessao_id, hash_eleitor)
 );

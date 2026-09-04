@@ -79,6 +79,7 @@ export type Database = {
           id: string;
           nome: string;
           professor_id: string;
+          updated_at: string;
         };
         Insert: {
           codigo_convite?: string;
@@ -87,6 +88,7 @@ export type Database = {
           id?: string;
           nome: string;
           professor_id: string;
+          updated_at?: string;
         };
         Update: {
           codigo_convite?: string;
@@ -95,6 +97,7 @@ export type Database = {
           id?: string;
           nome?: string;
           professor_id?: string;
+          updated_at?: string;
         };
         Relationships: [
           {
@@ -113,6 +116,7 @@ export type Database = {
           id: string;
           sessao_id: string;
           texto: string;
+          updated_at: string;
           votos: number;
         };
         Insert: {
@@ -121,6 +125,7 @@ export type Database = {
           id?: string;
           sessao_id: string;
           texto: string;
+          updated_at?: string;
           votos?: number;
         };
         Update: {
@@ -129,6 +134,7 @@ export type Database = {
           id?: string;
           sessao_id?: string;
           texto?: string;
+          updated_at?: string;
           votos?: number;
         };
         Relationships: [
@@ -158,6 +164,7 @@ export type Database = {
           sessao_id: string;
           status: Database['public']['Enums']['status_enquete'];
           tipo: Database['public']['Enums']['tipo_enquete'];
+          updated_at: string;
         };
         Insert: {
           created_at?: string;
@@ -168,6 +175,7 @@ export type Database = {
           sessao_id: string;
           status?: Database['public']['Enums']['status_enquete'];
           tipo: Database['public']['Enums']['tipo_enquete'];
+          updated_at?: string;
         };
         Update: {
           created_at?: string;
@@ -178,6 +186,7 @@ export type Database = {
           sessao_id?: string;
           status?: Database['public']['Enums']['status_enquete'];
           tipo?: Database['public']['Enums']['tipo_enquete'];
+          updated_at?: string;
         };
         Relationships: [
           {
@@ -274,6 +283,7 @@ export type Database = {
           professor_id: string;
           status: Database['public']['Enums']['status_sessao'];
           topico: string | null;
+          updated_at: string;
         };
         Insert: {
           created_at?: string;
@@ -284,6 +294,7 @@ export type Database = {
           professor_id: string;
           status?: Database['public']['Enums']['status_sessao'];
           topico?: string | null;
+          updated_at?: string;
         };
         Update: {
           created_at?: string;
@@ -294,6 +305,7 @@ export type Database = {
           professor_id?: string;
           status?: Database['public']['Enums']['status_sessao'];
           topico?: string | null;
+          updated_at?: string;
         };
         Relationships: [
           {
@@ -354,6 +366,7 @@ export type Database = {
           id: string;
           nome_completo: string | null;
           papel: Database['public']['Enums']['papel_usuario'];
+          updated_at: string;
           url_avatar: string | null;
         };
         Insert: {
@@ -361,6 +374,7 @@ export type Database = {
           id: string;
           nome_completo?: string | null;
           papel?: Database['public']['Enums']['papel_usuario'];
+          updated_at?: string;
           url_avatar?: string | null;
         };
         Update: {
@@ -368,6 +382,7 @@ export type Database = {
           id?: string;
           nome_completo?: string | null;
           papel?: Database['public']['Enums']['papel_usuario'];
+          updated_at?: string;
           url_avatar?: string | null;
         };
         Relationships: [];
@@ -481,6 +496,18 @@ export type Database = {
           tudo_certo: number;
           muito_devagar: number;
         }[];
+      };
+      submit_poll_vote: {
+        Args: { p_enquete_id: string; p_resposta: Json };
+        Returns: undefined;
+      };
+      submit_qa_upvote: {
+        Args: { p_duvida_id: string };
+        Returns: undefined;
+      };
+      submit_flash_review: {
+        Args: { p_sessao_id: string; p_nota: number; p_comentario: string | null };
+        Returns: undefined;
       };
     };
     Enums: {

@@ -34,13 +34,16 @@ export const useAuthStore = defineStore('auth', () => {
    * Usado principalmente pelo listener de AuthStateChange no App.vue
    * para recarregar silenciosamente o usuário caso mude em outra aba.
    */
-  async function reloadProfile(authUser: SupabaseUser) {
+  async function reloadProfile(authUser: SupabaseUser, throwError = false) {
     try {
       const perfil = await authService.getProfile(authUser.id);
       user.value = { auth: authUser, perfil };
     } catch (e) {
       console.error('Falha ao recarregar perfil no listener:', e);
       user.value = null;
+      if (throwError) {
+        throw e;
+      }
     }
   }
 
@@ -64,7 +67,7 @@ export const useAuthStore = defineStore('auth', () => {
     return execute(async () => {
       const data = await authService.signIn(credentials);
       if (data.user) {
-        await reloadProfile(data.user);
+        await reloadProfile(data.user, true);
       }
     }, 'Erro ao fazer login. Verifique suas credenciais.');
   }
@@ -73,7 +76,7 @@ export const useAuthStore = defineStore('auth', () => {
     return execute(async () => {
       const data = await authService.signUp(credentials);
       if (data.user) {
-        await reloadProfile(data.user);
+        await reloadProfile(data.user, true);
       }
     }, 'Erro ao criar conta.');
   }

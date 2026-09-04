@@ -9,7 +9,6 @@ import type {
   RealtimePostgresUpdatePayload,
 } from '@supabase/supabase-js';
 import { useAuthStore } from '@/stores/auth.store';
-import { generateVoterHash } from '@/modules/qa/utils/hash';
 
 // Anti-corruption layer: Tipos locais planos para evitar limite de recursão (TS2589) no Pinia
 export interface Resposta {
@@ -144,12 +143,9 @@ export const usePollStore = defineStore('poll', () => {
       const userId = authStore.user?.auth.id;
       if (!userId) throw new Error('Usuário não autenticado.');
 
-      const hash = await generateVoterHash(`${userId}-${pollId}`);
-
       await pollService.submitResponse({
         enquete_id: pollId,
         resposta: respostaData,
-        hash_eleitor: hash,
       });
 
       markAsResponded(pollId);
