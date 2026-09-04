@@ -1,4 +1,4 @@
-﻿-- ============================================================
+-- ============================================================
 -- 04 - TRIGGERS
 -- ============================================================
 
@@ -6,7 +6,7 @@
 CREATE OR REPLACE FUNCTION private.processar_novo_usuario()
 RETURNS TRIGGER
 LANGUAGE plpgsql
-SECURITY INVOKER SET search_path = public
+SECURITY DEFINER SET search_path = public
 AS $$
 DECLARE
   v_papel public.papel_usuario;

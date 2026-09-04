@@ -1,4 +1,4 @@
-﻿-- ============================================================
+-- ============================================================
 -- 05 - ROW LEVEL SECURITY (RLS) E POLÍTICAS
 -- ============================================================
 -- Nota: A role 'anon' não possui grants no schema public (Zero-Trust).
@@ -10,6 +10,10 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE ALL ON ROUTINES FROM PUBLIC;
 GRANT ALL ON ALL TABLES IN SCHEMA public TO authenticated, service_role;
 GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO authenticated, service_role;
 GRANT ALL ON ALL ROUTINES IN SCHEMA public TO authenticated, service_role;
+
+-- Grants para o schema private (necessário para as políticas RLS)
+GRANT USAGE ON SCHEMA private TO authenticated, service_role;
+GRANT EXECUTE ON ALL ROUTINES IN SCHEMA private TO authenticated, service_role;
 
 ALTER TABLE public.usuarios ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.disciplinas ENABLE ROW LEVEL SECURITY;
