@@ -59,7 +59,8 @@ async function onSubmit() {
 
     // Trata o erro de rede bloqueada (comum em redes acadêmicas/corporativas)
     if (err.message.includes('fetch') || !navigator.onLine) {
-      mensagem = 'Sem conexão com o servidor. Se estiver no Wi-Fi da faculdade, tente usar o 4G/5G.';
+      mensagem =
+        'Sem conexão com o servidor. Se estiver no Wi-Fi da faculdade, tente usar o 4G/5G.';
     }
 
     $q.notify({
