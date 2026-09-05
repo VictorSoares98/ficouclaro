@@ -15,7 +15,20 @@ export function useAsyncOperation() {
     try {
       return await operation();
     } catch (err: unknown) {
-      error.value = err instanceof Error ? err.message : fallbackErrorMsg;
+      let msg = err instanceof Error ? err.message : fallbackErrorMsg;
+      const lower = msg.toLowerCase();
+
+      // Trata erros de rede / bloqueio de Wi-Fi corporativo ou de faculdade
+      if (
+        lower.includes('failed to fetch') ||
+        lower.includes('networkerror') ||
+        lower.includes('network request failed') ||
+        lower.includes('load failed')
+      ) {
+        msg = 'Sem conexão com o servidor. Se estiver no Wi-Fi da faculdade, autentique na rede ou use o 4G/5G.';
+      }
+
+      error.value = msg;
       if (showNotify) {
         Notify.create({
           type: 'negative',
@@ -24,7 +37,7 @@ export function useAsyncOperation() {
           timeout: 4000,
         });
       }
-      throw err instanceof Error ? err : new Error(error.value);
+      throw new Error(msg, { cause: err });
     } finally {
       isLoading.value = false;
     }
