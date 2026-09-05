@@ -12,6 +12,7 @@ const $q = useQuasar();
 const isOpen = ref(false);
 const rating = ref(0);
 const comentario = ref('');
+const isAnonymous = ref(true);
 
 // Cores baseadas na nota (ux guide)
 const getRatingColor = (val: number) => {
@@ -47,7 +48,7 @@ async function submit() {
     sessao_id: sessionStore.currentSession.id,
     nota: rating.value,
     comentario: comentario.value.trim() || null,
-  });
+  }, isAnonymous.value);
 
   if (!flashReviewStore.error) {
     $q.notify({
@@ -100,6 +101,16 @@ function skip() {
           rows="3"
           class="tw-mb-4"
         />
+
+        <div class="tw-flex tw-items-center tw-justify-between tw-px-1 tw-mb-4">
+          <div class="tw-text-left">
+            <div class="tw-font-medium tw-text-sm">Avaliação Anônima</div>
+            <div class="tw-text-xs text-muted">
+              {{ isAnonymous ? 'O professor não verá quem enviou.' : 'Seu nome será enviado junto à avaliação.' }}
+            </div>
+          </div>
+          <q-toggle v-model="isAnonymous" color="primary" />
+        </div>
       </q-card-section>
 
       <q-card-actions class="tw-flex tw-justify-between tw-px-4 tw-pb-4">

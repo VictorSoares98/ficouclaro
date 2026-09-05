@@ -8,11 +8,15 @@ export class FlashReviewService {
   /**
    * Envia a avaliação anônima do aluno para uma sessão encerrada.
    */
-  async submitReview(review: Omit<AvaliacaoInsert, 'hash_eleitor' | 'created_at'>): Promise<void> {
+  async submitReview(
+    review: Omit<AvaliacaoInsert, 'hash_eleitor' | 'created_at'>,
+    isAnonymous: boolean = true,
+  ): Promise<void> {
     const { error } = await supabaseClient.rpc('submit_flash_review', {
       p_sessao_id: review.sessao_id,
       p_nota: review.nota,
       p_comentario: review.comentario || null,
+      p_anonimo: isAnonymous,
     });
 
     if (error) {
