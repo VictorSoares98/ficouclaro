@@ -117,20 +117,28 @@ END;
 $$;
 
 -- 3. Avaliação Rápida (Pós-Aula)
-CREATE OR REPLACE FUNCTION public.submit_flash_review(p_sessao_id UUID, p_nota SMALLINT, p_comentario TEXT)
+CREATE OR REPLACE FUNCTION public.submit_flash_review(p_sessao_id UUID, p_nota SMALLINT, p_comentario TEXT, p_anonimo BOOLEAN DEFAULT true)
 RETURNS void
 LANGUAGE plpgsql
 SECURITY INVOKER SET search_path = public
 AS $$
 DECLARE
   v_hash TEXT;
+  v_aluno_id UUID;
 BEGIN
   IF auth.uid() IS NULL THEN
     RAISE EXCEPTION 'Usuário não autenticado.';
   END IF;
+  
   v_hash := encode(digest((auth.uid()::text || p_sessao_id::text)::bytea, 'sha256'), 'hex');
+  
+  IF p_anonimo THEN
+    v_aluno_id := NULL;
+  ELSE
+    v_aluno_id := auth.uid();
+  END IF;
 
-  INSERT INTO public.avaliacoes_rapidas (sessao_id, nota, comentario, hash_eleitor)
-  VALUES (p_sessao_id, p_nota, p_comentario, v_hash);
+  INSERT INTO public.avaliacoes_rapidas (sessao_id, aluno_id, nota, comentario, hash_eleitor)
+  VALUES (p_sessao_id, v_aluno_id, p_nota, p_comentario, v_hash);
 END;
 $$;
