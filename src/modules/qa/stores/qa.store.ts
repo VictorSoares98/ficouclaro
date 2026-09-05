@@ -37,7 +37,7 @@ export const useQaStore = defineStore('qa', () => {
     return execute(async () => {
       questions.value = await qaService.fetchQuestions(sessionId);
 
-      const channel = realtimeManager.getChannel(`room-${sessionId}`);
+      const channel = realtimeManager.getChannel(`qa-${sessionId}`);
 
       channel.on(
         'postgres_changes',
@@ -80,7 +80,7 @@ export const useQaStore = defineStore('qa', () => {
     if (currentSessionId.value !== sessionId) return;
     currentSessionId.value = null;
 
-    realtimeManager.releaseChannel(`room-${sessionId}`);
+    realtimeManager.releaseChannel(`qa-${sessionId}`);
     questions.value = [];
     myUpvotes.value.clear();
   }

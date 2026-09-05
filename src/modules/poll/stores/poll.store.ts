@@ -181,7 +181,7 @@ export const usePollStore = defineStore('poll', () => {
     if (currentSessionId.value === sessionId) return;
     currentSessionId.value = sessionId;
 
-    const channelName = `room-${sessionId}`;
+    const channelName = `poll-${sessionId}`;
     const channel = realtimeManager.getChannel(channelName);
 
     // Escutar por novas enquetes ou alterações de status
@@ -260,7 +260,7 @@ export const usePollStore = defineStore('poll', () => {
     if (currentSessionId.value !== sessionId) return;
     currentSessionId.value = null;
 
-    realtimeManager.releaseChannel(`room-${sessionId}`);
+    realtimeManager.releaseChannel(`poll-${sessionId}`);
     activePolls.value = [];
     pastPolls.value = [];
     pollResults.value = {};
