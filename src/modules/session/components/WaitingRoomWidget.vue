@@ -1,17 +1,34 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import BaseSurfaceCard from '@/core/components/BaseSurfaceCard.vue';
 import { getAvatarUrl } from '@/core/services/api/avatar.service';
+import { getRandomAdvice } from '@/core/services/api/quotes.service';
+import { useAsyncOperation } from '@/core/composables/useAsyncOperation';
 
 defineProps<{
   topic?: string | null;
 }>();
 
 const nickname = ref('');
+const currentAdvice = ref<string>('');
+
+const { isLoading: isFetchingAdvice, execute: fetchAdvice } = useAsyncOperation();
 
 const avatarUrl = computed(() => {
   if (!nickname.value) return getAvatarUrl('Aluno');
   return getAvatarUrl(nickname.value);
+});
+
+const loadNewAdvice = async () => {
+  try {
+    currentAdvice.value = await fetchAdvice(getRandomAdvice, 'Erro ao carregar dica.');
+  } catch {
+    // Erro já é notificado pelo useAsyncOperation (ADR-005)
+  }
+};
+
+onMounted(() => {
+  void loadNewAdvice();
 });
 </script>
 
@@ -26,10 +43,10 @@ const avatarUrl = computed(() => {
       </p>
     </div>
 
-    <!-- Mashup Nível 4: DiceBear Avatar -->
+    <!-- Mashup Nível 4: DiceBear Avatar + Advice Slip -->
     <BaseSurfaceCard variant="glass" class="tw-p-6 tw-flex tw-flex-col tw-items-center tw-gap-4">
       <h3 class="tw-text-lg tw-font-bold tw-text-primary">Crie seu Avatar</h3>
-      <p class="text-muted tw-text-sm">
+      <p class="text-muted tw-text-sm tw-text-center">
         Enquanto a aula não começa, digite um apelido para gerar seu robô único!
       </p>
 
@@ -57,6 +74,31 @@ const avatarUrl = computed(() => {
           <q-icon name="smart_toy" />
         </template>
       </q-input>
+
+      <!-- Advice Slip API Section -->
+      <div class="tw-w-full tw-max-w-sm tw-mt-4 tw-p-4 tw-bg-white/50 dark:tw-bg-black/20 tw-rounded-lg tw-border tw-border-slate-200 dark:tw-border-slate-700">
+        <div class="tw-flex tw-justify-between tw-items-center tw-mb-2">
+          <span class="tw-text-xs tw-font-bold tw-uppercase text-muted">Conselho do Dia</span>
+          <q-btn
+            icon="refresh"
+            flat
+            round
+            dense
+            size="sm"
+            color="primary"
+            :loading="isFetchingAdvice"
+            @click="loadNewAdvice"
+          />
+        </div>
+        
+        <div v-if="isFetchingAdvice" class="tw-space-y-2">
+          <q-skeleton type="text" width="100%" />
+          <q-skeleton type="text" width="80%" />
+        </div>
+        <p v-else class="tw-text-sm tw-italic tw-text-center">
+          "{{ currentAdvice || '...' }}"
+        </p>
+      </div>
     </BaseSurfaceCard>
   </div>
 </template>
