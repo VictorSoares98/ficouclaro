@@ -90,7 +90,7 @@ BEGIN
   IF auth.uid() IS NULL THEN
     RAISE EXCEPTION 'Usuário não autenticado.';
   END IF;
-  v_hash := encode(digest((auth.uid()::text || p_enquete_id::text)::bytea, 'sha256'), 'hex');
+  v_hash := encode(extensions.digest(auth.uid()::text || p_enquete_id::text, 'sha256'), 'hex');
 
   INSERT INTO public.respostas_enquete (enquete_id, resposta, hash_eleitor)
   VALUES (p_enquete_id, p_resposta, v_hash);
@@ -109,7 +109,7 @@ BEGIN
   IF auth.uid() IS NULL THEN
     RAISE EXCEPTION 'Usuário não autenticado.';
   END IF;
-  v_hash := encode(digest((auth.uid()::text || p_duvida_id::text)::bytea, 'sha256'), 'hex');
+  v_hash := encode(extensions.digest(auth.uid()::text || p_duvida_id::text, 'sha256'), 'hex');
 
   INSERT INTO public.votos_duvida (duvida_id, hash_eleitor)
   VALUES (p_duvida_id, v_hash);
@@ -130,7 +130,7 @@ BEGIN
     RAISE EXCEPTION 'Usuário não autenticado.';
   END IF;
   
-  v_hash := encode(digest((auth.uid()::text || p_sessao_id::text)::bytea, 'sha256'), 'hex');
+  v_hash := encode(extensions.digest(auth.uid()::text || p_sessao_id::text, 'sha256'), 'hex');
   
   IF p_anonimo THEN
     v_aluno_id := NULL;
