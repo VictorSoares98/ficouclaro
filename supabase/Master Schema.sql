@@ -509,7 +509,6 @@ ALTER PUBLICATION supabase_realtime ADD TABLE public.sessoes;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.sinais_ritmo;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.duvidas;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.enquetes;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.respostas_enquete;
 
 -- >>> FIM DO SNIPPET: 07_Realtime.sql <<<
-
-
