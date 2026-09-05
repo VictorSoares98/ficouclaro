@@ -25,7 +25,8 @@ export function useAsyncOperation() {
         lower.includes('network request failed') ||
         lower.includes('load failed')
       ) {
-        msg = 'Sem conexão com o servidor. Se estiver no Wi-Fi da faculdade, autentique na rede ou use o 4G/5G.';
+        msg =
+          'Sem conexão com o servidor. Se estiver no Wi-Fi da faculdade, autentique na rede ou use o 4G/5G.';
       }
 
       error.value = msg;
