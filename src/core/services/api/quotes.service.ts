@@ -16,7 +16,7 @@ export async function getRandomAdvice(): Promise<string> {
   const adviceResponse = await fetch('https://api.adviceslip.com/advice', {
     cache: 'no-store',
   });
-  
+
   if (!adviceResponse.ok) {
     throw new Error('Falha ao obter conselho original.');
   }
@@ -27,7 +27,7 @@ export async function getRandomAdvice(): Promise<string> {
   // 2. Fetch do Mashup (API de Tradução para PT-BR)
   const encodedText = encodeURIComponent(englishAdvice);
   const translationResponse = await fetch(
-    `https://api.mymemory.translated.net/get?q=${encodedText}&langpair=en|pt-br`
+    `https://api.mymemory.translated.net/get?q=${encodedText}&langpair=en|pt-br`,
   );
 
   if (!translationResponse.ok) {

@@ -76,7 +76,9 @@ onMounted(() => {
       </q-input>
 
       <!-- Advice Slip API Section -->
-      <div class="tw-w-full tw-max-w-sm tw-mt-4 tw-p-4 tw-bg-white/50 dark:tw-bg-black/20 tw-rounded-lg tw-border tw-border-slate-200 dark:tw-border-slate-700">
+      <div
+        class="tw-w-full tw-max-w-sm tw-mt-4 tw-p-4 tw-bg-white/50 dark:tw-bg-black/20 tw-rounded-lg tw-border tw-border-slate-200 dark:tw-border-slate-700"
+      >
         <div class="tw-flex tw-justify-between tw-items-center tw-mb-2">
           <span class="tw-text-xs tw-font-bold tw-uppercase text-muted">Conselho do Dia</span>
           <q-btn
@@ -90,14 +92,12 @@ onMounted(() => {
             @click="loadNewAdvice"
           />
         </div>
-        
+
         <div v-if="isFetchingAdvice" class="tw-space-y-2">
           <q-skeleton type="text" width="100%" />
           <q-skeleton type="text" width="80%" />
         </div>
-        <p v-else class="tw-text-sm tw-italic tw-text-center">
-          "{{ currentAdvice || '...' }}"
-        </p>
+        <p v-else class="tw-text-sm tw-italic tw-text-center">"{{ currentAdvice || '...' }}"</p>
       </div>
     </BaseSurfaceCard>
   </div>
