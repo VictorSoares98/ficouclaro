@@ -51,7 +51,7 @@ onMounted(() => {
       </p>
 
       <div
-        class="tw-w-32 tw-h-32 tw-rounded-full tw-overflow-hidden tw-bg-slate-100 dark:tw-bg-slate-800 tw-flex tw-items-center tw-justify-center tw-shadow-inner"
+        class="tw-w-32 tw-h-32 tw-rounded-full tw-overflow-hidden bg-grey-2 dark:bg-grey-9 tw-flex tw-items-center tw-justify-center tw-shadow-inner"
       >
         <q-img
           :src="avatarUrl"
@@ -76,9 +76,7 @@ onMounted(() => {
       </q-input>
 
       <!-- Advice Slip API Section -->
-      <div
-        class="tw-w-full tw-max-w-sm tw-mt-4 tw-p-4 tw-bg-white/50 dark:tw-bg-black/20 tw-rounded-lg tw-border tw-border-slate-200 dark:tw-border-slate-700"
-      >
+      <BaseSurfaceCard variant="flat" class="tw-w-full tw-max-w-sm tw-mt-4 tw-p-4">
         <div class="tw-flex tw-justify-between tw-items-center tw-mb-2">
           <span class="tw-text-xs tw-font-bold tw-uppercase text-muted">Conselho do Dia</span>
           <q-btn
@@ -97,8 +95,8 @@ onMounted(() => {
           <q-skeleton type="text" width="100%" />
           <q-skeleton type="text" width="80%" />
         </div>
-        <p v-else class="tw-text-sm tw-italic tw-text-center">"{{ currentAdvice || '...' }}"</p>
-      </div>
+        <p v-else class="text-body2 tw-italic tw-text-center">"{{ currentAdvice || '...' }}"</p>
+      </BaseSurfaceCard>
     </BaseSurfaceCard>
   </div>
 </template>

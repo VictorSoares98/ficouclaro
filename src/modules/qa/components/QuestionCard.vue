@@ -41,11 +41,11 @@ const { isLoading: isSearchingWiki, execute: executeWikiSearch } = useAsyncOpera
 const searchWiki = async () => {
   if (!wikiSearchTerm.value.trim()) return;
   wikiResult.value = '';
-  
+
   try {
     wikiResult.value = await executeWikiSearch(
       () => getWikipediaSummary(wikiSearchTerm.value),
-      'Erro ao buscar na Wikipedia.'
+      'Erro ao buscar na Wikipedia.',
     );
   } catch {
     // Tratamento nativo do ADR-005 já notifica
@@ -134,12 +134,7 @@ const searchWiki = async () => {
             color="primary"
             @keyup.enter="searchWiki"
           />
-          <q-btn
-            color="primary"
-            icon="search"
-            :loading="isSearchingWiki"
-            @click="searchWiki"
-          />
+          <q-btn color="primary" icon="search" :loading="isSearchingWiki" @click="searchWiki" />
         </div>
 
         <!-- Resultados / Loading -->
@@ -148,11 +143,11 @@ const searchWiki = async () => {
           <q-skeleton type="text" width="90%" />
           <q-skeleton type="text" width="80%" />
         </div>
-        <div v-else-if="wikiResult" class="tw-mt-4 tw-p-4 tw-bg-slate-100 dark:tw-bg-slate-800 tw-rounded-lg">
-          <p class="tw-text-sm tw-leading-relaxed tw-m-0">
+        <BaseSurfaceCard v-else-if="wikiResult" variant="flat" class="tw-mt-4 tw-p-4">
+          <p class="text-body2 tw-leading-relaxed tw-m-0">
             {{ wikiResult }}
           </p>
-        </div>
+        </BaseSurfaceCard>
       </BaseSurfaceCard>
     </q-dialog>
   </BaseSurfaceCard>
