@@ -1,7 +1,20 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from '@/core/types/database.types';
 
-const supabaseUrl = import.meta.env.QCLI_SUPABASE_URL;
+let supabaseUrl = import.meta.env.QCLI_SUPABASE_URL;
+
+// Adaptação dinâmica para acesso mobile na mesma rede local
+if (
+  import.meta.env.DEV &&
+  supabaseUrl &&
+  (supabaseUrl.includes('127.0.0.1') || supabaseUrl.includes('localhost')) &&
+  window.location.hostname !== 'localhost' &&
+  window.location.hostname !== '127.0.0.1'
+) {
+  const urlObj = new URL(supabaseUrl);
+  urlObj.hostname = window.location.hostname;
+  supabaseUrl = urlObj.toString();
+}
 const supabaseAnonKey = import.meta.env.QCLI_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
