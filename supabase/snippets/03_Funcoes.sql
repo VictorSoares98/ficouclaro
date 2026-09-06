@@ -23,6 +23,9 @@ $$ LANGUAGE sql STABLE SECURITY INVOKER SET search_path = public;
 CREATE OR REPLACE FUNCTION public.delete_own_account()
 RETURNS void AS $$
 BEGIN
+  IF auth.uid() IS NULL THEN
+    RAISE EXCEPTION 'Usuário não autenticado.';
+  END IF;
   DELETE FROM auth.users WHERE id = auth.uid();
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;

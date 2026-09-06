@@ -1,7 +1,7 @@
 -- ====================================================================
 -- ⚠️ AVISO: ARQUIVO AUTO-GERADO!
 -- NÃO EDITE ESTE ARQUIVO DIRETAMENTE. ALTERE OS SNIPPETS E RODE db:build
--- Gerado em: 2026-09-06T06:24:37.877Z
+-- Gerado em: 2026-09-06T06:29:47.113Z
 -- ====================================================================
 
 -- >>> INÍCIO DO SNIPPET: 00_Init_Extensions.sql <<<
@@ -167,6 +167,9 @@ $$ LANGUAGE sql STABLE SECURITY INVOKER SET search_path = public;
 CREATE OR REPLACE FUNCTION public.delete_own_account()
 RETURNS void AS $$
 BEGIN
+  IF auth.uid() IS NULL THEN
+    RAISE EXCEPTION 'Usuário não autenticado.';
+  END IF;
   DELETE FROM auth.users WHERE id = auth.uid();
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
