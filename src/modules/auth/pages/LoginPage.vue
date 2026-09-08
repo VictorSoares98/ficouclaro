@@ -30,21 +30,9 @@ async function onSubmit() {
     } else {
       void router.push('/');
     }
-  } catch (error) {
-    const err = error as Error;
-    let mensagem = err.message || 'Erro ao realizar login';
-
-    // Trata o erro de rede bloqueada (comum em redes acadêmicas/corporativas)
-    if (err.message.includes('fetch') || !navigator.onLine) {
-      mensagem =
-        'Sem conexão com o servidor. Se estiver no Wi-Fi da faculdade, tente usar o 4G/5G.';
-    }
-
-    $q.notify({
-      type: 'negative',
-      message: mensagem,
-      position: 'top',
-    });
+  } catch {
+    // O erro já é tratado e notificado globalmente pelo authStore (useAsyncOperation)
+    // Este catch serve apenas para interromper o fluxo e evitar o redirecionamento indevido
   }
 }
 </script>

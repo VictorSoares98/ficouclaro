@@ -20,6 +20,7 @@ export function useAsyncOperation() {
 
       // Trata erros de rede / bloqueio de Wi-Fi corporativo ou de faculdade
       if (
+        !navigator.onLine ||
         lower.includes('failed to fetch') ||
         lower.includes('networkerror') ||
         lower.includes('network request failed') ||
