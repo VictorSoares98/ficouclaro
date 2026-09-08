@@ -40,9 +40,7 @@ export const useSessionStore = defineStore('session', () => {
           (payload: RealtimePostgresUpdatePayload<Sessao>) => {
             // Atualizar estado local quando o BD mudar
             if (currentSession.value) {
-              currentSession.value.status = payload.new.status;
-              currentSession.value.iniciada_em = payload.new.iniciada_em;
-              currentSession.value.encerrada_em = payload.new.encerrada_em;
+              currentSession.value = payload.new;
             }
           },
         );
@@ -74,8 +72,7 @@ export const useSessionStore = defineStore('session', () => {
     return execute(async () => {
       const updated = await sessionService.startSession(session.id);
       if (currentSession.value) {
-        currentSession.value.status = updated.status;
-        currentSession.value.iniciada_em = updated.iniciada_em;
+        currentSession.value = updated;
       }
     }, 'Erro ao iniciar aula.');
   }
@@ -87,8 +84,7 @@ export const useSessionStore = defineStore('session', () => {
     return execute(async () => {
       const updated = await sessionService.endSession(session.id);
       if (currentSession.value) {
-        currentSession.value.status = updated.status;
-        currentSession.value.encerrada_em = updated.encerrada_em;
+        currentSession.value = updated;
       }
     }, 'Erro ao encerrar sessão.');
   }
