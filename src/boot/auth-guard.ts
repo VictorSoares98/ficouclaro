@@ -19,8 +19,11 @@ export default defineBoot(({ router, store }) => {
 
     // Rota Pública
     if (!requiredRoles) {
-      // Se já estiver logado e tentar ir para login/register, manda pro dashboard
-      if (authStore.isAuthenticated && (to.path === '/login' || to.path === '/register')) {
+      // Se já estiver logado e tentar ir para rotas iniciais/públicas, manda pro dashboard correspondente
+      if (
+        authStore.isAuthenticated &&
+        (to.path === '/' || to.path === '/login' || to.path === '/register')
+      ) {
         const userRole = authStore.user?.perfil.papel;
         return userRole ? `/${userRole}` : '/';
       }
