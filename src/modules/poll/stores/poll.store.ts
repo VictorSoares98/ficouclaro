@@ -91,8 +91,7 @@ export const usePollStore = defineStore('poll', () => {
   async function createPoll(enquete: EnqueteInsertRow): Promise<void> {
     await execute(async (): Promise<void> => {
       const newPoll: Enquete = await pollService.createPoll(enquete);
-      const currentPast = pastPolls.value;
-      currentPast.unshift(newPoll);
+      pastPolls.value = [newPoll, ...pastPolls.value];
     }, 'Erro ao criar enquete');
   }
 
@@ -105,11 +104,8 @@ export const usePollStore = defineStore('poll', () => {
         const poll = pastPolls.value[pollIndex];
         if (poll) {
           poll.status = 'ativa';
-          const currentActive = activePolls.value;
-          currentActive.push(poll);
-
-          const currentPast = pastPolls.value;
-          currentPast.splice(pollIndex, 1);
+          activePolls.value = [...activePolls.value, poll];
+          pastPolls.value = pastPolls.value.filter((_, i) => i !== pollIndex);
         }
       }
     }, 'Erro ao ativar enquete');
@@ -124,11 +120,8 @@ export const usePollStore = defineStore('poll', () => {
         const poll = activePolls.value[pollIndex];
         if (poll) {
           poll.status = 'encerrada';
-          const currentPast = pastPolls.value;
-          currentPast.unshift(poll);
-
-          const currentActive = activePolls.value;
-          currentActive.splice(pollIndex, 1);
+          pastPolls.value = [poll, ...pastPolls.value];
+          activePolls.value = activePolls.value.filter((_, i) => i !== pollIndex);
         }
       }
     }, 'Erro ao encerrar enquete');
@@ -190,9 +183,9 @@ export const usePollStore = defineStore('poll', () => {
       { event: 'INSERT', schema: 'public', table: 'enquetes', filter: `sessao_id=eq.${sessionId}` },
       (payload: RealtimePostgresInsertPayload<Enquete>) => {
         if (payload.new.status === 'ativa') {
-          activePolls.value.unshift(payload.new);
+          activePolls.value = [payload.new, ...activePolls.value];
         } else if (isProfessor) {
-          pastPolls.value.unshift(payload.new);
+          pastPolls.value = [payload.new, ...pastPolls.value];
         }
       },
     );
@@ -207,13 +200,13 @@ export const usePollStore = defineStore('poll', () => {
         if (updatedPoll.status === 'encerrada') {
           activePolls.value = activePolls.value.filter((p) => p.id !== updatedPoll.id);
           if (isProfessor && !pastPolls.value.find((p) => p.id === updatedPoll.id)) {
-            pastPolls.value.unshift(updatedPoll);
+            pastPolls.value = [updatedPoll, ...pastPolls.value];
           }
         }
         // Adiciona nas ativas se ativou
         else if (updatedPoll.status === 'ativa') {
           if (!activePolls.value.find((p) => p.id === updatedPoll.id)) {
-            activePolls.value.unshift(updatedPoll);
+            activePolls.value = [updatedPoll, ...activePolls.value];
           }
           if (isProfessor) {
             pastPolls.value = pastPolls.value.filter((p) => p.id !== updatedPoll.id);
