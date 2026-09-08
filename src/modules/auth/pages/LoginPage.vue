@@ -53,10 +53,17 @@ async function onSubmit() {
         @click="authStore.loginWithGoogle()"
         :loading="authStore.isLoading"
       />
+      <p class="tw-text-xs tw-text-center text-muted tw-mt-2">
+        Ao continuar, você concorda com nossos
+        <router-link to="/termos" class="tw-text-primary hover:tw-underline">Termos</router-link> e
+        <router-link to="/privacidade" class="tw-text-primary hover:tw-underline"
+          >Privacidade</router-link
+        >.
+      </p>
 
       <div class="tw-flex tw-items-center">
         <div class="tw-flex-1 tw-h-px tw-bg-gray-300"></div>
-        <span class="tw-px-4 tw-text-gray-500 tw-font-medium">ou</span>
+        <span class="tw-px-4 text-muted tw-font-medium">ou</span>
         <div class="tw-flex-1 tw-h-px tw-bg-gray-300"></div>
       </div>
 

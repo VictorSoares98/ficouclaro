@@ -92,7 +92,7 @@ async function onGoogleLogin() {
 
       <div class="tw-flex tw-items-center">
         <div class="tw-flex-1 tw-h-px tw-bg-gray-300"></div>
-        <span class="tw-px-4 tw-text-gray-500 tw-font-medium">ou</span>
+        <span class="tw-px-4 text-muted tw-font-medium">ou</span>
         <div class="tw-flex-1 tw-h-px tw-bg-gray-300"></div>
       </div>
 
