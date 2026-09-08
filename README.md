@@ -41,9 +41,15 @@ Nossa stack foi rigorosamente escolhida para fornecer um MVP Híbrido, altamente
    Crie um arquivo `.env.local` na raiz do projeto contendo as chaves do seu projeto Supabase:
 
    ```env
-   VITE_SUPABASE_URL="https://<seu-projeto>.supabase.co"
-   VITE_SUPABASE_ANON_KEY="<sua-anon-key>"
+   QCLI_SUPABASE_URL="https://<seu-projeto>.supabase.co"
+   QCLI_SUPABASE_ANON_KEY="<sua-anon-key>"
+   
+   # Chaves Login Social Google (Requeridas para emular OAuth localmente)
+   SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID="<client-id>"
+   SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET="<secret>"
    ```
+
+   > 🔐 **Login Social Local (Google):** O arquivo `supabase/config.toml` está amarrado a essas chaves. Para testar o fluxo localmente sem erros 400, adicione estritamente o URI de redirecionamento `http://127.0.0.1:54421/auth/v1/callback` lá no seu projeto do **Google Cloud Console**.
 
    > 💡 **Importante para Mobile:** Para testes em dispositivos reais ou emuladores com Supabase Local, utilize o IP do seu computador (ex: `http://192.168.x.xxx:54421`) em vez de `localhost`. Consulte o [GUIA_CONFIGURACAO_MOBILE.md](./GUIA_CONFIGURACAO_MOBILE.md) para detalhes técnicos.
 
