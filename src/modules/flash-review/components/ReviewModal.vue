@@ -44,11 +44,14 @@ async function submit() {
     return;
   }
 
-  await flashReviewStore.submitReview({
-    sessao_id: sessionStore.currentSession.id,
-    nota: rating.value,
-    comentario: comentario.value.trim() || null,
-  }, isAnonymous.value);
+  await flashReviewStore.submitReview(
+    {
+      sessao_id: sessionStore.currentSession.id,
+      nota: rating.value,
+      comentario: comentario.value.trim() || null,
+    },
+    isAnonymous.value,
+  );
 
   if (!flashReviewStore.error) {
     $q.notify({
@@ -106,7 +109,11 @@ function skip() {
           <div class="tw-text-left">
             <div class="tw-font-medium tw-text-sm">Avaliação Anônima</div>
             <div class="tw-text-xs text-muted">
-              {{ isAnonymous ? 'O professor não verá quem enviou.' : 'Seu nome será enviado junto à avaliação.' }}
+              {{
+                isAnonymous
+                  ? 'O professor não verá quem enviou.'
+                  : 'Seu nome será enviado junto à avaliação.'
+              }}
             </div>
           </div>
           <q-toggle v-model="isAnonymous" color="primary" />

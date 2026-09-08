@@ -46,7 +46,7 @@ const chartOptions = computed<EChartsOption>(() => {
   const data = props.insights
     .filter((i) => i.iniciada_em)
     .map((i) => {
-      const date = new Date(i.iniciada_em!);
+      const date = new Date(i.iniciada_em);
       const dateStr = date.toISOString().split('T')[0];
       return [
         dateStr,

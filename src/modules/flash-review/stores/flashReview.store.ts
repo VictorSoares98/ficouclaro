@@ -59,7 +59,10 @@ export const useFlashReviewStore = defineStore('flashReview', (): FlashReviewSto
     }
   }
 
-  async function submitReview(review: AvaliacaoInsertRow, isAnonymous: boolean = true): Promise<void> {
+  async function submitReview(
+    review: AvaliacaoInsertRow,
+    isAnonymous: boolean = true,
+  ): Promise<void> {
     await execute(async (): Promise<void> => {
       const userId = authStore.user?.auth.id;
       if (!userId) throw new Error('Usuário não autenticado.');

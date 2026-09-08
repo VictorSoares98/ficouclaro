@@ -1,17 +1,8 @@
 import { supabaseClient } from '@/core/supabase/client';
+import type { Database } from '@/core/types/database.types';
 
-export interface SessionInsights {
-  sessao_id: string;
-  disciplina_id: string;
-  topico: string | null;
-  iniciada_em: string | null;
-  status: 'aguardando' | 'ativa' | 'encerrada';
-  media_estrelas: number;
-  total_avaliacoes: number;
-  total_duvidas: number;
-  total_sinais: number;
-  total_enquetes: number;
-}
+export type SessionInsights =
+  Database['public']['Functions']['get_course_insights']['Returns'][number];
 
 export class DashboardService {
   /**
@@ -27,8 +18,8 @@ export class DashboardService {
       throw new Error(error.message);
     }
 
-    // Cast seguro para a interface base e ordenação cronológica
-    const sessions = (data as unknown as SessionInsights[]) || [];
+    // Tipagem inferida automaticamente pelo Supabase; ordenação cronológica
+    const sessions = data || [];
 
     return sessions.sort((a, b) => {
       const dateA = a.iniciada_em ? new Date(a.iniciada_em).getTime() : 0;
