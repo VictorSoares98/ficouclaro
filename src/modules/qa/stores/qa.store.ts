@@ -49,7 +49,7 @@ export const useQaStore = defineStore('qa', () => {
         },
         (payload: RealtimePostgresChangesPayload<Duvida>) => {
           if (payload.eventType === 'INSERT') {
-            questions.value.push(payload.new);
+            questions.value = [...questions.value, payload.new];
           }
         },
       );
@@ -64,10 +64,9 @@ export const useQaStore = defineStore('qa', () => {
         },
         (payload: RealtimePostgresChangesPayload<Duvida>) => {
           if (payload.eventType === 'UPDATE') {
-            const index = questions.value.findIndex((q) => q.id === payload.new.id);
-            if (index !== -1) {
-              questions.value[index] = payload.new;
-            }
+            questions.value = questions.value.map((q) =>
+              q.id === payload.new.id ? payload.new : q,
+            );
           }
         },
       );
