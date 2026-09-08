@@ -21,8 +21,8 @@ BEGIN
   INSERT INTO public.usuarios (id, nome_completo, url_avatar, papel)
   VALUES (
     NEW.id,
-    NEW.raw_user_meta_data->>'nome_completo',
-    NEW.raw_user_meta_data->>'url_avatar',
+    COALESCE(NEW.raw_user_meta_data->>'nome_completo', NEW.raw_user_meta_data->>'full_name', NEW.raw_user_meta_data->>'name'),
+    COALESCE(NEW.raw_user_meta_data->>'url_avatar', NEW.raw_user_meta_data->>'avatar_url', NEW.raw_user_meta_data->>'picture'),
     COALESCE(v_papel, 'aluno'::public.papel_usuario)
   );
   

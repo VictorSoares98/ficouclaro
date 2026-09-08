@@ -23,6 +23,16 @@ class AuthService {
     if (error) throw new Error(error.message);
   }
 
+  async signInWithOAuth(provider: 'google' | 'github') {
+    const { error } = await supabaseClient.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: window.location.origin,
+      },
+    });
+    if (error) throw new Error(error.message);
+  }
+
   async deleteAccount() {
     const { error } = await supabaseClient.rpc('delete_own_account');
     if (error) throw new Error(error.message);

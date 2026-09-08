@@ -1,7 +1,7 @@
 -- ====================================================================
 -- ⚠️ AVISO: ARQUIVO AUTO-GERADO!
 -- NÃO EDITE ESTE ARQUIVO DIRETAMENTE. ALTERE OS SNIPPETS E RODE db:build
--- Gerado em: 2026-09-08T14:24:57.450Z
+-- Gerado em: 2026-09-08T14:31:21.074Z
 -- ====================================================================
 
 -- >>> INÍCIO DO SNIPPET: 00_Init_Extensions.sql <<<
@@ -319,8 +319,8 @@ BEGIN
   INSERT INTO public.usuarios (id, nome_completo, url_avatar, papel)
   VALUES (
     NEW.id,
-    NEW.raw_user_meta_data->>'nome_completo',
-    NEW.raw_user_meta_data->>'url_avatar',
+    COALESCE(NEW.raw_user_meta_data->>'nome_completo', NEW.raw_user_meta_data->>'full_name', NEW.raw_user_meta_data->>'name'),
+    COALESCE(NEW.raw_user_meta_data->>'url_avatar', NEW.raw_user_meta_data->>'avatar_url', NEW.raw_user_meta_data->>'picture'),
     COALESCE(v_papel, 'aluno'::public.papel_usuario)
   );
   

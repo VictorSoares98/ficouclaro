@@ -43,61 +43,79 @@ async function onSubmit() {
     subtitle="Insira suas credenciais para acessar a plataforma."
     :isLoading="authStore.isLoading"
   >
-    <q-form @submit.prevent="onSubmit" class="tw-space-y-6">
-      <q-input
-        v-model="email"
-        type="email"
-        label="E-mail"
-        outlined
-        reactive-rules
-        :rules="[
-          (val) => !!val || 'O e-mail é obrigatório',
-          (val) => /.+@.+\..+/.test(val) || 'E-mail inválido',
-        ]"
-        autocomplete="email"
-        name="email"
-        enterkeyhint="next"
-        color="primary"
-        class="tw-text-lg"
-      />
-
-      <q-input
-        v-model="password"
-        :type="isPasswordVisible ? 'text' : 'password'"
-        label="Senha"
-        outlined
-        reactive-rules
-        :rules="[
-          (val) => !!val || 'A senha é obrigatória',
-          (val) => val.length >= 6 || 'A senha deve ter no mínimo 6 caracteres',
-        ]"
-        autocomplete="current-password"
-        name="password"
-        enterkeyhint="done"
-        color="primary"
-        class="tw-text-lg"
-      >
-        <template v-slot:append>
-          <q-btn
-            round
-            dense
-            flat
-            :icon="isPasswordVisible ? 'visibility_off' : 'visibility'"
-            :aria-label="isPasswordVisible ? 'Ocultar senha' : 'Mostrar senha'"
-            @click="isPasswordVisible = !isPasswordVisible"
-          />
-        </template>
-      </q-input>
-
+    <div class="tw-space-y-6">
       <q-btn
-        type="submit"
-        color="primary"
-        class="tw-w-full tw-h-14 tw-rounded-xl tw-text-lg tw-font-bold tw-shadow-md"
-        :loading="authStore.isLoading"
+        class="tw-w-full tw-h-14 tw-rounded-xl tw-text-lg tw-font-bold tw-shadow-md tw-bg-white hover:tw-bg-gray-50"
+        text-color="grey-9"
+        icon="img:https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
+        label="Continuar com Google"
         unelevated
-        label="Entrar"
+        @click="authStore.loginWithGoogle()"
+        :loading="authStore.isLoading"
       />
-    </q-form>
+
+      <div class="tw-flex tw-items-center">
+        <div class="tw-flex-1 tw-h-px tw-bg-gray-300"></div>
+        <span class="tw-px-4 tw-text-gray-500 tw-font-medium">ou</span>
+        <div class="tw-flex-1 tw-h-px tw-bg-gray-300"></div>
+      </div>
+
+      <q-form @submit.prevent="onSubmit" class="tw-space-y-6">
+        <q-input
+          v-model="email"
+          type="email"
+          label="E-mail"
+          outlined
+          reactive-rules
+          :rules="[
+            (val) => !!val || 'O e-mail é obrigatório',
+            (val) => /.+@.+\..+/.test(val) || 'E-mail inválido',
+          ]"
+          autocomplete="email"
+          name="email"
+          enterkeyhint="next"
+          color="primary"
+          class="tw-text-lg"
+        />
+
+        <q-input
+          v-model="password"
+          :type="isPasswordVisible ? 'text' : 'password'"
+          label="Senha"
+          outlined
+          reactive-rules
+          :rules="[
+            (val) => !!val || 'A senha é obrigatória',
+            (val) => val.length >= 6 || 'A senha deve ter no mínimo 6 caracteres',
+          ]"
+          autocomplete="current-password"
+          name="password"
+          enterkeyhint="done"
+          color="primary"
+          class="tw-text-lg"
+        >
+          <template v-slot:append>
+            <q-btn
+              round
+              dense
+              flat
+              :icon="isPasswordVisible ? 'visibility_off' : 'visibility'"
+              :aria-label="isPasswordVisible ? 'Ocultar senha' : 'Mostrar senha'"
+              @click="isPasswordVisible = !isPasswordVisible"
+            />
+          </template>
+        </q-input>
+
+        <q-btn
+          type="submit"
+          color="primary"
+          class="tw-w-full tw-h-14 tw-rounded-xl tw-text-lg tw-font-bold tw-shadow-md"
+          :loading="authStore.isLoading"
+          unelevated
+          label="Entrar"
+        />
+      </q-form>
+    </div>
 
     <template #footer>
       <p class="text-muted">
