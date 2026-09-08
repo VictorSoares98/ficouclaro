@@ -15,6 +15,7 @@ export interface Resposta {
   id: string;
   created_at: string;
   enquete_id: string;
+  sessao_id: string;
   resposta: Json;
 }
 
@@ -135,9 +136,11 @@ export const usePollStore = defineStore('poll', () => {
 
       const userId = authStore.user?.auth.id;
       if (!userId) throw new Error('Usuário não autenticado.');
+      if (!currentSessionId.value) throw new Error('Sessão não definida.');
 
       await pollService.submitResponse({
         enquete_id: pollId,
+        sessao_id: currentSessionId.value,
         resposta: respostaData,
       });
 
@@ -217,30 +220,19 @@ export const usePollStore = defineStore('poll', () => {
 
     // Escutar por respostas (só interessa ao professor)
     if (isProfessor) {
-      // Como o filter do supabase só aceita =eq em colunas simples e não temos array_contains,
-      // a regra ideal seria filtrar por enquete_id. Como não sabemos quais enquetes podem receber respostas,
-      // vamos escutar todas e filtrar no código.
-      // O Supabase não permite filtrar por multiplos IDs em OR.
-      // Solução pragmática: escutar todas as respostas e descartar as que não pertencem a essa sessão
-      // (Isso será tratado pelo fato de que o canal de session não tem como filtrar tabela filha sem trigger)
-
-      // Wait, a better approach for responses is to use a specific channel per poll? No, limits.
-      // We can listen to all respostas_enquete and the RLS or client checks if it belongs to our poll.
       channel.on(
         'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'respostas_enquete' },
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'respostas_enquete',
+          filter: `sessao_id=eq.${sessionId}`,
+        },
         (payload: RealtimePostgresInsertPayload<Resposta>) => {
-          // Verifica se a resposta pertence a alguma enquete (ativa ou não) que conhecemos
-          const belongsToUs =
-            activePolls.value.some((p) => p.id === payload.new.enquete_id) ||
-            pastPolls.value.some((p) => p.id === payload.new.enquete_id);
+          responseBuffer.push(payload.new);
 
-          if (belongsToUs) {
-            responseBuffer.push(payload.new);
-
-            if (!bufferTimeout) {
-              bufferTimeout = window.setTimeout(flushBuffer, 500); // 500ms debounce buffer
-            }
+          if (!bufferTimeout) {
+            bufferTimeout = window.setTimeout(flushBuffer, 500); // 500ms debounce buffer
           }
         },
       );

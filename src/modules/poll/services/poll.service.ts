@@ -6,6 +6,7 @@ type EnqueteInsert = Database['public']['Tables']['enquetes']['Insert'];
 
 export interface PollVotePayload {
   enquete_id: string;
+  sessao_id: string;
   resposta: Json;
 }
 
@@ -61,6 +62,7 @@ export class PollService {
   async submitResponse(resposta: PollVotePayload): Promise<void> {
     const { error } = await supabaseClient.rpc('submit_poll_vote', {
       p_enquete_id: resposta.enquete_id,
+      p_sessao_id: resposta.sessao_id,
       p_resposta: resposta.resposta,
     });
 

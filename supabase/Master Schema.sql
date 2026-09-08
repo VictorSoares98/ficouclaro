@@ -1,7 +1,7 @@
 -- ====================================================================
 -- ⚠️ AVISO: ARQUIVO AUTO-GERADO!
 -- NÃO EDITE ESTE ARQUIVO DIRETAMENTE. ALTERE OS SNIPPETS E RODE db:build
--- Gerado em: 2026-09-08T13:43:52.340Z
+-- Gerado em: 2026-09-08T14:24:57.450Z
 -- ====================================================================
 
 -- >>> INÍCIO DO SNIPPET: 00_Init_Extensions.sql <<<
@@ -100,6 +100,7 @@ CREATE TABLE public.enquetes (
 CREATE TABLE public.respostas_enquete (
   id           UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   enquete_id   UUID NOT NULL REFERENCES public.enquetes(id) ON DELETE CASCADE,
+  sessao_id    UUID NOT NULL REFERENCES public.sessoes(id) ON DELETE CASCADE,
   resposta     JSONB NOT NULL,
   hash_eleitor TEXT NOT NULL,
   created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -227,7 +228,7 @@ $$ LANGUAGE sql STABLE SECURITY INVOKER SET search_path = public;
 -- ============================================================
 
 -- 1. Resposta de Enquete
-CREATE OR REPLACE FUNCTION public.submit_poll_vote(p_enquete_id UUID, p_resposta JSONB)
+CREATE OR REPLACE FUNCTION public.submit_poll_vote(p_enquete_id UUID, p_sessao_id UUID, p_resposta JSONB)
 RETURNS void
 LANGUAGE plpgsql
 SECURITY INVOKER SET search_path = public
@@ -240,8 +241,8 @@ BEGIN
   END IF;
   v_hash := encode(extensions.digest(auth.uid()::text || p_enquete_id::text, 'sha256'), 'hex');
 
-  INSERT INTO public.respostas_enquete (enquete_id, resposta, hash_eleitor)
-  VALUES (p_enquete_id, p_resposta, v_hash);
+  INSERT INTO public.respostas_enquete (enquete_id, sessao_id, resposta, hash_eleitor)
+  VALUES (p_enquete_id, p_sessao_id, p_resposta, v_hash);
 END;
 $$;
 

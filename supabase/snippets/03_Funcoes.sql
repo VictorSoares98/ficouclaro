@@ -83,7 +83,7 @@ $$ LANGUAGE sql STABLE SECURITY INVOKER SET search_path = public;
 -- ============================================================
 
 -- 1. Resposta de Enquete
-CREATE OR REPLACE FUNCTION public.submit_poll_vote(p_enquete_id UUID, p_resposta JSONB)
+CREATE OR REPLACE FUNCTION public.submit_poll_vote(p_enquete_id UUID, p_sessao_id UUID, p_resposta JSONB)
 RETURNS void
 LANGUAGE plpgsql
 SECURITY INVOKER SET search_path = public
@@ -96,8 +96,8 @@ BEGIN
   END IF;
   v_hash := encode(extensions.digest(auth.uid()::text || p_enquete_id::text, 'sha256'), 'hex');
 
-  INSERT INTO public.respostas_enquete (enquete_id, resposta, hash_eleitor)
-  VALUES (p_enquete_id, p_resposta, v_hash);
+  INSERT INTO public.respostas_enquete (enquete_id, sessao_id, resposta, hash_eleitor)
+  VALUES (p_enquete_id, p_sessao_id, p_resposta, v_hash);
 END;
 $$;
 
