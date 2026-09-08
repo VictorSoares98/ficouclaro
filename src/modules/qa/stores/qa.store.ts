@@ -86,12 +86,9 @@ export const useQaStore = defineStore('qa', () => {
   }
 
   async function submitQuestion(sessionId: string, texto: string) {
-    try {
+    return execute(async () => {
       await qaService.submitQuestion(sessionId, texto);
-    } catch (e) {
-      error.value = 'Erro ao enviar pergunta.';
-      throw e;
-    }
+    }, 'Erro ao enviar pergunta.');
   }
 
   async function upvoteQuestion(questionId: string) {
