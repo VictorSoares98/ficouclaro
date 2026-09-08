@@ -1,7 +1,7 @@
 -- ====================================================================
 -- ⚠️ AVISO: ARQUIVO AUTO-GERADO!
 -- NÃO EDITE ESTE ARQUIVO DIRETAMENTE. ALTERE OS SNIPPETS E RODE db:build
--- Gerado em: 2026-09-06T06:29:47.113Z
+-- Gerado em: 2026-09-08T13:43:52.340Z
 -- ====================================================================
 
 -- >>> INÍCIO DO SNIPPET: 00_Init_Extensions.sql <<<
@@ -201,7 +201,8 @@ RETURNS TABLE (
     (SELECT COUNT(*) FROM public.sinais_ritmo WHERE sessao_id = s.id) AS total_sinais,
     (SELECT COUNT(*) FROM public.enquetes WHERE sessao_id = s.id) AS total_enquetes
   FROM public.sessoes s
-  WHERE s.disciplina_id = p_disciplina_id;
+  WHERE s.disciplina_id = p_disciplina_id
+    AND s.professor_id = auth.uid();
 $$ LANGUAGE sql STABLE SECURITY INVOKER SET search_path = public;
 
 -- Função para contagem agregada de sinais do termômetro (Performance)

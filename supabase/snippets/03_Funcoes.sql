@@ -57,7 +57,8 @@ RETURNS TABLE (
     (SELECT COUNT(*) FROM public.sinais_ritmo WHERE sessao_id = s.id) AS total_sinais,
     (SELECT COUNT(*) FROM public.enquetes WHERE sessao_id = s.id) AS total_enquetes
   FROM public.sessoes s
-  WHERE s.disciplina_id = p_disciplina_id;
+  WHERE s.disciplina_id = p_disciplina_id
+    AND s.professor_id = auth.uid();
 $$ LANGUAGE sql STABLE SECURITY INVOKER SET search_path = public;
 
 -- Função para contagem agregada de sinais do termômetro (Performance)
