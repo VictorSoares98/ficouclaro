@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth.store';
 import { useThemeStore } from '@/stores/theme.store';
-import { useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
 import ThemeSwitcher from '@/components/ThemeSwitcher.vue';
 import BaseIconButton from '@/core/components/BaseIconButton.vue';
@@ -14,14 +13,15 @@ defineProps<{
 
 const authStore = useAuthStore();
 const themeStore = useThemeStore();
-const router = useRouter();
 const $q = useQuasar();
 
 async function handleLogout() {
   try {
     await authStore.signOut();
     $q.notify({ color: 'positive', message: 'Sessão encerrada com sucesso!' });
-    await router.push('/');
+    setTimeout(() => {
+      window.location.href = '/'; // Hard reload após a notificação
+    }, 500);
   } catch (error) {
     const err = error as Error;
     $q.notify({ color: 'negative', message: 'Erro ao sair: ' + err.message });
@@ -41,7 +41,9 @@ function confirmDeleteAccount() {
         $q.loading.show({ message: 'Excluindo conta...' });
         await authStore.deleteAccount();
         $q.notify({ color: 'positive', message: 'Conta excluída com sucesso.' });
-        await router.push('/');
+        setTimeout(() => {
+          window.location.href = '/'; // Hard reload após a notificação
+        }, 800);
       } catch (error) {
         const err = error as Error;
         $q.notify({ color: 'negative', message: 'Erro ao excluir conta: ' + err.message });

@@ -18,7 +18,7 @@ const tipoOptions = [
   { label: 'Múltipla Escolha', value: 'multipla_escolha' },
   { label: 'Nuvem de Palavras', value: 'nuvem_palavras' },
   { label: 'Escala de Clareza (1 a 5)', value: 'escala_clareza' },
-  { label: 'Ranking', value: 'ranking' },
+  // { label: 'Ranking', value: 'ranking' }, // TODO: Implementar UI de Drag and Drop (V2)
 ];
 
 const needsOptions = computed(() => {
