@@ -1,7 +1,9 @@
 import { ref } from 'vue';
 import { Notify } from 'quasar';
+import { useNetworkStatus } from '@/core/composables/useNetworkStatus';
 
 export function useAsyncOperation() {
+  const { isOnline } = useNetworkStatus();
   const isLoading = ref(false);
   const error = ref<string | null>(null);
 
@@ -20,7 +22,7 @@ export function useAsyncOperation() {
 
       // Trata erros de rede / bloqueio de Wi-Fi corporativo ou de faculdade
       if (
-        !navigator.onLine ||
+        !isOnline.value ||
         lower.includes('failed to fetch') ||
         lower.includes('networkerror') ||
         lower.includes('network request failed') ||
