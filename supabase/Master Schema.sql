@@ -1,7 +1,7 @@
 -- ====================================================================
 -- ⚠️ AVISO: ARQUIVO AUTO-GERADO!
 -- NÃO EDITE ESTE ARQUIVO DIRETAMENTE. ALTERE OS SNIPPETS E RODE db:build
--- Gerado em: 2026-09-08T14:31:21.074Z
+-- Gerado em: 2026-09-17T16:26:35.732Z
 -- ====================================================================
 
 -- >>> INÍCIO DO SNIPPET: 00_Init_Extensions.sql <<<
@@ -190,6 +190,12 @@ RETURNS TABLE (
   total_sinais BIGINT,
   total_enquetes BIGINT
 ) AS $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM public.disciplinas WHERE id = p_disciplina_id AND professor_id = auth.uid()) THEN
+    RAISE EXCEPTION 'Acesso negado: Você não é o proprietário desta disciplina.';
+  END IF;
+
+  RETURN QUERY
   SELECT
     s.id AS sessao_id,
     s.disciplina_id,
@@ -204,7 +210,8 @@ RETURNS TABLE (
   FROM public.sessoes s
   WHERE s.disciplina_id = p_disciplina_id
     AND s.professor_id = auth.uid();
-$$ LANGUAGE sql STABLE SECURITY INVOKER SET search_path = public;
+END;
+$$ LANGUAGE plpgsql STABLE SECURITY INVOKER SET search_path = public;
 
 -- Função para contagem agregada de sinais do termômetro (Performance)
 CREATE OR REPLACE FUNCTION public.get_thermometer_stats(p_sessao_id UUID)
