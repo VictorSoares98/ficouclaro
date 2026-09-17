@@ -15,19 +15,41 @@ export interface Resposta {
   id: string;
   created_at: string;
   enquete_id: string;
+  sessao_id: string;
   resposta: Json;
 }
 
-export interface Enquete {
+export interface BaseEnquete {
   id: string;
   created_at: string;
   pergunta: string;
-  tipo: 'multipla_escolha' | 'nuvem_palavras' | 'escala_clareza' | 'ranking';
-  opcoes: unknown;
   status: 'rascunho' | 'ativa' | 'encerrada';
   sessao_id: string;
   encerrada_em: string | null;
 }
+
+export interface EnqueteMultiplaEscolha extends BaseEnquete {
+  tipo: 'multipla_escolha';
+  opcoes: string[];
+}
+
+export interface EnqueteNuvemPalavras extends BaseEnquete {
+  tipo: 'nuvem_palavras';
+  opcoes: null;
+}
+
+export interface EnqueteEscalaClareza extends BaseEnquete {
+  tipo: 'escala_clareza';
+  opcoes: null;
+}
+
+export interface EnqueteRanking extends BaseEnquete {
+  tipo: 'ranking';
+  opcoes: string[];
+}
+
+export type Enquete =
+  EnqueteMultiplaEscolha | EnqueteNuvemPalavras | EnqueteEscalaClareza | EnqueteRanking;
 
 export type EnqueteInsertRow = Database['public']['Tables']['enquetes']['Insert'];
 
@@ -46,7 +68,7 @@ export const usePollStore = defineStore('poll', () => {
 
   function markAsResponded(pollId: string) {
     if (!myResponses.value.includes(pollId)) {
-      myResponses.value.push(pollId);
+      myResponses.value = [...myResponses.value, pollId];
       localStorage.setItem('ficouclaro_polls', JSON.stringify(myResponses.value));
     }
   }
@@ -57,13 +79,15 @@ export const usePollStore = defineStore('poll', () => {
 
   async function loadActivePolls(sessionId: string): Promise<void> {
     await execute(async (): Promise<void> => {
-      activePolls.value = await pollService.getActivePollsForSession(sessionId);
+      activePolls.value = (await pollService.getActivePollsForSession(
+        sessionId,
+      )) as unknown as Enquete[];
     }, 'Erro ao carregar enquetes ativas');
   }
 
   async function loadAllPolls(sessionId: string): Promise<void> {
     await execute(async (): Promise<void> => {
-      const all: Enquete[] = await pollService.getAllPollsForSession(sessionId);
+      const all = (await pollService.getAllPollsForSession(sessionId)) as unknown as Enquete[];
 
       const active: Enquete[] = [];
       const past: Enquete[] = [];
@@ -90,9 +114,8 @@ export const usePollStore = defineStore('poll', () => {
 
   async function createPoll(enquete: EnqueteInsertRow): Promise<void> {
     await execute(async (): Promise<void> => {
-      const newPoll: Enquete = await pollService.createPoll(enquete);
-      const currentPast = pastPolls.value;
-      currentPast.unshift(newPoll);
+      const newPoll = (await pollService.createPoll(enquete)) as unknown as Enquete;
+      pastPolls.value = [newPoll, ...pastPolls.value];
     }, 'Erro ao criar enquete');
   }
 
@@ -104,12 +127,9 @@ export const usePollStore = defineStore('poll', () => {
       if (pollIndex !== -1) {
         const poll = pastPolls.value[pollIndex];
         if (poll) {
-          poll.status = 'ativa';
-          const currentActive = activePolls.value;
-          currentActive.push(poll);
-
-          const currentPast = pastPolls.value;
-          currentPast.splice(pollIndex, 1);
+          const updatedPoll: Enquete = { ...poll, status: 'ativa' };
+          activePolls.value = [...activePolls.value, updatedPoll];
+          pastPolls.value = pastPolls.value.filter((_, i) => i !== pollIndex);
         }
       }
     }, 'Erro ao ativar enquete');
@@ -123,12 +143,9 @@ export const usePollStore = defineStore('poll', () => {
       if (pollIndex !== -1) {
         const poll = activePolls.value[pollIndex];
         if (poll) {
-          poll.status = 'encerrada';
-          const currentPast = pastPolls.value;
-          currentPast.unshift(poll);
-
-          const currentActive = activePolls.value;
-          currentActive.splice(pollIndex, 1);
+          const updatedPoll: Enquete = { ...poll, status: 'encerrada' };
+          pastPolls.value = [updatedPoll, ...pastPolls.value];
+          activePolls.value = activePolls.value.filter((_, i) => i !== pollIndex);
         }
       }
     }, 'Erro ao encerrar enquete');
@@ -142,9 +159,11 @@ export const usePollStore = defineStore('poll', () => {
 
       const userId = authStore.user?.auth.id;
       if (!userId) throw new Error('Usuário não autenticado.');
+      if (!currentSessionId.value) throw new Error('Sessão não definida.');
 
       await pollService.submitResponse({
         enquete_id: pollId,
+        sessao_id: currentSessionId.value,
         resposta: respostaData,
       });
 
@@ -161,17 +180,15 @@ export const usePollStore = defineStore('poll', () => {
   function flushBuffer() {
     if (responseBuffer.length === 0) return;
 
-    // Agrupa e commita as respostas de uma vez no ref
+    // Agrupa e commita as respostas recriando os dicionários sem mutar in-place
+    const newResults = { ...pollResults.value };
+
     responseBuffer.forEach((resp) => {
       const id = resp.enquete_id;
-      if (!pollResults.value[id]) {
-        pollResults.value[id] = [];
-      }
-      pollResults.value[id]?.push(resp);
+      newResults[id] = [...(newResults[id] || []), resp];
     });
 
-    // Força a reatividade do objeto inteiro para o Vue notar
-    pollResults.value = { ...pollResults.value };
+    pollResults.value = newResults;
 
     responseBuffer = [];
     bufferTimeout = null;
@@ -181,7 +198,7 @@ export const usePollStore = defineStore('poll', () => {
     if (currentSessionId.value === sessionId) return;
     currentSessionId.value = sessionId;
 
-    const channelName = `room-${sessionId}`;
+    const channelName = `poll-${sessionId}`;
     const channel = realtimeManager.getChannel(channelName);
 
     // Escutar por novas enquetes ou alterações de status
@@ -190,9 +207,9 @@ export const usePollStore = defineStore('poll', () => {
       { event: 'INSERT', schema: 'public', table: 'enquetes', filter: `sessao_id=eq.${sessionId}` },
       (payload: RealtimePostgresInsertPayload<Enquete>) => {
         if (payload.new.status === 'ativa') {
-          activePolls.value.unshift(payload.new);
+          activePolls.value = [payload.new, ...activePolls.value];
         } else if (isProfessor) {
-          pastPolls.value.unshift(payload.new);
+          pastPolls.value = [payload.new, ...pastPolls.value];
         }
       },
     );
@@ -207,13 +224,13 @@ export const usePollStore = defineStore('poll', () => {
         if (updatedPoll.status === 'encerrada') {
           activePolls.value = activePolls.value.filter((p) => p.id !== updatedPoll.id);
           if (isProfessor && !pastPolls.value.find((p) => p.id === updatedPoll.id)) {
-            pastPolls.value.unshift(updatedPoll);
+            pastPolls.value = [updatedPoll, ...pastPolls.value];
           }
         }
         // Adiciona nas ativas se ativou
         else if (updatedPoll.status === 'ativa') {
           if (!activePolls.value.find((p) => p.id === updatedPoll.id)) {
-            activePolls.value.unshift(updatedPoll);
+            activePolls.value = [updatedPoll, ...activePolls.value];
           }
           if (isProfessor) {
             pastPolls.value = pastPolls.value.filter((p) => p.id !== updatedPoll.id);
@@ -224,30 +241,19 @@ export const usePollStore = defineStore('poll', () => {
 
     // Escutar por respostas (só interessa ao professor)
     if (isProfessor) {
-      // Como o filter do supabase só aceita =eq em colunas simples e não temos array_contains,
-      // a regra ideal seria filtrar por enquete_id. Como não sabemos quais enquetes podem receber respostas,
-      // vamos escutar todas e filtrar no código.
-      // O Supabase não permite filtrar por multiplos IDs em OR.
-      // Solução pragmática: escutar todas as respostas e descartar as que não pertencem a essa sessão
-      // (Isso será tratado pelo fato de que o canal de session não tem como filtrar tabela filha sem trigger)
-
-      // Wait, a better approach for responses is to use a specific channel per poll? No, limits.
-      // We can listen to all respostas_enquete and the RLS or client checks if it belongs to our poll.
       channel.on(
         'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'respostas_enquete' },
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'respostas_enquete',
+          filter: `sessao_id=eq.${sessionId}`,
+        },
         (payload: RealtimePostgresInsertPayload<Resposta>) => {
-          // Verifica se a resposta pertence a alguma enquete (ativa ou não) que conhecemos
-          const belongsToUs =
-            activePolls.value.some((p) => p.id === payload.new.enquete_id) ||
-            pastPolls.value.some((p) => p.id === payload.new.enquete_id);
+          responseBuffer.push(payload.new);
 
-          if (belongsToUs) {
-            responseBuffer.push(payload.new);
-
-            if (!bufferTimeout) {
-              bufferTimeout = window.setTimeout(flushBuffer, 500); // 500ms debounce buffer
-            }
+          if (!bufferTimeout) {
+            bufferTimeout = window.setTimeout(flushBuffer, 500); // 500ms debounce buffer
           }
         },
       );
@@ -260,7 +266,7 @@ export const usePollStore = defineStore('poll', () => {
     if (currentSessionId.value !== sessionId) return;
     currentSessionId.value = null;
 
-    realtimeManager.releaseChannel(`room-${sessionId}`);
+    realtimeManager.releaseChannel(`poll-${sessionId}`);
     activePolls.value = [];
     pastPolls.value = [];
     pollResults.value = {};

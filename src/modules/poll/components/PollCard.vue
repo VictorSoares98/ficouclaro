@@ -61,8 +61,7 @@ async function submit() {
       </div>
 
       <div class="tw-mt-4">
-        <!-- Múltipla Escolha -->
-        <template v-if="poll.tipo === 'multipla_escolha' && Array.isArray(poll.opcoes)">
+        <template v-if="poll.tipo === 'multipla_escolha'">
           <div class="tw-space-y-2">
             <q-radio
               v-for="(opcao, index) in poll.opcoes"

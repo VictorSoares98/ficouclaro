@@ -23,6 +23,9 @@ $$ LANGUAGE sql STABLE SECURITY INVOKER SET search_path = public;
 CREATE OR REPLACE FUNCTION public.delete_own_account()
 RETURNS void AS $$
 BEGIN
+  IF auth.uid() IS NULL THEN
+    RAISE EXCEPTION 'Usuário não autenticado.';
+  END IF;
   DELETE FROM auth.users WHERE id = auth.uid();
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
@@ -42,6 +45,12 @@ RETURNS TABLE (
   total_sinais BIGINT,
   total_enquetes BIGINT
 ) AS $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM public.disciplinas WHERE id = p_disciplina_id AND professor_id = auth.uid()) THEN
+    RAISE EXCEPTION 'Acesso negado: Você não é o proprietário desta disciplina.';
+  END IF;
+
+  RETURN QUERY
   SELECT
     s.id AS sessao_id,
     s.disciplina_id,
@@ -54,8 +63,10 @@ RETURNS TABLE (
     (SELECT COUNT(*) FROM public.sinais_ritmo WHERE sessao_id = s.id) AS total_sinais,
     (SELECT COUNT(*) FROM public.enquetes WHERE sessao_id = s.id) AS total_enquetes
   FROM public.sessoes s
-  WHERE s.disciplina_id = p_disciplina_id;
-$$ LANGUAGE sql STABLE SECURITY INVOKER SET search_path = public;
+  WHERE s.disciplina_id = p_disciplina_id
+    AND s.professor_id = auth.uid();
+END;
+$$ LANGUAGE plpgsql STABLE SECURITY INVOKER SET search_path = public;
 
 -- Função para contagem agregada de sinais do termômetro (Performance)
 CREATE OR REPLACE FUNCTION public.get_thermometer_stats(p_sessao_id UUID)
@@ -79,7 +90,7 @@ $$ LANGUAGE sql STABLE SECURITY INVOKER SET search_path = public;
 -- ============================================================
 
 -- 1. Resposta de Enquete
-CREATE OR REPLACE FUNCTION public.submit_poll_vote(p_enquete_id UUID, p_resposta JSONB)
+CREATE OR REPLACE FUNCTION public.submit_poll_vote(p_enquete_id UUID, p_sessao_id UUID, p_resposta JSONB)
 RETURNS void
 LANGUAGE plpgsql
 SECURITY INVOKER SET search_path = public
@@ -90,10 +101,10 @@ BEGIN
   IF auth.uid() IS NULL THEN
     RAISE EXCEPTION 'Usuário não autenticado.';
   END IF;
-  v_hash := encode(digest(auth.uid()::text || p_enquete_id::text, 'sha256'), 'hex');
+  v_hash := encode(extensions.digest(auth.uid()::text || p_enquete_id::text, 'sha256'), 'hex');
 
-  INSERT INTO public.respostas_enquete (enquete_id, resposta, hash_eleitor)
-  VALUES (p_enquete_id, p_resposta, v_hash);
+  INSERT INTO public.respostas_enquete (enquete_id, sessao_id, resposta, hash_eleitor)
+  VALUES (p_enquete_id, p_sessao_id, p_resposta, v_hash);
 END;
 $$;
 
@@ -109,7 +120,7 @@ BEGIN
   IF auth.uid() IS NULL THEN
     RAISE EXCEPTION 'Usuário não autenticado.';
   END IF;
-  v_hash := encode(digest(auth.uid()::text || p_duvida_id::text, 'sha256'), 'hex');
+  v_hash := encode(extensions.digest(auth.uid()::text || p_duvida_id::text, 'sha256'), 'hex');
 
   INSERT INTO public.votos_duvida (duvida_id, hash_eleitor)
   VALUES (p_duvida_id, v_hash);
@@ -117,20 +128,28 @@ END;
 $$;
 
 -- 3. Avaliação Rápida (Pós-Aula)
-CREATE OR REPLACE FUNCTION public.submit_flash_review(p_sessao_id UUID, p_nota SMALLINT, p_comentario TEXT)
+CREATE OR REPLACE FUNCTION public.submit_flash_review(p_sessao_id UUID, p_nota SMALLINT, p_comentario TEXT, p_anonimo BOOLEAN DEFAULT true)
 RETURNS void
 LANGUAGE plpgsql
 SECURITY INVOKER SET search_path = public
 AS $$
 DECLARE
   v_hash TEXT;
+  v_aluno_id UUID;
 BEGIN
   IF auth.uid() IS NULL THEN
     RAISE EXCEPTION 'Usuário não autenticado.';
   END IF;
-  v_hash := encode(digest(auth.uid()::text || p_sessao_id::text, 'sha256'), 'hex');
+  
+  v_hash := encode(extensions.digest(auth.uid()::text || p_sessao_id::text, 'sha256'), 'hex');
+  
+  IF p_anonimo THEN
+    v_aluno_id := NULL;
+  ELSE
+    v_aluno_id := auth.uid();
+  END IF;
 
-  INSERT INTO public.avaliacoes_rapidas (sessao_id, nota, comentario, hash_eleitor)
-  VALUES (p_sessao_id, p_nota, p_comentario, v_hash);
+  INSERT INTO public.avaliacoes_rapidas (sessao_id, aluno_id, nota, comentario, hash_eleitor)
+  VALUES (p_sessao_id, v_aluno_id, p_nota, p_comentario, v_hash);
 END;
 $$;

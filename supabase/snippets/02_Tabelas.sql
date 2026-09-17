@@ -70,6 +70,7 @@ CREATE TABLE public.enquetes (
 CREATE TABLE public.respostas_enquete (
   id           UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   enquete_id   UUID NOT NULL REFERENCES public.enquetes(id) ON DELETE CASCADE,
+  sessao_id    UUID NOT NULL REFERENCES public.sessoes(id) ON DELETE CASCADE,
   resposta     JSONB NOT NULL,
   hash_eleitor TEXT NOT NULL,
   created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -100,6 +101,7 @@ CREATE TABLE public.votos_duvida (
 CREATE TABLE public.avaliacoes_rapidas (
   id           UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   sessao_id    UUID NOT NULL REFERENCES public.sessoes(id) ON DELETE CASCADE,
+  aluno_id     UUID REFERENCES public.usuarios(id) ON DELETE SET NULL,
   nota         SMALLINT NOT NULL CHECK (nota BETWEEN 1 AND 5),
   comentario   TEXT,
   hash_eleitor TEXT NOT NULL,

@@ -72,6 +72,12 @@ export const useAuthStore = defineStore('auth', () => {
     }, 'Erro ao fazer login. Verifique suas credenciais.');
   }
 
+  async function loginWithGoogle() {
+    return execute(async () => {
+      await authService.signInWithOAuth('google');
+    }, 'Erro ao inicializar login com Google.');
+  }
+
   async function register(credentials: SignUpWithPasswordCredentials) {
     return execute(async () => {
       const data = await authService.signUp(credentials);
@@ -94,6 +100,7 @@ export const useAuthStore = defineStore('auth', () => {
     clearUser,
     signOut,
     login,
+    loginWithGoogle,
     register,
     deleteAccount,
   };

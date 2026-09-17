@@ -9,7 +9,8 @@ import { useAuthStore } from '@/stores/auth.store';
 
 export const useQaStore = defineStore('qa', () => {
   const questions = ref<Duvida[]>([]);
-  const { isLoading, error, execute } = useAsyncOperation();
+  const { isLoading: isFetching, error: fetchError, execute: executeFetch } = useAsyncOperation();
+  const { isLoading: isActionLoading, execute: executeAction } = useAsyncOperation();
   const authStore = useAuthStore();
 
   const currentSessionId = ref<string | null>(null);
@@ -34,10 +35,10 @@ export const useQaStore = defineStore('qa', () => {
     if (currentSessionId.value === sessionId) return;
     currentSessionId.value = sessionId;
 
-    return execute(async () => {
+    return executeFetch(async () => {
       questions.value = await qaService.fetchQuestions(sessionId);
 
-      const channel = realtimeManager.getChannel(`room-${sessionId}`);
+      const channel = realtimeManager.getChannel(`qa-${sessionId}`);
 
       channel.on(
         'postgres_changes',
@@ -49,7 +50,7 @@ export const useQaStore = defineStore('qa', () => {
         },
         (payload: RealtimePostgresChangesPayload<Duvida>) => {
           if (payload.eventType === 'INSERT') {
-            questions.value.push(payload.new);
+            questions.value = [...questions.value, payload.new];
           }
         },
       );
@@ -64,10 +65,9 @@ export const useQaStore = defineStore('qa', () => {
         },
         (payload: RealtimePostgresChangesPayload<Duvida>) => {
           if (payload.eventType === 'UPDATE') {
-            const index = questions.value.findIndex((q) => q.id === payload.new.id);
-            if (index !== -1) {
-              questions.value[index] = payload.new;
-            }
+            questions.value = questions.value.map((q) =>
+              q.id === payload.new.id ? payload.new : q,
+            );
           }
         },
       );
@@ -80,18 +80,15 @@ export const useQaStore = defineStore('qa', () => {
     if (currentSessionId.value !== sessionId) return;
     currentSessionId.value = null;
 
-    realtimeManager.releaseChannel(`room-${sessionId}`);
+    realtimeManager.releaseChannel(`qa-${sessionId}`);
     questions.value = [];
     myUpvotes.value.clear();
   }
 
   async function submitQuestion(sessionId: string, texto: string) {
-    try {
+    return executeAction(async () => {
       await qaService.submitQuestion(sessionId, texto);
-    } catch (e) {
-      error.value = 'Erro ao enviar pergunta.';
-      throw e;
-    }
+    }, 'Erro ao enviar pergunta.');
   }
 
   async function upvoteQuestion(questionId: string) {
@@ -100,16 +97,14 @@ export const useQaStore = defineStore('qa', () => {
     const userId = authStore.user?.auth.id;
     if (!userId) return;
 
-    try {
+    return executeAction(async () => {
       await qaService.upvoteQuestion(questionId);
       myUpvotes.value.add(questionId);
-    } catch (e) {
-      console.error('Erro ao votar:', e);
-    }
+    }, 'Erro ao votar na dúvida.');
   }
 
   async function markAsAnswered(questionId: string) {
-    return execute(async () => {
+    return executeAction(async () => {
       await qaService.markAsAnswered(questionId);
     }, 'Erro ao marcar como respondida.');
   }
@@ -118,8 +113,9 @@ export const useQaStore = defineStore('qa', () => {
     questions,
     sortedQuestions,
     myUpvotes,
-    isLoading,
-    error,
+    isLoading: isFetching,
+    isActionLoading,
+    error: fetchError,
     subscribeToSession,
     unsubscribeFromSession,
     submitQuestion,

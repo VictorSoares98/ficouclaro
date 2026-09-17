@@ -23,7 +23,7 @@ export interface FlashReviewStore {
   error: Ref<string | null>;
   averageRating: ComputedRef<number>;
   hasReviewedSession: (sessionId: string) => boolean;
-  submitReview: (review: AvaliacaoInsertRow) => Promise<void>;
+  submitReview: (review: AvaliacaoInsertRow, isAnonymous?: boolean) => Promise<void>;
   loadSessionReviews: (sessionId: string) => Promise<void>;
   markAsSkipped: (sessionId: string) => void;
 }
@@ -59,12 +59,15 @@ export const useFlashReviewStore = defineStore('flashReview', (): FlashReviewSto
     }
   }
 
-  async function submitReview(review: AvaliacaoInsertRow): Promise<void> {
+  async function submitReview(
+    review: AvaliacaoInsertRow,
+    isAnonymous: boolean = true,
+  ): Promise<void> {
     await execute(async (): Promise<void> => {
       const userId = authStore.user?.auth.id;
       if (!userId) throw new Error('Usuário não autenticado.');
 
-      await flashReviewService.submitReview(review);
+      await flashReviewService.submitReview(review, isAnonymous);
       if (!reviewedSessions.value.includes(review.sessao_id)) {
         reviewedSessions.value.push(review.sessao_id);
         saveReviewedToStorage();

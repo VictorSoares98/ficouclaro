@@ -7,7 +7,7 @@ export default defineBoot(() => {
   // Permite validar imediatamente se as variáveis de ambiente foram lidas com sucesso.
   if (!supabaseClient) {
     console.error('🔥 [Boot] Falha grave: Cliente do Supabase não inicializado.');
-  } else {
+  } else if (import.meta.env.DEV) {
     console.log('✅ [Boot] Supabase Client carregado e pronto.');
   }
 });

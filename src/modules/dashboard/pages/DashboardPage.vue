@@ -12,7 +12,9 @@ const route = useRoute();
 const dashboardStore = useDashboardStore();
 const courseStore = useCourseStore();
 
-const cursoId = String((route.params as Record<string, unknown>).cursoId);
+// Tratamento seguro para parâmetros de rota que podem ser string ou array de strings
+const cursoIdParam = Reflect.get(route.params, 'cursoId');
+const cursoId = String(Array.isArray(cursoIdParam) ? cursoIdParam[0] : cursoIdParam || '');
 
 const courseTitle = computed(() => {
   const course = courseStore.courses.find((c) => c.id === cursoId);

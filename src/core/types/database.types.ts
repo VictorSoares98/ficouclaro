@@ -245,6 +245,7 @@ export type Database = {
         Row: {
           created_at: string;
           enquete_id: string;
+          sessao_id: string;
           hash_eleitor: string;
           id: string;
           resposta: Json;
@@ -252,6 +253,7 @@ export type Database = {
         Insert: {
           created_at?: string;
           enquete_id: string;
+          sessao_id: string;
           hash_eleitor?: string;
           id?: string;
           resposta: Json;
@@ -259,6 +261,7 @@ export type Database = {
         Update: {
           created_at?: string;
           enquete_id?: string;
+          sessao_id?: string;
           hash_eleitor?: string;
           id?: string;
           resposta?: Json;

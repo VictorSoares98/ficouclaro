@@ -21,8 +21,9 @@ class RealtimeManager {
     const currentCount = this.refCounts.get(channelName) || 0;
     this.refCounts.set(channelName, currentCount + 1);
 
-    if (this.channels.has(channelName)) {
-      return this.channels.get(channelName)!;
+    const existingChannel = this.channels.get(channelName);
+    if (existingChannel) {
+      return existingChannel;
     }
 
     const channel = supabaseClient.channel(channelName);
