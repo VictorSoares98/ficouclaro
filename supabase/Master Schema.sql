@@ -1,7 +1,7 @@
 -- ====================================================================
 -- ⚠️ AVISO: ARQUIVO AUTO-GERADO!
 -- NÃO EDITE ESTE ARQUIVO DIRETAMENTE. ALTERE OS SNIPPETS E RODE db:build
--- Gerado em: 2026-09-17T16:26:35.732Z
+-- Gerado em: 2026-09-17T17:54:17.735Z
 -- ====================================================================
 
 -- >>> INÍCIO DO SNIPPET: 00_Init_Extensions.sql <<<
@@ -202,11 +202,11 @@ BEGIN
     s.topico,
     s.iniciada_em,
     s.status,
-    COALESCE((SELECT AVG(nota) FROM public.avaliacoes_rapidas WHERE sessao_id = s.id), 0) AS media_estrelas,
-    (SELECT COUNT(*) FROM public.avaliacoes_rapidas WHERE sessao_id = s.id) AS total_avaliacoes,
-    (SELECT COUNT(*) FROM public.duvidas WHERE sessao_id = s.id) AS total_duvidas,
-    (SELECT COUNT(*) FROM public.sinais_ritmo WHERE sessao_id = s.id) AS total_sinais,
-    (SELECT COUNT(*) FROM public.enquetes WHERE sessao_id = s.id) AS total_enquetes
+    COALESCE((SELECT AVG(nota) FROM public.avaliacoes_rapidas ar WHERE ar.sessao_id = s.id), 0) AS media_estrelas,
+    (SELECT COUNT(*) FROM public.avaliacoes_rapidas ar WHERE ar.sessao_id = s.id) AS total_avaliacoes,
+    (SELECT COUNT(*) FROM public.duvidas d WHERE d.sessao_id = s.id) AS total_duvidas,
+    (SELECT COUNT(*) FROM public.sinais_ritmo sr WHERE sr.sessao_id = s.id) AS total_sinais,
+    (SELECT COUNT(*) FROM public.enquetes e WHERE e.sessao_id = s.id) AS total_enquetes
   FROM public.sessoes s
   WHERE s.disciplina_id = p_disciplina_id
     AND s.professor_id = auth.uid();
