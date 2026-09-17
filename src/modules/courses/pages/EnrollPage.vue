@@ -76,28 +76,23 @@ async function handleJoinActiveSession(courseId: string) {
 
 <template>
   <q-page class="tw-p-4 md:tw-p-8 lg:tw-p-12 tw-max-w-[1400px] tw-mx-auto">
-    <div class="tw-flex tw-flex-col sm:tw-flex-row sm:tw-justify-between sm:tw-items-center tw-gap-4 tw-mb-8">
+    <div
+      class="tw-flex tw-flex-col sm:tw-flex-row sm:tw-justify-between sm:tw-items-center tw-gap-4 tw-mb-8"
+    >
       <div>
         <h1 class="tw-text-2xl tw-font-bold tw-text-primary">Minhas Disciplinas</h1>
         <p class="text-muted">Acesse suas turmas e entre nas aulas ao vivo.</p>
       </div>
       <div class="tw-flex tw-gap-2 tw-self-end sm:tw-self-auto">
-        <q-btn
-          flat
-          color="primary"
-          icon="refresh"
-          :loading="isRefreshing"
-          @click="handleRefresh"
-        >
-          <q-tooltip>Atualizar Status das Aulas</q-tooltip>
+        <q-btn flat color="primary" icon="refresh" :loading="isRefreshing" @click="handleRefresh">
+          <q-tooltip anchor="top middle" self="bottom middle" :offset="[0, 8]" class="tw-text-sm">
+            Atualizar Status das Aulas
+          </q-tooltip>
         </q-btn>
-        <q-btn 
-          color="primary" 
-          icon="add" 
-          :label="$q.screen.lt.sm ? undefined : 'Entrar em Turma'" 
-          @click="isEnrolling = true" 
-        >
-          <q-tooltip>Entrar em Turma</q-tooltip>
+        <q-btn color="primary" icon="add" label="Entrar em Turma" @click="isEnrolling = true">
+          <q-tooltip anchor="top middle" self="bottom middle" :offset="[0, 8]" class="tw-text-sm">
+            Entrar em Turma
+          </q-tooltip>
         </q-btn>
       </div>
     </div>

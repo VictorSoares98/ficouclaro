@@ -86,30 +86,31 @@ function handleOpenInsights(courseId: string) {
 
 <template>
   <q-page class="tw-p-4 md:tw-p-8 lg:tw-p-12 tw-max-w-[1400px] tw-mx-auto">
-    <div class="tw-flex tw-flex-col sm:tw-flex-row sm:tw-justify-between sm:tw-items-center tw-gap-4 tw-mb-8">
+    <div
+      class="tw-flex tw-flex-col sm:tw-flex-row sm:tw-justify-between sm:tw-items-center tw-gap-4 tw-mb-8"
+    >
       <div>
         <h1 class="tw-text-2xl tw-font-bold tw-text-primary">Minhas Disciplinas</h1>
         <p class="text-muted">Gerencie suas turmas e inicie aulas.</p>
       </div>
       <div class="tw-flex tw-gap-2 tw-self-end sm:tw-self-auto">
-        <q-btn 
-          v-if="authStore.user?.perfil.papel === 'professor'" 
-          outline 
-          color="primary" 
-          icon="dashboard" 
-          :label="$q.screen.lt.sm ? undefined : 'Dashboard Global'" 
-          to="/dashboard" 
+        <q-btn
+          v-if="authStore.user?.perfil.papel === 'professor'"
+          outline
+          color="primary"
+          icon="dashboard"
+          label="Dashboard Global"
+          to="/dashboard"
         >
-          <q-tooltip>Dashboard Global</q-tooltip>
+          <q-tooltip anchor="top middle" self="bottom middle" :offset="[0, 8]" class="tw-text-sm">
+            Dashboard Global
+          </q-tooltip>
         </q-btn>
-        
-        <q-btn 
-          color="primary" 
-          icon="add" 
-          :label="$q.screen.lt.sm ? undefined : 'Nova Disciplina'" 
-          @click="isCreating = true" 
-        >
-          <q-tooltip>Nova Disciplina</q-tooltip>
+
+        <q-btn color="primary" icon="add" label="Nova Disciplina" @click="isCreating = true">
+          <q-tooltip anchor="top middle" self="bottom middle" :offset="[0, 8]" class="tw-text-sm">
+            Nova Disciplina
+          </q-tooltip>
         </q-btn>
       </div>
     </div>
