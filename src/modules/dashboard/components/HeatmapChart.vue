@@ -14,13 +14,21 @@ const WEEKS_TO_SHOW = 26; // Mostra os últimos ~6 meses
 const calendarData = computed(() => {
   const isDark = $q.dark.isActive;
 
+  // Função segura para pegar YYYY-MM-DD no timezone local do usuário (evita shift de UTC)
+  const toLocalDateString = (d: Date) => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  };
+
   // Agrega dados por data
   const aggregatedData = props.insights
     .filter((i) => i.iniciada_em)
     .reduce(
       (acc, curr) => {
         const date = new Date(curr.iniciada_em);
-        const dateStr = date.toISOString().split('T')[0] as string;
+        const dateStr = toLocalDateString(date);
         const topic = curr.topico || 'Aula Sem Tópico';
 
         if (!acc[dateStr]) {
@@ -64,42 +72,44 @@ const calendarData = computed(() => {
   start.setDate(start.getDate() - start.getDay());
 
   const days = [];
-  let weekIndex = -1;
 
   const current = new Date(start);
   while (current <= today) {
-    if (current.getDay() === 0) weekIndex++; // Computa nova semana (Coluna) no Grid
+    if (current.getDay() !== 0) {
+      // Ignora Domingos
+      const dStr = toLocalDateString(current);
+      const session = aggregatedData[dStr];
 
-    const dStr = current.toISOString().split('T')[0] as string;
-    const session = aggregatedData[dStr];
-
-    days.push({
-      dateStr: dStr,
-      dateFormatted: current.toLocaleDateString('pt-BR', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric',
-      }),
-      hasSession: !!session,
-      totalSinais: session ? session.totalSinais : 0,
-      topicos: session ? Array.from(session.topicos).join(' • ') : '',
-      color: getCellColor(session ? session.totalSinais : 0, !!session),
-    });
+      days.push({
+        dateStr: dStr,
+        dateFormatted: current.toLocaleDateString('pt-BR', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric',
+        }),
+        monthStr: current.toLocaleDateString('pt-BR', { month: 'short' }),
+        hasSession: !!session,
+        totalSinais: session ? session.totalSinais : 0,
+        topicos: session ? Array.from(session.topicos).join(' • ') : '',
+        color: getCellColor(session ? session.totalSinais : 0, !!session),
+      });
+    }
 
     current.setDate(current.getDate() + 1);
   }
 
-  // Cálculo de Rótulos de Meses baseados na largura das colunas
-  const weeksCount = weekIndex + 1;
+  // Cálculo de Rótulos de Meses baseados na largura das colunas reais (6 dias por semana útil)
+  const weeksCount = Math.ceil(days.length / 6);
   const monthLabelsFixed = [];
   let currentMonthStr = '';
   let currentMonthStartCol = 0;
 
   for (let w = 0; w < weeksCount; w++) {
-    const wDate = new Date(start);
-    wDate.setDate(wDate.getDate() + w * 7);
-    const m = wDate.toLocaleDateString('pt-BR', { month: 'short' });
-    const capM = m.charAt(0).toUpperCase() + m.slice(1).replace('.', ''); // Fix formatação (Ex: 'out.' -> 'Out')
+    const dayObj = days[w * 6];
+    if (!dayObj) continue;
+
+    const capM =
+      dayObj.monthStr.charAt(0).toUpperCase() + dayObj.monthStr.slice(1).replace('.', ''); // Fix formatação (Ex: 'out.' -> 'Out')
 
     if (capM !== currentMonthStr) {
       if (currentMonthStr !== '') {
@@ -113,10 +123,12 @@ const calendarData = computed(() => {
     }
   }
   // Insere o mês restante (mês atual em andamento)
-  monthLabelsFixed.push({
-    label: currentMonthStr,
-    cols: weeksCount - currentMonthStartCol,
-  });
+  if (currentMonthStr !== '') {
+    monthLabelsFixed.push({
+      label: currentMonthStr,
+      cols: weeksCount - currentMonthStartCol,
+    });
+  }
 
   return {
     days,
@@ -132,17 +144,16 @@ const calendarData = computed(() => {
   <div class="tw-w-full tw-flex tw-flex-col tw-overflow-x-auto tw-pb-2">
     <!-- Eixo Y (Dias) e Grid -->
     <div class="tw-flex tw-gap-2 tw-min-w-max">
-      <!-- Dia da Semana (Eixo Y) -->
+      <!-- Dia da Semana (Eixo Y) Alinhado em Grid Idêntico -->
       <div
-        class="tw-flex tw-flex-col tw-gap-1 tw-text-[10px] tw-text-gray-500 tw-justify-between tw-pt-6 tw-pb-1 tw-font-medium"
+        class="tw-grid tw-grid-rows-6 tw-gap-1 tw-text-[10px] tw-text-gray-500 tw-font-medium tw-mt-[20px]"
       >
-        <span>D</span>
-        <span class="tw-opacity-0">S</span>
-        <span>T</span>
-        <span class="tw-opacity-0">Q</span>
-        <span>Q</span>
-        <span class="tw-opacity-0">S</span>
-        <span>S</span>
+        <div class="tw-h-[14px] tw-flex tw-items-center">S</div>
+        <div class="tw-h-[14px] tw-flex tw-items-center">T</div>
+        <div class="tw-h-[14px] tw-flex tw-items-center">Q</div>
+        <div class="tw-h-[14px] tw-flex tw-items-center">Q</div>
+        <div class="tw-h-[14px] tw-flex tw-items-center">S</div>
+        <div class="tw-h-[14px] tw-flex tw-items-center">S</div>
       </div>
 
       <!-- Container do Calendário -->
@@ -160,7 +171,7 @@ const calendarData = computed(() => {
         </div>
 
         <!-- Grade Nativa de Dias (Efeito GitHub) -->
-        <div class="tw-grid tw-grid-rows-7 tw-grid-flow-col tw-gap-1">
+        <div class="tw-grid tw-grid-rows-6 tw-grid-flow-col tw-gap-1">
           <div
             v-for="day in calendarData.days"
             :key="day.dateStr"
