@@ -24,7 +24,7 @@ defineEmits<{
       <div class="tw-flex tw-justify-between tw-items-start">
         <h2 class="tw-text-xl tw-font-bold">{{ course.nome }}</h2>
         <div class="tw-flex tw-flex-col tw-items-end tw-gap-2">
-          <q-badge v-if="showInviteCode" color="secondary" class="tw-text-sm">
+          <q-badge v-if="showInviteCode" color="secondary" class="tw-text-sm tw-uppercase">
             Cód: {{ course.codigo_convite }}
           </q-badge>
 
@@ -54,17 +54,21 @@ defineEmits<{
 
     <q-separator />
 
-    <q-card-actions align="right">
+    <q-card-actions class="tw-flex tw-flex-nowrap tw-gap-2 tw-p-3">
       <q-btn
         v-if="showInsightsBtn"
+        class="tw-flex-1"
         flat
+        no-wrap
         color="secondary"
         icon="insights"
         label="Insights"
         @click="$emit('insights', course.id)"
       />
       <q-btn
+        class="tw-flex-1"
         flat
+        no-wrap
         :color="sessionStatus === 'nenhuma' || sessionStatus === 'encerrada' ? 'grey' : actionColor"
         :icon="actionIcon"
         :label="sessionStatus === 'aguardando' ? 'Entrar na Sala' : actionLabel"

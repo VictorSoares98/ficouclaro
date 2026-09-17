@@ -143,6 +143,8 @@ async function handleJoinActiveSession(courseId: string) {
             v-model="inviteCode"
             label="Código de Convite *"
             autofocus
+            input-class="tw-uppercase"
+            @update:model-value="(val) => (inviteCode = String(val).toUpperCase())"
             @keyup.enter="handleEnroll"
           />
         </q-card-section>
