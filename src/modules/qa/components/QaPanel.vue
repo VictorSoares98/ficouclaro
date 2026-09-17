@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed } from 'vue';
+import { onMounted, onUnmounted, computed } from 'vue';
 import { useQaStore } from '@/modules/qa/stores/qa.store';
 import { useSessionStore } from '@/modules/session/stores/session.store';
 import { useAuthStore } from '@/stores/auth.store';
@@ -14,7 +14,6 @@ const authStore = useAuthStore();
 const $q = useQuasar();
 
 const isProfessor = computed(() => authStore.user?.perfil.papel === 'professor');
-const isSubmitting = ref(false);
 
 onMounted(() => {
   if (sessionStore.currentSession) {
@@ -30,22 +29,18 @@ onUnmounted(() => {
 
 async function handleSubmit(texto: string) {
   if (sessionStore.currentSession) {
-    isSubmitting.value = true;
     try {
       await qaStore.submitQuestion(sessionStore.currentSession.id, texto);
+
+      // O tratamento de erro já é feito globalmente pelo executeAction da Store.
+      // Aqui só emitimos o sucesso se a promessa não disparar throw.
       $q.notify({
         color: 'positive',
         message: 'Dúvida enviada ao painel!',
         icon: 'check_circle',
       });
     } catch {
-      $q.notify({
-        color: 'negative',
-        message: 'Falha ao enviar a dúvida. Tente novamente.',
-        icon: 'error',
-      });
-    } finally {
-      isSubmitting.value = false;
+      // Falha capturada e notificada pelo composable (useAsyncOperation)
     }
   }
 }
@@ -54,7 +49,7 @@ async function handleSubmit(texto: string) {
 <template>
   <div class="tw-flex tw-flex-col tw-w-full tw-max-w-xl tw-mx-auto tw-gap-4">
     <!-- Form Aluno -->
-    <QuestionForm v-if="!isProfessor" :loading="isSubmitting" @submit="handleSubmit" />
+    <QuestionForm v-if="!isProfessor" :loading="qaStore.isActionLoading" @submit="handleSubmit" />
 
     <div v-if="qaStore.isLoading" class="tw-flex tw-justify-center tw-p-4">
       <BaseSkeletonList :count="3" type="card" />

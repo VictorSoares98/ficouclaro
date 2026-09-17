@@ -9,7 +9,8 @@ import { useAuthStore } from '@/stores/auth.store';
 
 export const useQaStore = defineStore('qa', () => {
   const questions = ref<Duvida[]>([]);
-  const { isLoading, error, execute } = useAsyncOperation();
+  const { isLoading: isFetching, error: fetchError, execute: executeFetch } = useAsyncOperation();
+  const { isLoading: isActionLoading, execute: executeAction } = useAsyncOperation();
   const authStore = useAuthStore();
 
   const currentSessionId = ref<string | null>(null);
@@ -34,7 +35,7 @@ export const useQaStore = defineStore('qa', () => {
     if (currentSessionId.value === sessionId) return;
     currentSessionId.value = sessionId;
 
-    return execute(async () => {
+    return executeFetch(async () => {
       questions.value = await qaService.fetchQuestions(sessionId);
 
       const channel = realtimeManager.getChannel(`qa-${sessionId}`);
@@ -85,7 +86,7 @@ export const useQaStore = defineStore('qa', () => {
   }
 
   async function submitQuestion(sessionId: string, texto: string) {
-    return execute(async () => {
+    return executeAction(async () => {
       await qaService.submitQuestion(sessionId, texto);
     }, 'Erro ao enviar pergunta.');
   }
@@ -96,16 +97,14 @@ export const useQaStore = defineStore('qa', () => {
     const userId = authStore.user?.auth.id;
     if (!userId) return;
 
-    try {
+    return executeAction(async () => {
       await qaService.upvoteQuestion(questionId);
       myUpvotes.value.add(questionId);
-    } catch (e) {
-      console.error('Erro ao votar:', e);
-    }
+    }, 'Erro ao votar na dúvida.');
   }
 
   async function markAsAnswered(questionId: string) {
-    return execute(async () => {
+    return executeAction(async () => {
       await qaService.markAsAnswered(questionId);
     }, 'Erro ao marcar como respondida.');
   }
@@ -114,8 +113,9 @@ export const useQaStore = defineStore('qa', () => {
     questions,
     sortedQuestions,
     myUpvotes,
-    isLoading,
-    error,
+    isLoading: isFetching,
+    isActionLoading,
+    error: fetchError,
     subscribeToSession,
     unsubscribeFromSession,
     submitQuestion,
