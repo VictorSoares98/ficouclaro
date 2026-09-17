@@ -236,6 +236,7 @@ function handleOpenInsights(courseId: string) {
                 placeholder="Ex: 2024.1"
                 mask="####.#"
                 hint="Formato: Ano.Semestre (ex: 2024.1)"
+                inputmode="numeric"
               />
 
               <q-input
@@ -285,6 +286,7 @@ function handleOpenInsights(courseId: string) {
                   label="Horário"
                   placeholder="19:00"
                   mask="##:##"
+                  inputmode="numeric"
                 />
               </div>
 
