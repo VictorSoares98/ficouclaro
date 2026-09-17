@@ -47,7 +47,7 @@ export const usePollStore = defineStore('poll', () => {
 
   function markAsResponded(pollId: string) {
     if (!myResponses.value.includes(pollId)) {
-      myResponses.value.push(pollId);
+      myResponses.value = [...myResponses.value, pollId];
       localStorage.setItem('ficouclaro_polls', JSON.stringify(myResponses.value));
     }
   }
@@ -104,8 +104,8 @@ export const usePollStore = defineStore('poll', () => {
       if (pollIndex !== -1) {
         const poll = pastPolls.value[pollIndex];
         if (poll) {
-          poll.status = 'ativa';
-          activePolls.value = [...activePolls.value, poll];
+          const updatedPoll: Enquete = { ...poll, status: 'ativa' };
+          activePolls.value = [...activePolls.value, updatedPoll];
           pastPolls.value = pastPolls.value.filter((_, i) => i !== pollIndex);
         }
       }
@@ -120,8 +120,8 @@ export const usePollStore = defineStore('poll', () => {
       if (pollIndex !== -1) {
         const poll = activePolls.value[pollIndex];
         if (poll) {
-          poll.status = 'encerrada';
-          pastPolls.value = [poll, ...pastPolls.value];
+          const updatedPoll: Enquete = { ...poll, status: 'encerrada' };
+          pastPolls.value = [updatedPoll, ...pastPolls.value];
           activePolls.value = activePolls.value.filter((_, i) => i !== pollIndex);
         }
       }
@@ -157,17 +157,15 @@ export const usePollStore = defineStore('poll', () => {
   function flushBuffer() {
     if (responseBuffer.length === 0) return;
 
-    // Agrupa e commita as respostas de uma vez no ref
+    // Agrupa e commita as respostas recriando os dicionários sem mutar in-place
+    const newResults = { ...pollResults.value };
+
     responseBuffer.forEach((resp) => {
       const id = resp.enquete_id;
-      if (!pollResults.value[id]) {
-        pollResults.value[id] = [];
-      }
-      pollResults.value[id]?.push(resp);
+      newResults[id] = [...(newResults[id] || []), resp];
     });
 
-    // Força a reatividade do objeto inteiro para o Vue notar
-    pollResults.value = { ...pollResults.value };
+    pollResults.value = newResults;
 
     responseBuffer = [];
     bufferTimeout = null;
