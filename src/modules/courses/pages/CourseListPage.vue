@@ -69,7 +69,7 @@ async function handleConfirmStartSession(topic: string) {
     );
 
     $q.loading.hide();
-    void router.push(`/professor/session/${session.id}`);
+    void router.push(`/sala/${session.id}`);
   } catch (err: unknown) {
     $q.loading.hide();
     $q.notify({
@@ -80,7 +80,7 @@ async function handleConfirmStartSession(topic: string) {
 }
 
 function handleOpenInsights(courseId: string) {
-  void router.push(`/professor/curso/${courseId}/dashboard`);
+  void router.push(`/disciplinas/${courseId}/insights`);
 }
 </script>
 
@@ -91,7 +91,17 @@ function handleOpenInsights(courseId: string) {
         <h1 class="tw-text-2xl tw-font-bold tw-text-primary">Minhas Disciplinas</h1>
         <p class="text-muted">Gerencie suas turmas e inicie aulas.</p>
       </div>
-      <q-btn color="primary" icon="add" label="Nova Disciplina" @click="isCreating = true" />
+      <div class="tw-flex tw-gap-2">
+        <q-btn
+          v-if="authStore.user?.perfil.papel === 'professor'"
+          outline
+          color="primary"
+          icon="dashboard"
+          label="Dashboard Global"
+          to="/dashboard"
+        />
+        <q-btn color="primary" icon="add" label="Nova Disciplina" @click="isCreating = true" />
+      </div>
     </div>
 
     <!-- Loading State -->

@@ -45,7 +45,7 @@ onUnmounted(() => {
           {{ courseTitle }}
         </p>
       </div>
-      <q-btn outline color="primary" icon="arrow_back" label="Voltar" to="/professor" />
+      <q-btn outline color="primary" icon="arrow_back" label="Voltar" to="/disciplinas" />
     </div>
 
     <!-- Loading State -->

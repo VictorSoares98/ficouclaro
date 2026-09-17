@@ -63,7 +63,7 @@ async function handleJoinActiveSession(courseId: string) {
     const sessionId = await sessionStore.getActiveSession(courseId);
 
     $q.loading.hide();
-    void router.push(`/aluno/session/${sessionId}`);
+    void router.push(`/sala/${sessionId}`);
   } catch (err: unknown) {
     $q.loading.hide();
     $q.notify({
