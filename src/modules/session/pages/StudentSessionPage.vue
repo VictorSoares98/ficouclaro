@@ -9,6 +9,7 @@ import QaPanel from '@/modules/qa/components/QaPanel.vue';
 import ActivePollPanel from '@/modules/poll/components/ActivePollPanel.vue';
 import ReviewModal from '@/modules/flash-review/components/ReviewModal.vue';
 import BaseSurfaceCard from '@/core/components/BaseSurfaceCard.vue';
+import WaitingRoomWidget from '@/modules/session/components/WaitingRoomWidget.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -59,13 +60,8 @@ onUnmounted(() => {
       }"
     >
       <!-- Aguardando Professor -->
-      <div v-if="sessionStore.currentSession.status === 'aguardando'" class="tw-space-y-4">
-        <q-icon name="hourglass_empty" size="4rem" color="primary" class="tw-animate-pulse" />
-        <h2 class="tw-text-2xl tw-font-bold tw-text-primary">Aguardando o professor</h2>
-        <p class="text-muted">
-          A aula de <strong>{{ sessionStore.currentSession.topico || 'Sem Tópico' }}</strong> logo
-          vai começar.
-        </p>
+      <div v-if="sessionStore.currentSession.status === 'aguardando'" class="tw-w-full">
+        <WaitingRoomWidget :topic="sessionStore.currentSession.topico" />
       </div>
 
       <!-- Sessão Ativa (Onde o termômetro ficará) -->

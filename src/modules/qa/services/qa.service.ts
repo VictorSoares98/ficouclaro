@@ -22,8 +22,6 @@ export class QaService {
       .insert({
         sessao_id: sessionId,
         texto: texto,
-        votos: 0,
-        foi_respondida: false,
       })
       .select()
       .single();

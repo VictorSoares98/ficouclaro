@@ -1,9 +1,14 @@
 import { supabaseClient } from '@/core/supabase/client';
-import type { Database } from '@/core/types/database.types';
+import type { Database, Json } from '@/core/types/database.types';
 
 type Enquete = Database['public']['Tables']['enquetes']['Row'];
 type EnqueteInsert = Database['public']['Tables']['enquetes']['Insert'];
-type RespostaEnqueteInsert = Database['public']['Tables']['respostas_enquete']['Insert'];
+
+export interface PollVotePayload {
+  enquete_id: string;
+  sessao_id: string;
+  resposta: Json;
+}
 
 export class PollService {
   async getActivePollsForSession(sessionId: string): Promise<Enquete[]> {
@@ -54,11 +59,10 @@ export class PollService {
     if (error) throw new Error(error.message);
   }
 
-  async submitResponse(
-    resposta: Omit<RespostaEnqueteInsert, 'hash_eleitor' | 'created_at'>,
-  ): Promise<void> {
+  async submitResponse(resposta: PollVotePayload): Promise<void> {
     const { error } = await supabaseClient.rpc('submit_poll_vote', {
       p_enquete_id: resposta.enquete_id,
+      p_sessao_id: resposta.sessao_id,
       p_resposta: resposta.resposta,
     });
 
