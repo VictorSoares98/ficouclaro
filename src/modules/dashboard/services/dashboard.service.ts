@@ -21,7 +21,8 @@ export class DashboardService {
     // Tipagem inferida automaticamente pelo Supabase; ordenação cronológica
     const sessions = data || [];
 
-    return sessions.sort((a, b) => {
+    // Retorna uma cópia do array ordenada, prevenindo mutações diretas
+    return [...sessions].sort((a, b) => {
       const dateA = a.iniciada_em ? new Date(a.iniciada_em).getTime() : 0;
       const dateB = b.iniciada_em ? new Date(b.iniciada_em).getTime() : 0;
       return dateA - dateB;

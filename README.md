@@ -43,7 +43,7 @@ Nossa stack foi rigorosamente escolhida para fornecer um MVP Híbrido, altamente
    ```env
    QCLI_SUPABASE_URL="https://<seu-projeto>.supabase.co"
    QCLI_SUPABASE_ANON_KEY="<sua-anon-key>"
-   
+
    # Chaves Login Social Google (Requeridas para emular OAuth localmente)
    SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID="<client-id>"
    SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET="<secret>"
