@@ -48,7 +48,7 @@ export class CourseService {
       sala?: string;
       bloco?: string;
       icone?: string;
-    }
+    },
   ): Promise<Disciplina> {
     const MAX_RETRIES = 3;
     let attempts = 0;

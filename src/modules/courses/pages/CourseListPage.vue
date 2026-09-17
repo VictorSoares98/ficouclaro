@@ -197,10 +197,12 @@ function handleOpenInsights(courseId: string) {
 
     <!-- Modal Nova Disciplina -->
     <q-dialog v-model="isCreating">
-      <q-card style="width: 700px; max-width: 90vw;">
+      <q-card style="width: 700px; max-width: 90vw">
         <q-card-section>
           <div class="tw-text-lg tw-font-bold">Nova Disciplina</div>
-          <p class="text-muted tw-text-sm">Preencha os dados da turma. Apenas o Nome é obrigatório.</p>
+          <p class="text-muted tw-text-sm">
+            Preencha os dados da turma. Apenas o Nome é obrigatório.
+          </p>
         </q-card-section>
 
         <q-card-section class="tw-pt-0">
@@ -212,20 +214,28 @@ function handleOpenInsights(courseId: string) {
                 v-model="newCourseName"
                 label="Nome da Disciplina *"
                 autofocus
+                :rules="[
+                  (val) => !!val || 'O nome é obrigatório',
+                  (val) => val.length >= 3 || 'Mínimo de 3 caracteres',
+                ]"
+                maxlength="100"
               />
-              
+
               <q-input
                 outlined
                 v-model="newCourseCurso"
                 label="Curso / Graduação"
                 placeholder="Ex: Engenharia Civil"
+                maxlength="100"
               />
 
               <q-input
                 outlined
                 v-model="newCourseSemestre"
                 label="Semestre / Período"
-                placeholder="Ex: 2024.1 ou 5º Semestre"
+                placeholder="Ex: 2024.1"
+                mask="####.#"
+                hint="Formato: Ano.Semestre (ex: 2024.1)"
               />
 
               <q-input
@@ -234,6 +244,7 @@ function handleOpenInsights(courseId: string) {
                 label="Descrição Curta"
                 type="textarea"
                 rows="2"
+                maxlength="250"
               />
             </div>
 
@@ -260,10 +271,23 @@ function handleOpenInsights(courseId: string) {
               </q-select>
 
               <div class="tw-grid tw-grid-cols-2 tw-gap-2">
-                <q-input outlined v-model="newCourseTurma" label="Turma" placeholder="Ex: T01" />
-                <q-input outlined v-model="newCourseHorario" label="Horário" placeholder="Ex: 19:00" />
+                <q-input
+                  outlined
+                  v-model="newCourseTurma"
+                  label="Turma"
+                  placeholder="Ex: T01"
+                  maxlength="10"
+                  class="tw-uppercase"
+                />
+                <q-input
+                  outlined
+                  v-model="newCourseHorario"
+                  label="Horário"
+                  placeholder="19:00"
+                  mask="##:##"
+                />
               </div>
-              
+
               <q-select
                 outlined
                 v-model="newCourseDiaSemana"
@@ -275,8 +299,20 @@ function handleOpenInsights(courseId: string) {
               />
 
               <div class="tw-grid tw-grid-cols-2 tw-gap-2">
-                <q-input outlined v-model="newCourseSala" label="Sala" placeholder="Ex: 104" />
-                <q-input outlined v-model="newCourseBloco" label="Bloco" placeholder="Ex: Bloco B" />
+                <q-input
+                  outlined
+                  v-model="newCourseSala"
+                  label="Sala"
+                  placeholder="Ex: 104"
+                  maxlength="15"
+                />
+                <q-input
+                  outlined
+                  v-model="newCourseBloco"
+                  label="Bloco"
+                  placeholder="Ex: B"
+                  maxlength="15"
+                />
               </div>
             </div>
           </div>
