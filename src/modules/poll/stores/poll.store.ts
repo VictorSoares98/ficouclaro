@@ -19,16 +19,37 @@ export interface Resposta {
   resposta: Json;
 }
 
-export interface Enquete {
+export interface BaseEnquete {
   id: string;
   created_at: string;
   pergunta: string;
-  tipo: 'multipla_escolha' | 'nuvem_palavras' | 'escala_clareza' | 'ranking';
-  opcoes: unknown;
   status: 'rascunho' | 'ativa' | 'encerrada';
   sessao_id: string;
   encerrada_em: string | null;
 }
+
+export interface EnqueteMultiplaEscolha extends BaseEnquete {
+  tipo: 'multipla_escolha';
+  opcoes: string[];
+}
+
+export interface EnqueteNuvemPalavras extends BaseEnquete {
+  tipo: 'nuvem_palavras';
+  opcoes: null;
+}
+
+export interface EnqueteEscalaClareza extends BaseEnquete {
+  tipo: 'escala_clareza';
+  opcoes: null;
+}
+
+export interface EnqueteRanking extends BaseEnquete {
+  tipo: 'ranking';
+  opcoes: string[];
+}
+
+export type Enquete =
+  EnqueteMultiplaEscolha | EnqueteNuvemPalavras | EnqueteEscalaClareza | EnqueteRanking;
 
 export type EnqueteInsertRow = Database['public']['Tables']['enquetes']['Insert'];
 
@@ -58,13 +79,15 @@ export const usePollStore = defineStore('poll', () => {
 
   async function loadActivePolls(sessionId: string): Promise<void> {
     await execute(async (): Promise<void> => {
-      activePolls.value = await pollService.getActivePollsForSession(sessionId);
+      activePolls.value = (await pollService.getActivePollsForSession(
+        sessionId,
+      )) as unknown as Enquete[];
     }, 'Erro ao carregar enquetes ativas');
   }
 
   async function loadAllPolls(sessionId: string): Promise<void> {
     await execute(async (): Promise<void> => {
-      const all: Enquete[] = await pollService.getAllPollsForSession(sessionId);
+      const all = (await pollService.getAllPollsForSession(sessionId)) as unknown as Enquete[];
 
       const active: Enquete[] = [];
       const past: Enquete[] = [];
@@ -91,7 +114,7 @@ export const usePollStore = defineStore('poll', () => {
 
   async function createPoll(enquete: EnqueteInsertRow): Promise<void> {
     await execute(async (): Promise<void> => {
-      const newPoll: Enquete = await pollService.createPoll(enquete);
+      const newPoll = (await pollService.createPoll(enquete)) as unknown as Enquete;
       pastPolls.value = [newPoll, ...pastPolls.value];
     }, 'Erro ao criar enquete');
   }

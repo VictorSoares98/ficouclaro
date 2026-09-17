@@ -11,7 +11,7 @@ const totalVotes = computed(() => props.results?.length || 0);
 
 // Calcula a porcentagem de cada opção
 const optionStats = computed(() => {
-  if (props.poll.tipo !== 'multipla_escolha' || !Array.isArray(props.poll.opcoes)) {
+  if (props.poll.tipo !== 'multipla_escolha') {
     return [];
   }
 
