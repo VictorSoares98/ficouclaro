@@ -19,6 +19,33 @@ const $q = useQuasar();
 const isCreating = ref(false);
 const newCourseName = ref('');
 const newCourseDesc = ref('');
+const newCourseCurso = ref('');
+const newCourseSemestre = ref('');
+const newCourseTurma = ref('');
+const newCourseHorario = ref('');
+const newCourseDiaSemana = ref('');
+const newCourseSala = ref('');
+const newCourseBloco = ref('');
+const newCourseIcone = ref('school'); // Default icon
+
+const diaSemanaOptions = [
+  { label: 'Segunda-feira', value: 'Segunda-feira' },
+  { label: 'Terça-feira', value: 'Terça-feira' },
+  { label: 'Quarta-feira', value: 'Quarta-feira' },
+  { label: 'Quinta-feira', value: 'Quinta-feira' },
+  { label: 'Sexta-feira', value: 'Sexta-feira' },
+  { label: 'Sábado', value: 'Sábado' },
+];
+
+const iconeOptions = [
+  { label: 'Geral (Escola)', value: 'school', icon: 'school' },
+  { label: 'Exatas (Cálculo)', value: 'calculate', icon: 'calculate' },
+  { label: 'Ciências / Lab', value: 'science', icon: 'science' },
+  { label: 'Tecnologia / TI', value: 'computer', icon: 'computer' },
+  { label: 'Humanas / História', value: 'history_edu', icon: 'history_edu' },
+  { label: 'Linguagens / Arte', value: 'palette', icon: 'palette' },
+  { label: 'Negócios / Gestão', value: 'business_center', icon: 'business_center' },
+];
 
 const selectedCourseForSession = ref<Disciplina | null>(null);
 const isConfirmDialogOpen = computed({
@@ -35,11 +62,30 @@ onMounted(async () => {
 async function handleCreateCourse() {
   if (!newCourseName.value) return;
   try {
-    await courseStore.createCourse(newCourseName.value, newCourseDesc.value);
+    await courseStore.createCourse({
+      nome: newCourseName.value,
+      descricao: newCourseDesc.value,
+      curso: newCourseCurso.value,
+      semestre: newCourseSemestre.value,
+      turma: newCourseTurma.value,
+      horario: newCourseHorario.value,
+      dia_semana: newCourseDiaSemana.value,
+      sala: newCourseSala.value,
+      bloco: newCourseBloco.value,
+      icone: newCourseIcone.value,
+    });
     $q.notify({ color: 'positive', message: 'Disciplina criada com sucesso!' });
     isCreating.value = false;
     newCourseName.value = '';
     newCourseDesc.value = '';
+    newCourseCurso.value = '';
+    newCourseSemestre.value = '';
+    newCourseTurma.value = '';
+    newCourseHorario.value = '';
+    newCourseDiaSemana.value = '';
+    newCourseSala.value = '';
+    newCourseBloco.value = '';
+    newCourseIcone.value = 'school';
   } catch (err: unknown) {
     $q.notify({
       color: 'negative',
@@ -151,26 +197,89 @@ function handleOpenInsights(courseId: string) {
 
     <!-- Modal Nova Disciplina -->
     <q-dialog v-model="isCreating">
-      <q-card style="min-width: 350px">
+      <q-card style="width: 700px; max-width: 90vw;">
         <q-card-section>
           <div class="tw-text-lg tw-font-bold">Nova Disciplina</div>
+          <p class="text-muted tw-text-sm">Preencha os dados da turma. Apenas o Nome é obrigatório.</p>
         </q-card-section>
 
-        <q-card-section class="tw-pt-0 tw-space-y-4">
-          <q-input
-            outlined
-            v-model="newCourseName"
-            label="Nome da Disciplina *"
-            autofocus
-            @keyup.enter="handleCreateCourse"
-          />
-          <q-input
-            outlined
-            v-model="newCourseDesc"
-            label="Descrição (Opcional)"
-            type="textarea"
-            rows="3"
-          />
+        <q-card-section class="tw-pt-0">
+          <div class="tw-grid tw-grid-cols-1 md:tw-grid-cols-2 tw-gap-4">
+            <!-- Coluna 1 -->
+            <div class="tw-space-y-4">
+              <q-input
+                outlined
+                v-model="newCourseName"
+                label="Nome da Disciplina *"
+                autofocus
+              />
+              
+              <q-input
+                outlined
+                v-model="newCourseCurso"
+                label="Curso / Graduação"
+                placeholder="Ex: Engenharia Civil"
+              />
+
+              <q-input
+                outlined
+                v-model="newCourseSemestre"
+                label="Semestre / Período"
+                placeholder="Ex: 2024.1 ou 5º Semestre"
+              />
+
+              <q-input
+                outlined
+                v-model="newCourseDesc"
+                label="Descrição Curta"
+                type="textarea"
+                rows="2"
+              />
+            </div>
+
+            <!-- Coluna 2 -->
+            <div class="tw-space-y-4">
+              <q-select
+                outlined
+                v-model="newCourseIcone"
+                :options="iconeOptions"
+                label="Ícone de Identificação"
+                emit-value
+                map-options
+              >
+                <template v-slot:option="scope">
+                  <q-item v-bind="scope.itemProps">
+                    <q-item-section avatar>
+                      <q-icon :name="scope.opt.icon" />
+                    </q-item-section>
+                    <q-item-section>
+                      <q-item-label>{{ scope.opt.label }}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                </template>
+              </q-select>
+
+              <div class="tw-grid tw-grid-cols-2 tw-gap-2">
+                <q-input outlined v-model="newCourseTurma" label="Turma" placeholder="Ex: T01" />
+                <q-input outlined v-model="newCourseHorario" label="Horário" placeholder="Ex: 19:00" />
+              </div>
+              
+              <q-select
+                outlined
+                v-model="newCourseDiaSemana"
+                :options="diaSemanaOptions"
+                label="Dia da Semana"
+                emit-value
+                map-options
+                clearable
+              />
+
+              <div class="tw-grid tw-grid-cols-2 tw-gap-2">
+                <q-input outlined v-model="newCourseSala" label="Sala" placeholder="Ex: 104" />
+                <q-input outlined v-model="newCourseBloco" label="Bloco" placeholder="Ex: Bloco B" />
+              </div>
+            </div>
+          </div>
         </q-card-section>
 
         <q-card-actions align="right" class="text-primary">

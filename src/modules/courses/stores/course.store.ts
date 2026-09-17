@@ -20,12 +20,23 @@ export const useCourseStore = defineStore('course', () => {
     }, 'Erro ao carregar disciplinas.');
   }
 
-  async function createCourse(nome: string, descricao?: string) {
+  async function createCourse(payload: {
+    nome: string;
+    descricao?: string;
+    curso?: string;
+    semestre?: string;
+    turma?: string;
+    horario?: string;
+    dia_semana?: string;
+    sala?: string;
+    bloco?: string;
+    icone?: string;
+  }) {
     const user = authStore.user;
     if (!user) throw new Error('Não autenticado');
 
     return execute(async () => {
-      const newCourse = await courseService.createCourse(user.auth.id, nome, descricao);
+      const newCourse = await courseService.createCourse(user.auth.id, payload);
       courses.value = [newCourse, ...courses.value];
       return newCourse;
     }, 'Erro ao criar disciplina.');
