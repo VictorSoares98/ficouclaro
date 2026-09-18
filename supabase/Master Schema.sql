@@ -1,7 +1,7 @@
 -- ====================================================================
 -- ⚠️ AVISO: ARQUIVO AUTO-GERADO!
 -- NÃO EDITE ESTE ARQUIVO DIRETAMENTE. ALTERE OS SNIPPETS E RODE db:build
--- Gerado em: 2026-09-18T19:05:33.976Z
+-- Gerado em: 2026-09-18T19:45:07.554Z
 -- ====================================================================
 
 -- >>> INÍCIO DO SNIPPET: 00_Init_Extensions.sql <<<
@@ -139,7 +139,6 @@ CREATE TABLE public.votos_duvida (
 CREATE TABLE public.avaliacoes_rapidas (
   id           UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   sessao_id    UUID NOT NULL REFERENCES public.sessoes(id) ON DELETE CASCADE,
-  aluno_id     UUID REFERENCES public.usuarios(id) ON DELETE SET NULL,
   nota         SMALLINT NOT NULL CHECK (nota BETWEEN 1 AND 5),
   comentario   TEXT,
   hash_eleitor TEXT NOT NULL,
