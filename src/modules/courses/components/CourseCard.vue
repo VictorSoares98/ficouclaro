@@ -1,8 +1,14 @@
 <script setup lang="ts">
+import { ref, computed } from 'vue';
 import type { Disciplina } from '@/modules/courses/services/course.service';
 import BaseSurfaceCard from '@/core/components/BaseSurfaceCard.vue';
+import QrcodeVue from 'qrcode.vue';
 
-defineProps<{
+const showQrCode = ref(false);
+const qrValue = computed(() => `ficouclaro://join/${props.course.codigo_convite}`);
+
+
+const props = defineProps<{
   course: Disciplina;
   actionLabel: string;
   actionIcon: string;
@@ -27,10 +33,22 @@ defineEmits<{
       <!-- HEADER ROW: Badges (Left) & Options (Right) -->
       <div class="tw-flex tw-justify-between tw-items-center tw-mb-3">
         <!-- Left: Invite Code -->
-        <div>
+        <div class="tw-flex tw-items-center tw-gap-2">
           <q-badge v-if="showInviteCode" color="secondary" class="tw-text-sm tw-uppercase">
             Cód: {{ course.codigo_convite }}
           </q-badge>
+          <q-btn
+            v-if="showInviteCode"
+            flat
+            round
+            dense
+            size="sm"
+            color="primary"
+            icon="qr_code"
+            @click="showQrCode = true"
+          >
+            <q-tooltip>Mostrar QR Code</q-tooltip>
+          </q-btn>
         </div>
 
         <!-- Right: Status & 3 Dots -->
@@ -156,4 +174,23 @@ defineEmits<{
       />
     </q-card-actions>
   </BaseSurfaceCard>
+
+  <!-- Modal de QR Code -->
+  <q-dialog v-model="showQrCode">
+    <q-card class="tw-rounded-2xl tw-p-4 tw-text-center tw-bg-white dark:tw-bg-dark-page">
+      <q-card-section>
+        <div class="tw-text-xl tw-font-bold tw-mb-2">Convite para Turma</div>
+        <p class="text-muted tw-mb-6">Escaneie o código abaixo para entrar</p>
+        <div class="tw-bg-white tw-p-4 tw-rounded-xl tw-inline-block">
+          <QrcodeVue :value="qrValue" :size="250" level="H" />
+        </div>
+        <div class="tw-text-3xl tw-font-black tw-tracking-widest tw-mt-6 tw-text-primary tw-uppercase">
+          {{ course.codigo_convite }}
+        </div>
+      </q-card-section>
+      <q-card-actions align="center">
+        <q-btn flat label="Fechar" color="primary" v-close-popup />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
 </template>

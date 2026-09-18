@@ -145,7 +145,7 @@ async function onGoogleLogin() {
           type="text"
           label="Nome Completo"
           outlined
-          reactive-rules
+          lazy-rules
           :rules="[(val) => !!val || 'O nome é obrigatório']"
           autocomplete="name"
           name="name"
@@ -158,7 +158,7 @@ async function onGoogleLogin() {
           type="email"
           label="E-mail"
           outlined
-          reactive-rules
+          lazy-rules
           :rules="[
             (val) => !!val || 'O e-mail é obrigatório',
             (val) => /.+@.+\..+/.test(val) || 'E-mail inválido',
@@ -175,7 +175,7 @@ async function onGoogleLogin() {
             :type="isPasswordVisible ? 'text' : 'password'"
             label="Senha"
             outlined
-            reactive-rules
+            lazy-rules
             :rules="[
               (val) => !!val || 'A senha é obrigatória',
               (val) =>
@@ -207,7 +207,7 @@ async function onGoogleLogin() {
           :type="isPasswordVisible ? 'text' : 'password'"
           label="Confirmar Senha"
           outlined
-          reactive-rules
+          lazy-rules
           :rules="[
             (val) => !!val || 'A confirmação é obrigatória',
             (val) => val === password || 'As senhas não coincidem',

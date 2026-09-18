@@ -9,11 +9,20 @@ const $q = useQuasar();
 function confirmDeleteAccount() {
   $q.dialog({
     title: 'Excluir Conta',
-    message: 'Tem certeza? Esta ação é irreversível e apagará todos os seus dados da plataforma.',
+    message: 'Tem certeza? Esta ação é irreversível. Para confirmar, digite exatamente "EXCLUIR MINHA CONTA" abaixo:',
+    prompt: {
+      model: '',
+      type: 'text'
+    },
     color: 'negative',
     cancel: true,
     persistent: true,
-  }).onOk(() => {
+  }).onOk((data: string) => {
+    if (data !== 'EXCLUIR MINHA CONTA') {
+      $q.notify({ color: 'warning', message: 'Frase de confirmação incorreta. Operação cancelada.' });
+      return;
+    }
+
     void (async () => {
       try {
         $q.loading.show({ message: 'Excluindo conta...' });
@@ -32,27 +41,53 @@ function confirmDeleteAccount() {
   });
 }
 
-function exportData() {
-  if (!authStore.user) {
+function getSanitizedData() {
+  if (!authStore.user) return null;
+  return {
+    id: authStore.user.auth.id,
+    email: authStore.user.auth.email,
+    nome: authStore.user.perfil.nome_completo,
+    papel: authStore.user.perfil.papel,
+    criado_em: authStore.user.auth.created_at,
+    termos_aceitos_em: authStore.user.perfil.termos_aceitos_em,
+    versao_termos: authStore.user.perfil.versao_termos,
+    exportado_em: new Date().toISOString(),
+  };
+}
+
+function exportDataJSON() {
+  const dataToExport = getSanitizedData();
+  if (!dataToExport) {
     $q.notify({ color: 'negative', message: 'Usuário não autenticado.' });
     return;
   }
 
-  // Gera o arquivo JSON com as informações que o app possui em authStore
-  const dataToExport = {
-    auth: authStore.user.auth,
-    perfil: authStore.user.perfil,
-    exported_at: new Date().toISOString(),
-  };
-
   const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(dataToExport, null, 2));
+  triggerDownload(dataStr, 'meus_dados_ficou_claro.json');
+}
+
+function exportDataCSV() {
+  const data = getSanitizedData();
+  if (!data) {
+    $q.notify({ color: 'negative', message: 'Usuário não autenticado.' });
+    return;
+  }
+
+  const keys = Object.keys(data);
+  const values = Object.values(data).map(v => `"${String(v || '').replace(/"/g, '""')}"`);
+  const csvContent = `${keys.join(',')}\n${values.join(',')}`;
+
+  const dataStr = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvContent);
+  triggerDownload(dataStr, 'meus_dados_ficou_claro.csv');
+}
+
+function triggerDownload(href: string, filename: string) {
   const downloadAnchorNode = document.createElement('a');
-  downloadAnchorNode.setAttribute('href', dataStr);
-  downloadAnchorNode.setAttribute('download', 'meus_dados_ficou_claro.json');
+  downloadAnchorNode.setAttribute('href', href);
+  downloadAnchorNode.setAttribute('download', filename);
   document.body.appendChild(downloadAnchorNode);
   downloadAnchorNode.click();
   downloadAnchorNode.remove();
-
   $q.notify({ color: 'positive', message: 'Download de dados iniciado com sucesso.' });
 }
 </script>
@@ -73,16 +108,26 @@ function exportData() {
         <h2 class="tw-text-xl tw-font-bold tw-mb-4">Seus Dados (Direito de Acesso)</h2>
         <p class="text-muted tw-mb-6">
           A Lei Geral de Proteção de Dados (LGPD) garante a você o direito de saber quais dados temos sobre você. 
-          Baixe um relatório em formato estruturado (JSON) com seu perfil completo.
+          Baixe um relatório sanitizado com seu perfil completo.
         </p>
-        <q-btn
-          color="primary"
-          icon="download"
-          label="Baixar Meus Dados (JSON)"
-          unelevated
-          no-caps
-          @click="exportData"
-        />
+        <div class="tw-flex tw-gap-4 tw-flex-wrap">
+          <q-btn
+            color="primary"
+            icon="data_object"
+            label="Baixar Meus Dados (JSON)"
+            unelevated
+            no-caps
+            @click="exportDataJSON"
+          />
+          <q-btn
+            color="secondary"
+            icon="table_view"
+            label="Baixar Meus Dados (CSV)"
+            unelevated
+            no-caps
+            @click="exportDataCSV"
+          />
+        </div>
       </BaseSurfaceCard>
 
       <BaseSurfaceCard class="tw-p-6 tw-border-red-100 dark:tw-border-red-900/30">

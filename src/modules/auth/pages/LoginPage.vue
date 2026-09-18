@@ -210,7 +210,7 @@ async function onSubmit() {
           type="email"
           label="E-mail"
           outlined
-          reactive-rules
+          lazy-rules
           :rules="[
             (val) => !!val || 'O e-mail é obrigatório',
             (val) => /.+@.+\..+/.test(val) || 'E-mail inválido',
@@ -228,7 +228,7 @@ async function onSubmit() {
           :type="isPasswordVisible ? 'text' : 'password'"
           label="Senha"
           outlined
-          reactive-rules
+          lazy-rules
           :rules="[
             (val) => !!val || 'A senha é obrigatória',
             (val) => val.length >= 6 || 'A senha deve ter no mínimo 6 caracteres',
