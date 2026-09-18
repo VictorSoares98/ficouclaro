@@ -31,31 +31,53 @@
           </li>
         </ul>
 
-        <h2 class="tw-text-2xl tw-font-semibold tw-mt-8 tw-mb-4">2. Anonimização e Feedback</h2>
+        <h2 class="tw-text-2xl tw-font-semibold tw-mt-8 tw-mb-4">2. Terceiros e Suboperadores</h2>
         <p>
-          O sistema de "Termômetro" (sinais de ritmo) e o "Painel de Dúvidas" foram desenhados para
-          proteger a identidade do aluno. Seus registros no banco de dados não vinculam diretamente
-          sua identidade (ID de usuário) ao conteúdo da dúvida ou ao sinal emitido perante a visão
-          do professor, garantindo um ambiente seguro para o aprendizado livre de julgamentos.
+          Para entregar nossos serviços, utilizamos a infraestrutura técnica dos seguintes parceiros
+          (que também possuem rígidas políticas de privacidade):
         </p>
+        <ul class="tw-list-disc tw-pl-6 tw-space-y-2">
+          <li>
+            <strong>Supabase:</strong> Banco de dados e autenticação segura (criptografia em repouso
+            e trânsito).
+          </li>
+          <li>
+            <strong>Cloudflare / Vercel:</strong> Hospedagem e aceleração de entrega de conteúdo
+            (CDN).
+          </li>
+          <li>
+            <strong>Google Fontes/Ícones:</strong> Fornecimento de tipografia e recursos visuais.
+          </li>
+        </ul>
 
         <h2 class="tw-text-2xl tw-font-semibold tw-mt-8 tw-mb-4">
-          3. Seu Direito ao Esquecimento (Art. 18, VI)
+          3. Biometria e Processamento Local
         </h2>
         <p>
-          Você tem o controle absoluto sobre seus dados. A qualquer momento, através das
-          configurações do seu perfil, você pode acionar a opção "Excluir Minha Conta". Este
-          processo apagará imediatamente seus dados pessoais (nome, e-mail e avatar) do nosso
-          sistema de autenticação, anonimizando ou destruindo em cascata os registros atrelados.
+          Nossa plataforma oferece recursos avançados, como autenticação biométrica via WebAuthn.
+          <strong
+            >É crucial destacar que suas digitais ou face nunca saem do seu dispositivo.</strong
+          >
+          Todo o processamento biométrico (incluindo futuros recursos de análise de sentimento via
+          Inteligência Artificial) ocorre 100% localmente no navegador ou celular (Edge Computing).
         </p>
 
-        <h2 class="tw-text-2xl tw-font-semibold tw-mt-8 tw-mb-4">4. Segurança dos Dados</h2>
+        <h2 class="tw-text-2xl tw-font-semibold tw-mt-8 tw-mb-4">4. Seus Direitos (LGPD Hub)</h2>
         <p>
-          Utilizamos o Supabase como nossa infraestrutura de backend. Toda comunicação é
-          criptografada de ponta a ponta (HTTPS/WSS) e o acesso ao banco de dados é restrito por
-          políticas severas de Row Level Security (RLS), o que significa que nenhum usuário possui
-          permissão técnica para visualizar dados além daqueles aos quais foi autorizado.
+          Você tem controle absoluto sobre seus dados. Criamos uma seção dedicada ("Privacidade e
+          Segurança") acessível pelo menu do seu perfil. Lá você pode:
         </p>
+        <ul class="tw-list-disc tw-pl-6 tw-space-y-2">
+          <li>
+            <strong>Direito de Acesso:</strong> Baixar todos os seus dados em formato estruturado
+            (JSON).
+          </li>
+          <li>
+            <strong>Direito ao Esquecimento:</strong> Excluir sua conta definitivamente, apagando
+            seu nome, e-mail e vinculações, mantendo apenas o histórico anônimo necessário para as
+            métricas da turma.
+          </li>
+        </ul>
 
         <h2 class="tw-text-2xl tw-font-semibold tw-mt-8 tw-mb-4">5. Contato</h2>
         <p>

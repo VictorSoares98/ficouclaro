@@ -1,28 +1,32 @@
-import { ref, onMounted, onUnmounted, readonly } from 'vue';
+import { ref, readonly, getCurrentInstance, onMounted } from 'vue';
+
+// Estado global compartilhado
+const isOnline = ref<boolean>(typeof window !== 'undefined' ? navigator.onLine : true);
+let listenersAttached = false;
+
+function updateStatus() {
+  if (typeof window !== 'undefined') {
+    isOnline.value = navigator.onLine;
+  }
+}
+
+function attachListeners() {
+  if (typeof window !== 'undefined' && !listenersAttached) {
+    window.addEventListener('online', updateStatus);
+    window.addEventListener('offline', updateStatus);
+    listenersAttached = true;
+  }
+}
 
 export function useNetworkStatus() {
-  // Inicializa de forma segura verificando se estamos em um ambiente de browser
-  const isOnline = ref<boolean>(typeof window !== 'undefined' ? navigator.onLine : true);
+  const instance = getCurrentInstance();
 
-  function updateStatus() {
-    if (typeof window !== 'undefined') {
-      isOnline.value = navigator.onLine;
-    }
+  if (instance) {
+    onMounted(attachListeners);
+  } else {
+    // Quando inicializado fora de um componente (ex: Pinia store dentro do boot auth-guard)
+    attachListeners();
   }
-
-  onMounted(() => {
-    if (typeof window !== 'undefined') {
-      window.addEventListener('online', updateStatus);
-      window.addEventListener('offline', updateStatus);
-    }
-  });
-
-  onUnmounted(() => {
-    if (typeof window !== 'undefined') {
-      window.removeEventListener('online', updateStatus);
-      window.removeEventListener('offline', updateStatus);
-    }
-  });
 
   return {
     isOnline: readonly(isOnline),

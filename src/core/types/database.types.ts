@@ -135,6 +135,7 @@ export type Database = {
       };
       duvidas: {
         Row: {
+          autor_id: string | null;
           created_at: string;
           foi_respondida: boolean;
           id: string;
@@ -144,6 +145,7 @@ export type Database = {
           votos: number;
         };
         Insert: {
+          autor_id?: string | null;
           created_at?: string;
           foi_respondida?: boolean;
           id?: string;
@@ -153,6 +155,7 @@ export type Database = {
           votos?: number;
         };
         Update: {
+          autor_id?: string | null;
           created_at?: string;
           foi_respondida?: boolean;
           id?: string;
@@ -393,6 +396,8 @@ export type Database = {
           id: string;
           nome_completo: string | null;
           papel: Database['public']['Enums']['papel_usuario'];
+          termos_aceitos_em: string | null;
+          versao_termos: string | null;
           updated_at: string;
           url_avatar: string | null;
         };
@@ -401,6 +406,8 @@ export type Database = {
           id: string;
           nome_completo?: string | null;
           papel?: Database['public']['Enums']['papel_usuario'];
+          termos_aceitos_em?: string | null;
+          versao_termos?: string | null;
           updated_at?: string;
           url_avatar?: string | null;
         };
@@ -409,6 +416,8 @@ export type Database = {
           id?: string;
           nome_completo?: string | null;
           papel?: Database['public']['Enums']['papel_usuario'];
+          termos_aceitos_em?: string | null;
+          versao_termos?: string | null;
           updated_at?: string;
           url_avatar?: string | null;
         };
@@ -498,6 +507,21 @@ export type Database = {
       esta_matriculado: { Args: { p_disciplina_id: string }; Returns: boolean };
       get_course_insights: {
         Args: { p_disciplina_id: string };
+        Returns: {
+          disciplina_id: string;
+          iniciada_em: string;
+          media_estrelas: number;
+          sessao_id: string;
+          status: Database['public']['Enums']['status_sessao'];
+          topico: string;
+          total_avaliacoes: number;
+          total_duvidas: number;
+          total_enquetes: number;
+          total_sinais: number;
+        }[];
+      };
+      get_global_insights: {
+        Args: Record<PropertyKey, never>;
         Returns: {
           disciplina_id: string;
           iniciada_em: string;

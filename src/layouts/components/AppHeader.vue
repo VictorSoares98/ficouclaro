@@ -27,32 +27,6 @@ async function handleLogout() {
     $q.notify({ color: 'negative', message: 'Erro ao sair: ' + err.message });
   }
 }
-
-function confirmDeleteAccount() {
-  $q.dialog({
-    title: 'Excluir Conta',
-    message: 'Tem certeza? Esta ação é irreversível e apagará todos os seus dados da plataforma.',
-    color: 'negative',
-    cancel: true,
-    persistent: true,
-  }).onOk(() => {
-    void (async () => {
-      try {
-        $q.loading.show({ message: 'Excluindo conta...' });
-        await authStore.deleteAccount();
-        $q.notify({ color: 'positive', message: 'Conta excluída com sucesso.' });
-        setTimeout(() => {
-          window.location.href = '/'; // Hard reload após a notificação
-        }, 800);
-      } catch (error) {
-        const err = error as Error;
-        $q.notify({ color: 'negative', message: 'Erro ao excluir conta: ' + err.message });
-      } finally {
-        $q.loading.hide();
-      }
-    })();
-  });
-}
 </script>
 
 <template>
@@ -163,11 +137,11 @@ function confirmDeleteAccount() {
             <q-item-section>Sair</q-item-section>
           </q-item>
           <q-separator />
-          <q-item clickable v-close-popup @click="confirmDeleteAccount" class="text-negative">
+          <q-item clickable v-close-popup to="/privacidade-seguranca" class="tw-text-gray-700">
             <q-item-section avatar>
-              <q-icon name="delete_forever" color="negative" />
+              <q-icon name="security" color="primary" />
             </q-item-section>
-            <q-item-section>Excluir Minha Conta</q-item-section>
+            <q-item-section>Privacidade e Segurança</q-item-section>
           </q-item>
         </q-list>
       </q-btn-dropdown>

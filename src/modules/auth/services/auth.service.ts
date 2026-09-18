@@ -46,7 +46,7 @@ class AuthService {
   async getProfile(userId: string): Promise<Perfil> {
     const { data, error } = await supabaseClient
       .from('usuarios')
-      .select('id, papel, nome_completo, url_avatar')
+      .select('id, papel, nome_completo, url_avatar, termos_aceitos_em, versao_termos')
       .eq('id', userId)
       .single();
 

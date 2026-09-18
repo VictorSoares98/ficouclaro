@@ -16,12 +16,13 @@ export class QaService {
     return data || [];
   }
 
-  async submitQuestion(sessionId: string, texto: string): Promise<Duvida> {
+  async submitQuestion(sessionId: string, texto: string, autorId?: string | null): Promise<Duvida> {
     const { data, error } = await supabaseClient
       .from('duvidas')
       .insert({
         sessao_id: sessionId,
         texto: texto,
+        ...(autorId ? { autor_id: autorId } : {}),
       })
       .select()
       .single();
