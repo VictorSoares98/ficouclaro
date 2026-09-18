@@ -107,11 +107,11 @@ async function handleSaveCourse() {
       descricao: newCourseDesc.value,
       curso: newCourseCurso.value,
       semestre: newCourseSemestre.value,
-      turma: newCourseTurma.value,
+      turma: newCourseTurma.value?.toUpperCase(),
       horario: newCourseHorario.value,
       dia_semana: newCourseDiaSemana.value,
-      sala: newCourseSala.value,
-      bloco: newCourseBloco.value,
+      sala: newCourseSala.value?.toUpperCase(),
+      bloco: newCourseBloco.value?.toUpperCase(),
       icone: newCourseIcone.value,
     };
 
@@ -382,6 +382,7 @@ function handleOpenInsights(courseId: string) {
                   label="Sala"
                   placeholder="Ex: 104"
                   maxlength="15"
+                  class="tw-uppercase"
                 />
                 <q-input
                   outlined
@@ -389,6 +390,7 @@ function handleOpenInsights(courseId: string) {
                   label="Bloco"
                   placeholder="Ex: B"
                   maxlength="15"
+                  class="tw-uppercase"
                 />
               </div>
             </div>
