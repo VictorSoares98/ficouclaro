@@ -1,9 +1,18 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
 import { useAuthStore } from '@/stores/auth.store';
 import AuthFormContainer from '@/modules/auth/components/AuthFormContainer.vue';
+
+interface PasswordCredentialExt {
+  id?: string;
+  password?: string;
+}
+
+interface CredentialRequestOptionsWithPassword extends CredentialRequestOptions {
+  password?: boolean;
+}
 
 const router = useRouter();
 const $q = useQuasar();
@@ -13,9 +22,49 @@ const email = ref('');
 const password = ref('');
 const isPasswordVisible = ref(false);
 
+onMounted(async () => {
+  // Dispara o modal nativo do sistema (Google Password Manager / Samsung Pass / iCloud) ao carregar a página
+  if (typeof window !== 'undefined' && 'credentials' in navigator && navigator.credentials.get) {
+    try {
+      const cred = (await navigator.credentials.get({
+        password: true,
+      } as CredentialRequestOptionsWithPassword)) as PasswordCredentialExt | null;
+
+      if (cred && cred.id && cred.password) {
+        email.value = cred.id;
+        password.value = cred.password;
+      }
+    } catch (err) {
+      console.debug('[CredentialManager] Nenhuma credencial selecionada:', err);
+    }
+  }
+});
+
 async function onSubmit() {
   try {
     await authStore.login({ email: email.value, password: password.value });
+
+    // Registra a credencial no gerenciador nativo do dispositivo após login bem-sucedido
+    if (
+      typeof window !== 'undefined' &&
+      'credentials' in navigator &&
+      (window as unknown as Record<string, unknown>).PasswordCredential
+    ) {
+      try {
+        const PasswordCred = (
+          window as unknown as {
+            PasswordCredential: new (data: { id: string; password: string }) => Credential;
+          }
+        ).PasswordCredential;
+        const cred = new PasswordCred({
+          id: email.value,
+          password: password.value,
+        });
+        await navigator.credentials.store(cred);
+      } catch (err) {
+        console.debug('[CredentialManager] Erro ao salvar credencial:', err);
+      }
+    }
 
     const papel = authStore.user?.perfil.papel;
 

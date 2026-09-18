@@ -46,6 +46,28 @@ async function onSubmit() {
       },
     });
 
+    // Registra a credencial no gerenciador nativo do dispositivo após criar a conta
+    if (
+      typeof window !== 'undefined' &&
+      'credentials' in navigator &&
+      (window as unknown as Record<string, unknown>).PasswordCredential
+    ) {
+      try {
+        const PasswordCred = (
+          window as unknown as {
+            PasswordCredential: new (data: { id: string; password: string }) => Credential;
+          }
+        ).PasswordCredential;
+        const cred = new PasswordCred({
+          id: email.value,
+          password: password.value,
+        });
+        await navigator.credentials.store(cred);
+      } catch (err) {
+        console.debug('[CredentialManager] Erro ao salvar credencial:', err);
+      }
+    }
+
     $q.notify({
       type: 'positive',
       message: 'Conta criada com sucesso!',
