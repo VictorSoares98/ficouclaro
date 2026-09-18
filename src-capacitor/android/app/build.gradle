@@ -17,15 +17,24 @@ android {
         }
     }
     buildTypes {
+        debug {
+            applicationIdSuffix ".dev"
+            manifestPlaceholders = [appName: "Ficou Claro (Dev)"]
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            manifestPlaceholders = [appName: "Ficou Claro"]
         }
     }
 
     applicationVariants.all { variant ->
         variant.outputs.all {
-            outputFileName = "Ficou-Claro.apk"
+            if (variant.buildType.name == 'debug') {
+                outputFileName = "Ficou-Claro-Dev.apk"
+            } else {
+                outputFileName = "Ficou-Claro.apk"
+            }
         }
     }
 }
