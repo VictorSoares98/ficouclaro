@@ -28,7 +28,7 @@ onMounted(() => {
       message: 'Sincronizando com a nuvem...',
       position: 'top',
       timeout: 1000,
-      onDismiss: () => window.location.reload()
+      onDismiss: () => window.location.reload(),
     });
   });
 

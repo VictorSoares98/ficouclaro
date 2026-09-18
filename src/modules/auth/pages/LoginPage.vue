@@ -74,8 +74,10 @@ async function onSubmit() {
       position: 'top',
     });
 
-    if (papel) {
-      void router.push(`/${papel}`);
+    if (papel === 'professor') {
+      void router.push('/disciplinas');
+    } else if (papel === 'aluno') {
+      void router.push('/hub');
     } else {
       void router.push('/');
     }

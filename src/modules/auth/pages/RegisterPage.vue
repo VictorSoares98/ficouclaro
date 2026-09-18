@@ -74,7 +74,11 @@ async function onSubmit() {
       position: 'top',
     });
 
-    void router.push(`/${role.value}`);
+    if (role.value === 'professor') {
+      void router.push('/disciplinas');
+    } else {
+      void router.push('/hub');
+    }
   } catch {
     // O erro já é tratado e notificado globalmente pelo authStore (useAsyncOperation)
     // Este catch serve apenas para interromper o fluxo e evitar o redirecionamento indevido
