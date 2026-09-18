@@ -209,7 +209,7 @@ function handleOpenInsights(courseId: string) {
         <h1 class="tw-text-2xl tw-font-bold tw-text-primary">Minhas Disciplinas</h1>
         <p class="text-muted">Gerencie suas turmas e inicie aulas.</p>
       </div>
-      <div class="tw-flex tw-gap-2 tw-self-end sm:tw-self-auto">
+      <div class="tw-flex tw-flex-col sm:tw-flex-row tw-gap-3 tw-w-full sm:tw-w-auto">
         <q-btn
           v-if="authStore.user?.perfil.papel === 'professor'"
           outline
@@ -217,13 +217,22 @@ function handleOpenInsights(courseId: string) {
           icon="dashboard"
           label="Dashboard Global"
           to="/dashboard"
+          class="tw-w-full sm:tw-w-auto"
+          no-wrap
         >
           <q-tooltip anchor="top middle" self="bottom middle" :offset="[0, 8]" class="tw-text-sm">
             Dashboard Global
           </q-tooltip>
         </q-btn>
 
-        <q-btn color="primary" icon="add" label="Nova Disciplina" @click="openCreateModal">
+        <q-btn
+          color="primary"
+          icon="add"
+          label="Nova Disciplina"
+          @click="openCreateModal"
+          class="tw-w-full sm:tw-w-auto"
+          no-wrap
+        >
           <q-tooltip anchor="top middle" self="bottom middle" :offset="[0, 8]" class="tw-text-sm">
             Nova Disciplina
           </q-tooltip>

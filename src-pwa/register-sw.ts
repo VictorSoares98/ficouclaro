@@ -1,4 +1,5 @@
 import { register } from 'register-service-worker';
+import { Notify } from 'quasar';
 
 // The ready(), registered(), cached(), updatefound() and updated()
 // events passes a ServiceWorkerRegistration instance in their arguments.
@@ -28,7 +29,14 @@ register(import.meta.env.QUASAR_SERVICE_WORKER_FILE, {
   },
 
   updated(/* registration */) {
-    // console.log('New content is available; please refresh.')
+    Notify.create({
+      type: 'info',
+      icon: 'update',
+      message: 'Nova versão do sistema disponível. Atualizando ambiente...',
+      color: 'primary',
+      timeout: 2000,
+      onDismiss: () => window.location.reload(),
+    });
   },
 
   offline() {
