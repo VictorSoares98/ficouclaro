@@ -22,6 +22,7 @@ android {
             manifestPlaceholders = [appName: "Ficou Claro (Dev)"]
         }
         release {
+            signingConfig signingConfigs.debug
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             manifestPlaceholders = [appName: "Ficou Claro"]
