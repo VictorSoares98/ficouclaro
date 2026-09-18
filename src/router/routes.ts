@@ -10,7 +10,10 @@ const routes: RouteRecordRaw[] = [
       { path: 'register', component: () => import('@/modules/auth/pages/RegisterPage.vue') },
       { path: 'termos', component: () => import('@/pages/TermsPage.vue') },
       { path: 'privacidade', component: () => import('@/pages/PrivacyPage.vue') },
-      { path: 'privacidade-seguranca', component: () => import('@/pages/PrivacidadeSegurancaPage.vue') },
+      {
+        path: 'privacidade-seguranca',
+        component: () => import('@/pages/PrivacidadeSegurancaPage.vue'),
+      },
     ],
   },
   {

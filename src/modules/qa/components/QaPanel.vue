@@ -33,7 +33,7 @@ async function handleSubmit(payload: { text: string; isAnonymous: boolean }) {
       await qaStore.submitQuestion(
         sessionStore.currentSession.id,
         payload.text,
-        payload.isAnonymous
+        payload.isAnonymous,
       );
 
       // O tratamento de erro já é feito globalmente pelo executeAction da Store.

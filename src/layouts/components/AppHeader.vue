@@ -27,7 +27,6 @@ async function handleLogout() {
     $q.notify({ color: 'negative', message: 'Erro ao sair: ' + err.message });
   }
 }
-
 </script>
 
 <template>

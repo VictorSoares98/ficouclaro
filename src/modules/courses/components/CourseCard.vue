@@ -7,7 +7,6 @@ import QrcodeVue from 'qrcode.vue';
 const showQrCode = ref(false);
 const qrValue = computed(() => `ficouclaro://join/${props.course.codigo_convite}`);
 
-
 const props = defineProps<{
   course: Disciplina;
   actionLabel: string;
@@ -184,7 +183,9 @@ defineEmits<{
         <div class="tw-bg-white tw-p-4 tw-rounded-xl tw-inline-block">
           <QrcodeVue :value="qrValue" :size="250" level="H" />
         </div>
-        <div class="tw-text-3xl tw-font-black tw-tracking-widest tw-mt-6 tw-text-primary tw-uppercase">
+        <div
+          class="tw-text-3xl tw-font-black tw-tracking-widest tw-mt-6 tw-text-primary tw-uppercase"
+        >
           {{ course.codigo_convite }}
         </div>
       </q-card-section>

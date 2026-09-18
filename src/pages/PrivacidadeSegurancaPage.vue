@@ -9,17 +9,21 @@ const $q = useQuasar();
 function confirmDeleteAccount() {
   $q.dialog({
     title: 'Excluir Conta',
-    message: 'Tem certeza? Esta ação é irreversível. Para confirmar, digite exatamente "EXCLUIR MINHA CONTA" abaixo:',
+    message:
+      'Tem certeza? Esta ação é irreversível. Para confirmar, digite exatamente "EXCLUIR MINHA CONTA" abaixo:',
     prompt: {
       model: '',
-      type: 'text'
+      type: 'text',
     },
     color: 'negative',
     cancel: true,
     persistent: true,
   }).onOk((data: string) => {
     if (data !== 'EXCLUIR MINHA CONTA') {
-      $q.notify({ color: 'warning', message: 'Frase de confirmação incorreta. Operação cancelada.' });
+      $q.notify({
+        color: 'warning',
+        message: 'Frase de confirmação incorreta. Operação cancelada.',
+      });
       return;
     }
 
@@ -62,7 +66,8 @@ function exportDataJSON() {
     return;
   }
 
-  const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(dataToExport, null, 2));
+  const dataStr =
+    'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(dataToExport, null, 2));
   triggerDownload(dataStr, 'meus_dados_ficou_claro.json');
 }
 
@@ -74,7 +79,7 @@ function exportDataCSV() {
   }
 
   const keys = Object.keys(data);
-  const values = Object.values(data).map(v => `"${String(v || '').replace(/"/g, '""')}"`);
+  const values = Object.values(data).map((v) => `"${String(v || '').replace(/"/g, '""')}"`);
   const csvContent = `${keys.join(',')}\n${values.join(',')}`;
 
   const dataStr = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvContent);
@@ -107,8 +112,8 @@ function triggerDownload(href: string, filename: string) {
       <BaseSurfaceCard class="tw-p-6">
         <h2 class="tw-text-xl tw-font-bold tw-mb-4">Seus Dados (Direito de Acesso)</h2>
         <p class="text-muted tw-mb-6">
-          A Lei Geral de Proteção de Dados (LGPD) garante a você o direito de saber quais dados temos sobre você. 
-          Baixe um relatório sanitizado com seu perfil completo.
+          A Lei Geral de Proteção de Dados (LGPD) garante a você o direito de saber quais dados
+          temos sobre você. Baixe um relatório sanitizado com seu perfil completo.
         </p>
         <div class="tw-flex tw-gap-4 tw-flex-wrap">
           <q-btn
@@ -135,8 +140,9 @@ function triggerDownload(href: string, filename: string) {
           Zona de Perigo (Direito ao Esquecimento)
         </h2>
         <p class="text-muted tw-mb-6">
-          Ao excluir sua conta, todas as suas informações de perfil serão removidas de nossos servidores. 
-          Suas avaliações e dúvidas passadas serão mantidas, mas desvinculadas da sua identidade para garantir o anonimato histórico.
+          Ao excluir sua conta, todas as suas informações de perfil serão removidas de nossos
+          servidores. Suas avaliações e dúvidas passadas serão mantidas, mas desvinculadas da sua
+          identidade para garantir o anonimato histórico.
         </p>
         <q-btn
           color="negative"

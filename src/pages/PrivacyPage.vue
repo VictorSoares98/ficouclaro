@@ -33,30 +33,50 @@
 
         <h2 class="tw-text-2xl tw-font-semibold tw-mt-8 tw-mb-4">2. Terceiros e Suboperadores</h2>
         <p>
-          Para entregar nossos serviços, utilizamos a infraestrutura técnica dos seguintes parceiros (que também possuem rígidas políticas de privacidade):
+          Para entregar nossos serviços, utilizamos a infraestrutura técnica dos seguintes parceiros
+          (que também possuem rígidas políticas de privacidade):
         </p>
         <ul class="tw-list-disc tw-pl-6 tw-space-y-2">
-          <li><strong>Supabase:</strong> Banco de dados e autenticação segura (criptografia em repouso e trânsito).</li>
-          <li><strong>Cloudflare / Vercel:</strong> Hospedagem e aceleração de entrega de conteúdo (CDN).</li>
-          <li><strong>Google Fontes/Ícones:</strong> Fornecimento de tipografia e recursos visuais.</li>
+          <li>
+            <strong>Supabase:</strong> Banco de dados e autenticação segura (criptografia em repouso
+            e trânsito).
+          </li>
+          <li>
+            <strong>Cloudflare / Vercel:</strong> Hospedagem e aceleração de entrega de conteúdo
+            (CDN).
+          </li>
+          <li>
+            <strong>Google Fontes/Ícones:</strong> Fornecimento de tipografia e recursos visuais.
+          </li>
         </ul>
 
-        <h2 class="tw-text-2xl tw-font-semibold tw-mt-8 tw-mb-4">3. Biometria e Processamento Local</h2>
-        <p>
-          Nossa plataforma oferece recursos avançados, como autenticação biométrica via WebAuthn. 
-          <strong>É crucial destacar que suas digitais ou face nunca saem do seu dispositivo.</strong> 
-          Todo o processamento biométrico (incluindo futuros recursos de análise de sentimento via Inteligência Artificial) ocorre 100% localmente no navegador ou celular (Edge Computing).
-        </p>
-
         <h2 class="tw-text-2xl tw-font-semibold tw-mt-8 tw-mb-4">
-          4. Seus Direitos (LGPD Hub)
+          3. Biometria e Processamento Local
         </h2>
         <p>
-          Você tem controle absoluto sobre seus dados. Criamos uma seção dedicada ("Privacidade e Segurança") acessível pelo menu do seu perfil. Lá você pode:
+          Nossa plataforma oferece recursos avançados, como autenticação biométrica via WebAuthn.
+          <strong
+            >É crucial destacar que suas digitais ou face nunca saem do seu dispositivo.</strong
+          >
+          Todo o processamento biométrico (incluindo futuros recursos de análise de sentimento via
+          Inteligência Artificial) ocorre 100% localmente no navegador ou celular (Edge Computing).
+        </p>
+
+        <h2 class="tw-text-2xl tw-font-semibold tw-mt-8 tw-mb-4">4. Seus Direitos (LGPD Hub)</h2>
+        <p>
+          Você tem controle absoluto sobre seus dados. Criamos uma seção dedicada ("Privacidade e
+          Segurança") acessível pelo menu do seu perfil. Lá você pode:
         </p>
         <ul class="tw-list-disc tw-pl-6 tw-space-y-2">
-          <li><strong>Direito de Acesso:</strong> Baixar todos os seus dados em formato estruturado (JSON).</li>
-          <li><strong>Direito ao Esquecimento:</strong> Excluir sua conta definitivamente, apagando seu nome, e-mail e vinculações, mantendo apenas o histórico anônimo necessário para as métricas da turma.</li>
+          <li>
+            <strong>Direito de Acesso:</strong> Baixar todos os seus dados em formato estruturado
+            (JSON).
+          </li>
+          <li>
+            <strong>Direito ao Esquecimento:</strong> Excluir sua conta definitivamente, apagando
+            seu nome, e-mail e vinculações, mantendo apenas o histórico anônimo necessário para as
+            métricas da turma.
+          </li>
         </ul>
 
         <h2 class="tw-text-2xl tw-font-semibold tw-mt-8 tw-mb-4">5. Contato</h2>
