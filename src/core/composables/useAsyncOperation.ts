@@ -1,6 +1,7 @@
 import { ref } from 'vue';
 import { Notify } from 'quasar';
 import { useNetworkStatus } from '@/core/composables/useNetworkStatus';
+import { i18n } from '@/boot/i18n';
 
 export function useAsyncOperation() {
   const { isOnline } = useNetworkStatus();
@@ -28,8 +29,23 @@ export function useAsyncOperation() {
         lower.includes('network request failed') ||
         lower.includes('load failed')
       ) {
-        msg =
-          'Sem conexão com o servidor. Se estiver no Wi-Fi da faculdade, autentique na rede ou use o 4G/5G.';
+        msg = i18n.global.t('errors.network.offline');
+      } else if (lower.includes('invalid login credentials')) {
+        msg = i18n.global.t('errors.auth.invalid_credentials');
+      } else if (lower.includes('user already registered')) {
+        msg = i18n.global.t('errors.auth.user_already_registered');
+      } else if (lower.includes('password should be at least')) {
+        msg = i18n.global.t('errors.auth.weak_password');
+      } else if (lower.includes('email not confirmed')) {
+        msg = i18n.global.t('errors.auth.email_not_confirmed');
+      } else if (lower.includes('jwt expired')) {
+        msg = i18n.global.t('errors.auth.jwt_expired');
+      } else if (lower.includes('duplicate key value violates unique constraint')) {
+        msg = i18n.global.t('errors.database.unique_violation');
+      } else if (lower.includes('new password should be different')) {
+        msg = i18n.global.t('errors.auth.same_password');
+      } else if (lower.includes('rate limit')) {
+        msg = i18n.global.t('errors.network.rate_limit');
       }
 
       error.value = msg;

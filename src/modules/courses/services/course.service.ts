@@ -35,7 +35,21 @@ export class CourseService {
     }
   }
 
-  async createCourse(professorId: string, nome: string, descricao?: string): Promise<Disciplina> {
+  async createCourse(
+    professorId: string,
+    payload: {
+      nome: string;
+      descricao?: string;
+      curso?: string;
+      semestre?: string;
+      turma?: string;
+      horario?: string;
+      dia_semana?: string;
+      sala?: string;
+      bloco?: string;
+      icone?: string;
+    },
+  ): Promise<Disciplina> {
     const MAX_RETRIES = 3;
     let attempts = 0;
 
@@ -44,8 +58,16 @@ export class CourseService {
         .from('disciplinas')
         .insert({
           professor_id: professorId,
-          nome,
-          descricao: descricao || null,
+          nome: payload.nome,
+          descricao: payload.descricao || null,
+          curso: payload.curso || null,
+          semestre: payload.semestre || null,
+          turma: payload.turma || null,
+          horario: payload.horario || null,
+          dia_semana: payload.dia_semana || null,
+          sala: payload.sala || null,
+          bloco: payload.bloco || null,
+          icone: payload.icone || null,
         })
         .select()
         .single();
@@ -62,6 +84,53 @@ export class CourseService {
     }
 
     throw new Error('Não foi possível gerar um código de convite único. Tente novamente.');
+  }
+
+  async updateCourse(
+    courseId: string,
+    payload: {
+      nome: string;
+      descricao?: string;
+      curso?: string;
+      semestre?: string;
+      turma?: string;
+      horario?: string;
+      dia_semana?: string;
+      sala?: string;
+      bloco?: string;
+      icone?: string;
+    },
+  ): Promise<Disciplina> {
+    const { data, error } = await supabase
+      .from('disciplinas')
+      .update({
+        nome: payload.nome,
+        descricao: payload.descricao || null,
+        curso: payload.curso || null,
+        semestre: payload.semestre || null,
+        turma: payload.turma || null,
+        horario: payload.horario || null,
+        dia_semana: payload.dia_semana || null,
+        sala: payload.sala || null,
+        bloco: payload.bloco || null,
+        icone: payload.icone || null,
+      })
+      .eq('id', courseId)
+      .select()
+      .single();
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return data;
+  }
+
+  async deleteCourse(courseId: string): Promise<void> {
+    const { error } = await supabase.from('disciplinas').delete().eq('id', courseId);
+    if (error) {
+      throw new Error(error.message);
+    }
   }
 
   async enrollByCode(alunoId: string, codigoConvite: string): Promise<Matricula> {

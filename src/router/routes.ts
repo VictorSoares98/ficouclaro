@@ -13,28 +13,35 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
-    path: '/aluno',
+    path: '/hub',
     component: () => import('@/layouts/StudentLayout.vue'),
-    children: [
-      { path: '', component: () => import('@/modules/courses/pages/EnrollPage.vue') },
-      {
-        path: 'session/:id',
-        component: () => import('@/modules/session/pages/StudentSessionPage.vue'),
-      },
-    ],
+    children: [{ path: '', component: () => import('@/modules/courses/pages/EnrollPage.vue') }],
   },
   {
-    path: '/professor',
+    path: '/disciplinas',
     component: () => import('@/layouts/ProfessorLayout.vue'),
     children: [
       { path: '', component: () => import('@/modules/courses/pages/CourseListPage.vue') },
       {
-        path: 'session/:id',
-        component: () => import('@/modules/session/pages/ProfessorSessionPage.vue'),
+        path: ':cursoId/insights',
+        component: () => import('@/modules/dashboard/pages/CourseInsightsPage.vue'),
       },
+    ],
+  },
+  {
+    path: '/dashboard',
+    component: () => import('@/layouts/ProfessorLayout.vue'),
+    children: [
+      { path: '', component: () => import('@/modules/dashboard/pages/GlobalDashboardPage.vue') },
+    ],
+  },
+  {
+    path: '/sala',
+    component: () => import('@/layouts/SessionLayout.vue'),
+    children: [
       {
-        path: 'curso/:cursoId/dashboard',
-        component: () => import('@/modules/dashboard/pages/DashboardPage.vue'),
+        path: ':id',
+        component: () => import('@/modules/session/pages/SessionGatewayPage.vue'),
       },
     ],
   },

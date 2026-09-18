@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { pollService } from '@/modules/poll/services/poll.service';
 import type { Database, Json } from '@/core/types/database.types';
 import { useAsyncOperation } from '@/core/composables/useAsyncOperation';
@@ -59,8 +59,21 @@ export const usePollStore = defineStore('poll', () => {
   const pastPolls = ref<Enquete[]>([]);
   const pollResults = ref<Record<string, Resposta[]>>({});
 
-  // Controle de votos locais (para o aluno)
-  const myResponses = ref<string[]>(JSON.parse(localStorage.getItem('ficouclaro_polls') || '[]'));
+  const getStorageKey = () => `ficouclaro_polls_${authStore.user?.auth.id || 'anonymous'}`;
+  const myResponses = ref<string[]>([]);
+
+  // Atualiza as respostas locais sempre que o usuário mudar
+  watch(
+    () => authStore.user?.auth.id,
+    (newId) => {
+      if (newId) {
+        myResponses.value = JSON.parse(localStorage.getItem(getStorageKey()) || '[]');
+      } else {
+        myResponses.value = [];
+      }
+    },
+    { immediate: true },
+  );
 
   const { isLoading, error, execute } = useAsyncOperation();
 
@@ -69,7 +82,7 @@ export const usePollStore = defineStore('poll', () => {
   function markAsResponded(pollId: string) {
     if (!myResponses.value.includes(pollId)) {
       myResponses.value = [...myResponses.value, pollId];
-      localStorage.setItem('ficouclaro_polls', JSON.stringify(myResponses.value));
+      localStorage.setItem(getStorageKey(), JSON.stringify(myResponses.value));
     }
   }
 

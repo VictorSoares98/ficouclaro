@@ -13,5 +13,18 @@ export default defineCapacitorConfig({
       style: 'dark',
       resizeOnFullScreen: true,
     },
+    SplashScreen: {
+      launchShowDuration: 2500,
+      launchAutoHide: true,
+      launchFadeOutDuration: 500,
+      backgroundColor: '#1976D2',
+      androidSplashResourceName: 'splash',
+      androidScaleType: 'CENTER_CROP',
+      showSpinner: true,
+      androidSpinnerStyle: 'large',
+      spinnerColor: '#FFFFFF',
+      splashFullScreen: true,
+      splashImmersive: true,
+    },
   },
 });
