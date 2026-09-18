@@ -45,6 +45,9 @@ _Registro das diretrizes arquiteturais e de engenharia atualmente estabelecidas 
 - **ADR-008 (Accepted): IA de Custo Zero ($0 AI).**  
   Funcionalidades de "Inteligência Artificial" devem ser implementadas utilizando Arquitetura Híbrida Gratuita: Motor de Regras (Heurística e Estatística via SQL/TypeScript) para Actionable Insights, e Modelos WebAssembly Locais (ex: Transformers.js rodando no navegador do cliente) para análises qualitativas (Nuvem de Palavras, Análise de Sentimento). O objetivo é garantir zero custo de servidor e máxima privacidade para o aluno.
 
+- **ADR-009 (Accepted): Privacy by Design (LGPD Compliance).**
+  A plataforma adota o princípio de Privacidade desde a Concepção. O anonimato das interações do aluno é inegociável perante a interface do professor. A Central de Privacidade centraliza ferramentas exclusivas para portabilidade de dados (exportação JSON/CSV) e deleção permanente da conta com desafio de segurança text-match.
+
 ---
 
 ## 4. Definition of Done (DoD) Universal
