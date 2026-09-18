@@ -1,6 +1,10 @@
-# 🎓 Ficou Claro? (Is it Clear?)
+<div align="center">
+  <img src="./assets/logo.png" alt="Ficou Claro? Logo" width="180"/>
+  <h1>🎓 Ficou Claro? (Is it Clear?)</h1>
+  <p><em>The end of "Does anyone have any questions?" followed by absolute silence.</em></p>
+</div>
 
-> Real-time feedback to seamlessly connect students and professors.
+> The anti-boredom thermometer for your classroom. Anonymous, real-time feedback for professors who care.
 
 _Read this in other languages: [🇺🇸 English](README.en.md) | [🇧🇷 Português](README.md)_
 

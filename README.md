@@ -1,6 +1,10 @@
-# 🎓 Ficou Claro?
+<div align="center">
+  <img src="./assets/logo.png" alt="Ficou Claro? Logo" width="180"/>
+  <h1>🎓 Ficou Claro?</h1>
+  <p><em>O fim do "Alguém tem alguma dúvida?" seguido de silêncio absoluto.</em></p>
+</div>
 
-> Feedback em tempo real para conectar alunos e professores sem fricção.
+> O termômetro anti-tédio da sua aula. Feedback anônimo e em tempo real para professores que se importam.
 
 _Leia isto em outros idiomas: [🇺🇸 English](README.en.md) | [🇧🇷 Português](README.md)_
 
