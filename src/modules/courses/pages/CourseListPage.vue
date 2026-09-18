@@ -16,9 +16,38 @@ const authStore = useAuthStore();
 const router = useRouter();
 const $q = useQuasar();
 
-const isCreating = ref(false);
+const isCourseModalOpen = ref(false);
+const editingCourseId = ref<string | null>(null);
+
 const newCourseName = ref('');
 const newCourseDesc = ref('');
+const newCourseCurso = ref('');
+const newCourseSemestre = ref('');
+const newCourseTurma = ref('');
+const newCourseHorario = ref('');
+const newCourseDiaSemana = ref('');
+const newCourseSala = ref('');
+const newCourseBloco = ref('');
+const newCourseIcone = ref('school'); // Default icon
+
+const diaSemanaOptions = [
+  { label: 'Segunda-feira', value: 'Segunda-feira' },
+  { label: 'Terça-feira', value: 'Terça-feira' },
+  { label: 'Quarta-feira', value: 'Quarta-feira' },
+  { label: 'Quinta-feira', value: 'Quinta-feira' },
+  { label: 'Sexta-feira', value: 'Sexta-feira' },
+  { label: 'Sábado', value: 'Sábado' },
+];
+
+const iconeOptions = [
+  { label: 'Geral (Escola)', value: 'school', icon: 'school' },
+  { label: 'Exatas (Cálculo)', value: 'calculate', icon: 'calculate' },
+  { label: 'Ciências / Lab', value: 'science', icon: 'science' },
+  { label: 'Tecnologia / TI', value: 'computer', icon: 'computer' },
+  { label: 'Humanas / História', value: 'history_edu', icon: 'history_edu' },
+  { label: 'Linguagens / Arte', value: 'palette', icon: 'palette' },
+  { label: 'Negócios / Gestão', value: 'business_center', icon: 'business_center' },
+];
 
 const selectedCourseForSession = ref<Disciplina | null>(null);
 const isConfirmDialogOpen = computed({
@@ -32,20 +61,107 @@ onMounted(async () => {
   await courseStore.fetchMyCourses();
 });
 
-async function handleCreateCourse() {
+function resetForm() {
+  editingCourseId.value = null;
+  newCourseName.value = '';
+  newCourseDesc.value = '';
+  newCourseCurso.value = '';
+  newCourseSemestre.value = '';
+  newCourseTurma.value = '';
+  newCourseHorario.value = '';
+  newCourseDiaSemana.value = '';
+  newCourseSala.value = '';
+  newCourseBloco.value = '';
+  newCourseIcone.value = 'school';
+}
+
+function openCreateModal() {
+  resetForm();
+  isCourseModalOpen.value = true;
+}
+
+function openEditModal(courseId: string) {
+  const course = courseStore.courses.find((c) => c.id === courseId);
+  if (!course) return;
+
+  editingCourseId.value = course.id;
+  newCourseName.value = course.nome;
+  newCourseDesc.value = course.descricao || '';
+  newCourseCurso.value = course.curso || '';
+  newCourseSemestre.value = course.semestre || '';
+  newCourseTurma.value = course.turma || '';
+  newCourseHorario.value = course.horario || '';
+  newCourseDiaSemana.value = course.dia_semana || '';
+  newCourseSala.value = course.sala || '';
+  newCourseBloco.value = course.bloco || '';
+  newCourseIcone.value = course.icone || 'school';
+
+  isCourseModalOpen.value = true;
+}
+
+async function handleSaveCourse() {
   if (!newCourseName.value) return;
   try {
-    await courseStore.createCourse(newCourseName.value, newCourseDesc.value);
-    $q.notify({ color: 'positive', message: 'Disciplina criada com sucesso!' });
-    isCreating.value = false;
-    newCourseName.value = '';
-    newCourseDesc.value = '';
+    const payload = {
+      nome: newCourseName.value,
+      descricao: newCourseDesc.value,
+      curso: newCourseCurso.value,
+      semestre: newCourseSemestre.value,
+      turma: newCourseTurma.value?.toUpperCase(),
+      horario: newCourseHorario.value,
+      dia_semana: newCourseDiaSemana.value,
+      sala: newCourseSala.value?.toUpperCase(),
+      bloco: newCourseBloco.value?.toUpperCase(),
+      icone: newCourseIcone.value,
+    };
+
+    if (editingCourseId.value) {
+      await courseStore.updateCourse(editingCourseId.value, payload);
+      $q.notify({ color: 'positive', message: 'Disciplina atualizada com sucesso!' });
+    } else {
+      await courseStore.createCourse(payload);
+      $q.notify({ color: 'positive', message: 'Disciplina criada com sucesso!' });
+    }
+
+    isCourseModalOpen.value = false;
   } catch (err: unknown) {
     $q.notify({
       color: 'negative',
-      message: err instanceof Error ? err.message : 'Erro ao carregar',
+      message: err instanceof Error ? err.message : 'Erro ao salvar',
     });
   }
+}
+
+function handleDeleteCourse(courseId: string) {
+  $q.dialog({
+    title: 'Excluir Disciplina',
+    message:
+      'Tem certeza que deseja apagar? Todos os dados, matrículas e aulas da turma serão perdidos permanentemente.',
+    color: 'negative',
+    persistent: true,
+    ok: {
+      label: 'Excluir',
+      color: 'negative',
+      flat: true,
+    },
+    cancel: {
+      label: 'Cancelar',
+      color: 'grey-7',
+      flat: true,
+    },
+  }).onOk(() => {
+    courseStore
+      .deleteCourse(courseId)
+      .then(() => {
+        $q.notify({ color: 'positive', message: 'Disciplina excluída com sucesso!' });
+      })
+      .catch((err: unknown) => {
+        $q.notify({
+          color: 'negative',
+          message: err instanceof Error ? err.message : 'Erro ao excluir',
+        });
+      });
+  });
 }
 
 function openStartSessionDialog(courseId: string) {
@@ -69,7 +185,7 @@ async function handleConfirmStartSession(topic: string) {
     );
 
     $q.loading.hide();
-    void router.push(`/professor/session/${session.id}`);
+    void router.push(`/sala/${session.id}`);
   } catch (err: unknown) {
     $q.loading.hide();
     $q.notify({
@@ -80,22 +196,46 @@ async function handleConfirmStartSession(topic: string) {
 }
 
 function handleOpenInsights(courseId: string) {
-  void router.push(`/professor/curso/${courseId}/dashboard`);
+  void router.push(`/disciplinas/${courseId}/insights`);
 }
 </script>
 
 <template>
-  <q-page class="tw-p-4 md:tw-p-8 tw-max-w-4xl tw-mx-auto">
-    <div class="tw-flex tw-justify-between tw-items-center tw-mb-8">
+  <q-page class="tw-p-4 md:tw-p-8 lg:tw-p-12 tw-max-w-[1400px] tw-mx-auto">
+    <div
+      class="tw-flex tw-flex-col sm:tw-flex-row sm:tw-justify-between sm:tw-items-center tw-gap-4 tw-mb-8"
+    >
       <div>
         <h1 class="tw-text-2xl tw-font-bold tw-text-primary">Minhas Disciplinas</h1>
         <p class="text-muted">Gerencie suas turmas e inicie aulas.</p>
       </div>
-      <q-btn color="primary" icon="add" label="Nova Disciplina" @click="isCreating = true" />
+      <div class="tw-flex tw-gap-2 tw-self-end sm:tw-self-auto">
+        <q-btn
+          v-if="authStore.user?.perfil.papel === 'professor'"
+          outline
+          color="primary"
+          icon="dashboard"
+          label="Dashboard Global"
+          to="/dashboard"
+        >
+          <q-tooltip anchor="top middle" self="bottom middle" :offset="[0, 8]" class="tw-text-sm">
+            Dashboard Global
+          </q-tooltip>
+        </q-btn>
+
+        <q-btn color="primary" icon="add" label="Nova Disciplina" @click="openCreateModal">
+          <q-tooltip anchor="top middle" self="bottom middle" :offset="[0, 8]" class="tw-text-sm">
+            Nova Disciplina
+          </q-tooltip>
+        </q-btn>
+      </div>
     </div>
 
     <!-- Loading State -->
-    <div v-if="courseStore.isLoading" class="tw-grid tw-grid-cols-1 md:tw-grid-cols-2 tw-gap-4">
+    <div
+      v-if="courseStore.isLoading"
+      class="tw-grid tw-grid-cols-1 md:tw-grid-cols-2 lg:tw-grid-cols-3 tw-gap-6"
+    >
       <CourseCardSkeleton v-for="i in 4" :key="i" />
     </div>
 
@@ -106,11 +246,11 @@ function handleOpenInsights(courseId: string) {
       <p class="text-muted tw-mb-4">
         Comece criando a sua primeira disciplina para gerar o código de convite aos alunos.
       </p>
-      <q-btn color="primary" outline label="Criar Disciplina" @click="isCreating = true" />
+      <q-btn color="primary" outline label="Criar Disciplina" @click="openCreateModal" />
     </div>
 
     <!-- Listagem -->
-    <div v-else class="tw-grid tw-grid-cols-1 md:tw-grid-cols-2 tw-gap-4">
+    <div v-else class="tw-grid tw-grid-cols-1 md:tw-grid-cols-2 lg:tw-grid-cols-3 tw-gap-6">
       <CourseCard
         v-for="course in courseStore.courses"
         :key="course.id"
@@ -120,38 +260,151 @@ function handleOpenInsights(courseId: string) {
         actionColor="primary"
         :showInviteCode="true"
         :showInsightsBtn="authStore.user?.perfil.papel === 'professor'"
+        :showOptionsBtn="authStore.user?.perfil.papel === 'professor'"
         @action="openStartSessionDialog"
         @insights="handleOpenInsights"
+        @edit="openEditModal"
+        @delete="handleDeleteCourse"
       />
     </div>
 
-    <!-- Modal Nova Disciplina -->
-    <q-dialog v-model="isCreating">
-      <q-card style="min-width: 350px">
+    <!-- Modal Nova/Editar Disciplina -->
+    <q-dialog v-model="isCourseModalOpen" @hide="resetForm">
+      <q-card style="width: 700px; max-width: 90vw">
         <q-card-section>
-          <div class="tw-text-lg tw-font-bold">Nova Disciplina</div>
+          <div class="tw-text-lg tw-font-bold">
+            {{ editingCourseId ? 'Editar Disciplina' : 'Nova Disciplina' }}
+          </div>
+          <p class="text-muted tw-text-sm">
+            Preencha os dados da turma. Apenas o Nome é obrigatório.
+          </p>
         </q-card-section>
 
-        <q-card-section class="tw-pt-0 tw-space-y-4">
-          <q-input
-            outlined
-            v-model="newCourseName"
-            label="Nome da Disciplina *"
-            autofocus
-            @keyup.enter="handleCreateCourse"
-          />
-          <q-input
-            outlined
-            v-model="newCourseDesc"
-            label="Descrição (Opcional)"
-            type="textarea"
-            rows="3"
-          />
+        <q-card-section class="tw-pt-0">
+          <div class="tw-grid tw-grid-cols-1 md:tw-grid-cols-2 tw-gap-4">
+            <!-- Coluna 1 -->
+            <div class="tw-space-y-4">
+              <q-input
+                outlined
+                v-model="newCourseName"
+                label="Nome da Disciplina *"
+                autofocus
+                :rules="[
+                  (val) => !!val || 'O nome é obrigatório',
+                  (val) => val.length >= 3 || 'Mínimo de 3 caracteres',
+                ]"
+                maxlength="100"
+              />
+
+              <q-input
+                outlined
+                v-model="newCourseCurso"
+                label="Curso / Graduação"
+                placeholder="Ex: Engenharia Civil"
+                maxlength="100"
+              />
+
+              <q-input
+                outlined
+                v-model="newCourseSemestre"
+                label="Semestre / Período"
+                placeholder="Ex: 2024.1"
+                mask="####.#"
+                hint="Formato: Ano.Semestre (ex: 2024.1)"
+                inputmode="numeric"
+              />
+
+              <q-input
+                outlined
+                v-model="newCourseDesc"
+                label="Descrição Curta"
+                type="textarea"
+                rows="2"
+                maxlength="250"
+              />
+            </div>
+
+            <!-- Coluna 2 -->
+            <div class="tw-space-y-4">
+              <q-select
+                outlined
+                v-model="newCourseIcone"
+                :options="iconeOptions"
+                label="Ícone de Identificação"
+                emit-value
+                map-options
+              >
+                <template v-slot:option="scope">
+                  <q-item v-bind="scope.itemProps">
+                    <q-item-section avatar>
+                      <q-icon :name="scope.opt.icon" />
+                    </q-item-section>
+                    <q-item-section>
+                      <q-item-label>{{ scope.opt.label }}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                </template>
+              </q-select>
+
+              <div class="tw-grid tw-grid-cols-2 tw-gap-2">
+                <q-input
+                  outlined
+                  v-model="newCourseTurma"
+                  label="Turma"
+                  placeholder="Ex: T01"
+                  maxlength="10"
+                  class="tw-uppercase"
+                />
+                <q-input
+                  outlined
+                  v-model="newCourseHorario"
+                  label="Horário"
+                  placeholder="19:00"
+                  mask="##:##"
+                  inputmode="numeric"
+                />
+              </div>
+
+              <q-select
+                outlined
+                v-model="newCourseDiaSemana"
+                :options="diaSemanaOptions"
+                label="Dia da Semana"
+                emit-value
+                map-options
+                clearable
+              />
+
+              <div class="tw-grid tw-grid-cols-2 tw-gap-2">
+                <q-input
+                  outlined
+                  v-model="newCourseSala"
+                  label="Sala"
+                  placeholder="Ex: 104"
+                  maxlength="15"
+                  class="tw-uppercase"
+                />
+                <q-input
+                  outlined
+                  v-model="newCourseBloco"
+                  label="Bloco"
+                  placeholder="Ex: B"
+                  maxlength="15"
+                  class="tw-uppercase"
+                />
+              </div>
+            </div>
+          </div>
         </q-card-section>
 
         <q-card-actions align="right" class="text-primary">
           <q-btn flat label="Cancelar" v-close-popup />
-          <q-btn flat label="Criar" @click="handleCreateCourse" :disable="!newCourseName" />
+          <q-btn
+            flat
+            :label="editingCourseId ? 'Salvar' : 'Criar'"
+            @click="handleSaveCourse"
+            :disable="!newCourseName"
+          />
         </q-card-actions>
       </q-card>
     </q-dialog>

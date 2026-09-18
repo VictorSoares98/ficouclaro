@@ -73,30 +73,54 @@ export type Database = {
       };
       disciplinas: {
         Row: {
+          bloco: string | null;
           codigo_convite: string;
           created_at: string;
+          curso: string | null;
           descricao: string | null;
+          dia_semana: string | null;
+          horario: string | null;
+          icone: string | null;
           id: string;
           nome: string;
           professor_id: string;
+          sala: string | null;
+          semestre: string | null;
+          turma: string | null;
           updated_at: string;
         };
         Insert: {
+          bloco?: string | null;
           codigo_convite?: string;
           created_at?: string;
+          curso?: string | null;
           descricao?: string | null;
+          dia_semana?: string | null;
+          horario?: string | null;
+          icone?: string | null;
           id?: string;
           nome: string;
           professor_id: string;
+          sala?: string | null;
+          semestre?: string | null;
+          turma?: string | null;
           updated_at?: string;
         };
         Update: {
+          bloco?: string | null;
           codigo_convite?: string;
           created_at?: string;
+          curso?: string | null;
           descricao?: string | null;
+          dia_semana?: string | null;
+          horario?: string | null;
+          icone?: string | null;
           id?: string;
           nome?: string;
           professor_id?: string;
+          sala?: string | null;
+          semestre?: string | null;
+          turma?: string | null;
           updated_at?: string;
         };
         Relationships: [

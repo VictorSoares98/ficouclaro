@@ -1,6 +1,12 @@
-# 🎓 Ficou Claro?
+<div align="center">
+  <img src="./assets/logo.png" alt="Ficou Claro? Logo" width="180"/>
+  <h1>🎓 Ficou Claro?</h1>
+  <p><em>O fim do "Alguém tem alguma dúvida?" seguido de silêncio absoluto.</em></p>
+</div>
 
-> Feedback em tempo real para conectar alunos e professores sem fricção.
+> O termômetro anti-tédio da sua aula. Feedback anônimo e em tempo real para professores que se importam.
+
+_Leia isto em outros idiomas: [🇺🇸 English](README.en.md) | [🇧🇷 Português](README.md)_
 
 [![Vue 3](https://img.shields.io/badge/Vue.js-35495E?style=flat&logo=vuedotjs&logoColor=4FC08D)](https://vuejs.org/)
 [![Quasar](https://img.shields.io/badge/Quasar-1976D2?style=flat&logo=quasar&logoColor=white)](https://quasar.dev/)
@@ -100,15 +106,23 @@ O aplicativo foi empacotado para execução nativa via Quasar + Capacitor. Possu
 
 > ⚠️ **Nota de Segurança:** As políticas de rede para desenvolvimento local (HTTP) estão configuradas em `src-capacitor/android/app/src/main/res/xml/network_security_config.xml`. Consulte o guia de configuração mobile para saber como atualizar o IP permitido.
 
-## 🌟 6. Funcionalidades Principais (Visão do Produto)
+## 🌟 6. Fluxo de Usuário e Funcionalidades (MVP)
 
-Para garantir o engajamento dos alunos e fornecer dados úteis aos professores, o aplicativo conta com funcionalidades centrais inspiradas em plataformas de interação em tempo real:
+A arquitetura central divide a experiência em dois perfis distintos (Role-Based Access Control) que interagem na mesma Sala Virtual:
+
+### Arquitetura de Perfis (RBAC)
+
+- **Painel do Professor:** O docente cria turmas (com metadados ricos: semestre, turno, sala), gerando um `Código de Convite` alfanumérico único. A partir do painel, ele inicia "Salas de Aula" (Sessões).
+- **Hub do Aluno:** O estudante insere o Código de Convite, é matriculado instantaneamente e aguarda a abertura da sala.
+- **Gateway Híbrido (`/sala/:id`):** O aplicativo usa a mesma URL para a aula, mas o Vue Router renderiza painéis completamente diferentes dependendo da role do usuário (`ProfessorSessionPage` com controles vs `StudentSessionPage` com botões de votação).
+
+### Funcionalidades Core
 
 1. **Enquetes e Interações em Tempo Real:** Check-in didático durante a aula (Múltipla escolha, Nuvem de palavras, Escalas).
 2. **Termômetro de Ritmo da Aula:** Feedback contínuo e visual ("Muito rápido", "Boiando", "Tudo certo") operando via _Supabase Realtime_, com proteção anti-spam via throttle de 10s.
 3. **Painel de Dúvidas com Upvote:** Sistema de Q&A textual 100% anônimo para os alunos (LGPD by design) priorizado pela própria turma.
 4. **Avaliação Flash Pós-Aula:** Sistema de avaliação instantânea pós-sessão para criar um histórico de qualidade da disciplina.
-5. **Insights & Heatmap (O Diferencial):** Dashboard avançado (implementado) que cruza enquetes, termômetro e notas para o professor visualizar o mapa de calor da sua didática e reformular seu plano de ensino cirurgicamente.
+5. **Dashboard & Insights:** Tela que consolida as avaliações rápidas, o volume de dúvidas e o pico do termômetro, permitindo que o professor entenda o engajamento e a recepção geral da sua disciplina de forma clara e objetiva.
 
 ---
 

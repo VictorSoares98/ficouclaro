@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { flashReviewService } from '@/modules/flash-review/services/flashReview.service';
 import type { Database } from '@/core/types/database.types';
 import { useAsyncOperation } from '@/core/composables/useAsyncOperation';
@@ -33,9 +33,20 @@ export const useFlashReviewStore = defineStore('flashReview', (): FlashReviewSto
   const sessionReviews = ref<AvaliacaoRapida[]>([]);
   const { isLoading, error, execute } = useAsyncOperation();
 
-  // Guarda IDs das sessões já avaliadas no LocalStorage para evitar reabertura infinita/voto duplo
-  const reviewedSessions = ref<string[]>(
-    JSON.parse(localStorage.getItem('ficouclaro_reviews') || '[]'),
+  const getStorageKey = () => `ficouclaro_reviews_${authStore.user?.auth.id || 'anonymous'}`;
+  const reviewedSessions = ref<string[]>([]);
+
+  // Atualiza as sessões revisadas localmente sempre que o usuário mudar
+  watch(
+    () => authStore.user?.auth.id,
+    (newId) => {
+      if (newId) {
+        reviewedSessions.value = JSON.parse(localStorage.getItem(getStorageKey()) || '[]');
+      } else {
+        reviewedSessions.value = [];
+      }
+    },
+    { immediate: true },
   );
 
   const averageRating = computed(() => {
@@ -45,7 +56,7 @@ export const useFlashReviewStore = defineStore('flashReview', (): FlashReviewSto
   });
 
   function saveReviewedToStorage() {
-    localStorage.setItem('ficouclaro_reviews', JSON.stringify(reviewedSessions.value));
+    localStorage.setItem(getStorageKey(), JSON.stringify(reviewedSessions.value));
   }
 
   function hasReviewedSession(sessionId: string): boolean {

@@ -13,7 +13,12 @@ import {
   precacheAndRoute,
 } from 'workbox-precaching';
 
-declare const self: ServiceWorkerGlobalScope & typeof globalThis;
+import type { PrecacheEntry } from 'workbox-precaching';
+
+declare const self: ServiceWorkerGlobalScope &
+  typeof globalThis & {
+    __WB_MANIFEST: (string | PrecacheEntry)[];
+  };
 
 void self.skipWaiting();
 clientsClaim();

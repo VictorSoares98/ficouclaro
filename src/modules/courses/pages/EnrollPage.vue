@@ -63,7 +63,7 @@ async function handleJoinActiveSession(courseId: string) {
     const sessionId = await sessionStore.getActiveSession(courseId);
 
     $q.loading.hide();
-    void router.push(`/aluno/session/${sessionId}`);
+    void router.push(`/sala/${sessionId}`);
   } catch (err: unknown) {
     $q.loading.hide();
     $q.notify({
@@ -75,29 +75,33 @@ async function handleJoinActiveSession(courseId: string) {
 </script>
 
 <template>
-  <q-page class="tw-p-4 md:tw-p-8 tw-max-w-4xl tw-mx-auto">
-    <div class="tw-flex tw-justify-between tw-items-center tw-mb-8">
+  <q-page class="tw-p-4 md:tw-p-8 lg:tw-p-12 tw-max-w-[1400px] tw-mx-auto">
+    <div
+      class="tw-flex tw-flex-col sm:tw-flex-row sm:tw-justify-between sm:tw-items-center tw-gap-4 tw-mb-8"
+    >
       <div>
         <h1 class="tw-text-2xl tw-font-bold tw-text-primary">Minhas Disciplinas</h1>
         <p class="text-muted">Acesse suas turmas e entre nas aulas ao vivo.</p>
       </div>
-      <div class="tw-flex tw-gap-2">
-        <q-btn
-          flat
-          round
-          color="primary"
-          icon="refresh"
-          :loading="isRefreshing"
-          @click="handleRefresh"
-        >
-          <q-tooltip>Atualizar Status das Aulas</q-tooltip>
+      <div class="tw-flex tw-gap-2 tw-self-end sm:tw-self-auto">
+        <q-btn flat color="primary" icon="refresh" :loading="isRefreshing" @click="handleRefresh">
+          <q-tooltip anchor="top middle" self="bottom middle" :offset="[0, 8]" class="tw-text-sm">
+            Atualizar Status das Aulas
+          </q-tooltip>
         </q-btn>
-        <q-btn color="primary" icon="add" label="Entrar em Turma" @click="isEnrolling = true" />
+        <q-btn color="primary" icon="add" label="Entrar em Turma" @click="isEnrolling = true">
+          <q-tooltip anchor="top middle" self="bottom middle" :offset="[0, 8]" class="tw-text-sm">
+            Entrar em Turma
+          </q-tooltip>
+        </q-btn>
       </div>
     </div>
 
     <!-- Loading State -->
-    <div v-if="courseStore.isLoading" class="tw-grid tw-grid-cols-1 md:tw-grid-cols-2 tw-gap-4">
+    <div
+      v-if="courseStore.isLoading"
+      class="tw-grid tw-grid-cols-1 md:tw-grid-cols-2 lg:tw-grid-cols-3 tw-gap-6"
+    >
       <CourseCardSkeleton v-for="i in 4" :key="i" />
     </div>
 
@@ -112,7 +116,7 @@ async function handleJoinActiveSession(courseId: string) {
     </div>
 
     <!-- Listagem -->
-    <div v-else class="tw-grid tw-grid-cols-1 md:tw-grid-cols-2 tw-gap-4">
+    <div v-else class="tw-grid tw-grid-cols-1 md:tw-grid-cols-2 lg:tw-grid-cols-3 tw-gap-6">
       <CourseCard
         v-for="course in courseStore.courses"
         :key="course.id"
@@ -139,6 +143,8 @@ async function handleJoinActiveSession(courseId: string) {
             v-model="inviteCode"
             label="Código de Convite *"
             autofocus
+            input-class="tw-uppercase"
+            @update:model-value="(val) => (inviteCode = String(val).toUpperCase())"
             @keyup.enter="handleEnroll"
           />
         </q-card-section>

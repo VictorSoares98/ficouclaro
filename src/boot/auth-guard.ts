@@ -25,7 +25,9 @@ export default defineBoot(({ router, store }) => {
         (to.path === '/' || to.path === '/login' || to.path === '/register')
       ) {
         const userRole = authStore.user?.perfil.papel;
-        return userRole ? `/${userRole}` : '/';
+        if (userRole === 'professor') return '/disciplinas';
+        if (userRole === 'aluno') return '/hub';
+        return '/';
       }
       return true; // Permitido acesso público
     }
@@ -39,7 +41,9 @@ export default defineBoot(({ router, store }) => {
     const userRole = authStore.user?.perfil.papel;
     if (userRole && !requiredRoles.includes(userRole)) {
       // Usuário logado tenta acessar área de outro papel
-      return `/${userRole}`;
+      if (userRole === 'professor') return '/disciplinas';
+      if (userRole === 'aluno') return '/hub';
+      return '/';
     }
 
     // Passou por tudo, acesso concedido
