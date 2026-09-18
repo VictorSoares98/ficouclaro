@@ -147,21 +147,32 @@ async function onSubmit() {
     :isLoading="authStore.isLoading"
   >
     <div class="tw-space-y-6">
-      <div class="tw-space-y-3">
-        <q-btn
-          v-if="isBiometricAvailable"
-          class="tw-w-full tw-h-14 tw-rounded-xl tw-text-base sm:tw-text-lg tw-font-bold tw-shadow-md"
-          color="primary"
-          icon="fingerprint"
-          label="Entrar com Biometria"
-          unelevated
-          no-wrap
-          @click="onBiometricLogin"
-          :loading="authStore.isLoading"
-        />
+      <!-- Botão Premium de Biometria -->
+      <div v-if="isBiometricAvailable" class="tw-flex tw-flex-col tw-items-center tw-justify-center tw-mb-2">
+        <div class="tw-relative tw-group tw-cursor-pointer" @click="onBiometricLogin">
+          <!-- Efeito Glow / Pulse de fundo -->
+          <div class="tw-absolute -tw-inset-2 tw-bg-gradient-to-r tw-from-primary tw-to-secondary tw-rounded-full tw-blur-md tw-opacity-40 group-hover:tw-opacity-75 tw-transition tw-duration-500 tw-animate-pulse"></div>
+          <!-- Botão Circular -->
+          <q-btn
+            round
+            size="24px"
+            color="primary"
+            text-color="white"
+            icon="fingerprint"
+            class="tw-relative tw-shadow-2xl hover:tw-scale-110 tw-transition-transform tw-duration-300"
+            @click.stop="onBiometricLogin"
+            :loading="authStore.isLoading"
+          />
+        </div>
+        <p class="tw-mt-4 tw-text-xs tw-font-semibold tw-text-gray-500 dark:tw-text-gray-400 tw-tracking-widest tw-uppercase">
+          Desbloqueio Rápido
+        </p>
+      </div>
 
+      <div class="tw-space-y-3">
+        <!-- Login Google mantido com estilo limpo -->
         <q-btn
-          class="tw-w-full tw-h-14 tw-rounded-xl tw-text-base sm:tw-text-lg tw-font-bold tw-shadow-md tw-bg-white hover:tw-bg-gray-50"
+          class="tw-w-full tw-h-14 tw-rounded-xl tw-text-base sm:tw-text-lg tw-font-bold tw-shadow-md tw-bg-white hover:tw-bg-gray-50 dark:tw-bg-dark-page dark:hover:tw-bg-dark"
           text-color="grey-9"
           icon="img:https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
           label="Continuar com Google"

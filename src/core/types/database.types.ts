@@ -511,6 +511,21 @@ export type Database = {
           total_sinais: number;
         }[];
       };
+      get_global_insights: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          disciplina_id: string;
+          iniciada_em: string;
+          media_estrelas: number;
+          sessao_id: string;
+          status: Database['public']['Enums']['status_sessao'];
+          topico: string;
+          total_avaliacoes: number;
+          total_duvidas: number;
+          total_enquetes: number;
+          total_sinais: number;
+        }[];
+      };
       obter_meu_papel: {
         Args: never;
         Returns: Database['public']['Enums']['papel_usuario'];
