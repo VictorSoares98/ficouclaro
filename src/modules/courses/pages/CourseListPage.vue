@@ -16,7 +16,9 @@ const authStore = useAuthStore();
 const router = useRouter();
 const $q = useQuasar();
 
-const isCreating = ref(false);
+const isCourseModalOpen = ref(false);
+const editingCourseId = ref<string | null>(null);
+
 const newCourseName = ref('');
 const newCourseDesc = ref('');
 const newCourseCurso = ref('');
@@ -59,10 +61,48 @@ onMounted(async () => {
   await courseStore.fetchMyCourses();
 });
 
-async function handleCreateCourse() {
+function resetForm() {
+  editingCourseId.value = null;
+  newCourseName.value = '';
+  newCourseDesc.value = '';
+  newCourseCurso.value = '';
+  newCourseSemestre.value = '';
+  newCourseTurma.value = '';
+  newCourseHorario.value = '';
+  newCourseDiaSemana.value = '';
+  newCourseSala.value = '';
+  newCourseBloco.value = '';
+  newCourseIcone.value = 'school';
+}
+
+function openCreateModal() {
+  resetForm();
+  isCourseModalOpen.value = true;
+}
+
+function openEditModal(courseId: string) {
+  const course = courseStore.courses.find((c) => c.id === courseId);
+  if (!course) return;
+
+  editingCourseId.value = course.id;
+  newCourseName.value = course.nome;
+  newCourseDesc.value = course.descricao || '';
+  newCourseCurso.value = course.curso || '';
+  newCourseSemestre.value = course.semestre || '';
+  newCourseTurma.value = course.turma || '';
+  newCourseHorario.value = course.horario || '';
+  newCourseDiaSemana.value = course.dia_semana || '';
+  newCourseSala.value = course.sala || '';
+  newCourseBloco.value = course.bloco || '';
+  newCourseIcone.value = course.icone || 'school';
+
+  isCourseModalOpen.value = true;
+}
+
+async function handleSaveCourse() {
   if (!newCourseName.value) return;
   try {
-    await courseStore.createCourse({
+    const payload = {
       nome: newCourseName.value,
       descricao: newCourseDesc.value,
       curso: newCourseCurso.value,
@@ -73,25 +113,55 @@ async function handleCreateCourse() {
       sala: newCourseSala.value,
       bloco: newCourseBloco.value,
       icone: newCourseIcone.value,
-    });
-    $q.notify({ color: 'positive', message: 'Disciplina criada com sucesso!' });
-    isCreating.value = false;
-    newCourseName.value = '';
-    newCourseDesc.value = '';
-    newCourseCurso.value = '';
-    newCourseSemestre.value = '';
-    newCourseTurma.value = '';
-    newCourseHorario.value = '';
-    newCourseDiaSemana.value = '';
-    newCourseSala.value = '';
-    newCourseBloco.value = '';
-    newCourseIcone.value = 'school';
+    };
+
+    if (editingCourseId.value) {
+      await courseStore.updateCourse(editingCourseId.value, payload);
+      $q.notify({ color: 'positive', message: 'Disciplina atualizada com sucesso!' });
+    } else {
+      await courseStore.createCourse(payload);
+      $q.notify({ color: 'positive', message: 'Disciplina criada com sucesso!' });
+    }
+
+    isCourseModalOpen.value = false;
   } catch (err: unknown) {
     $q.notify({
       color: 'negative',
-      message: err instanceof Error ? err.message : 'Erro ao carregar',
+      message: err instanceof Error ? err.message : 'Erro ao salvar',
     });
   }
+}
+
+function handleDeleteCourse(courseId: string) {
+  $q.dialog({
+    title: 'Excluir Disciplina',
+    message:
+      'Tem certeza que deseja apagar? Todos os dados, matrículas e aulas da turma serão perdidos permanentemente.',
+    color: 'negative',
+    persistent: true,
+    ok: {
+      label: 'Excluir',
+      color: 'negative',
+      flat: true,
+    },
+    cancel: {
+      label: 'Cancelar',
+      color: 'grey-7',
+      flat: true,
+    },
+  }).onOk(() => {
+    courseStore
+      .deleteCourse(courseId)
+      .then(() => {
+        $q.notify({ color: 'positive', message: 'Disciplina excluída com sucesso!' });
+      })
+      .catch((err: unknown) => {
+        $q.notify({
+          color: 'negative',
+          message: err instanceof Error ? err.message : 'Erro ao excluir',
+        });
+      });
+  });
 }
 
 function openStartSessionDialog(courseId: string) {
@@ -153,7 +223,7 @@ function handleOpenInsights(courseId: string) {
           </q-tooltip>
         </q-btn>
 
-        <q-btn color="primary" icon="add" label="Nova Disciplina" @click="isCreating = true">
+        <q-btn color="primary" icon="add" label="Nova Disciplina" @click="openCreateModal">
           <q-tooltip anchor="top middle" self="bottom middle" :offset="[0, 8]" class="tw-text-sm">
             Nova Disciplina
           </q-tooltip>
@@ -176,7 +246,7 @@ function handleOpenInsights(courseId: string) {
       <p class="text-muted tw-mb-4">
         Comece criando a sua primeira disciplina para gerar o código de convite aos alunos.
       </p>
-      <q-btn color="primary" outline label="Criar Disciplina" @click="isCreating = true" />
+      <q-btn color="primary" outline label="Criar Disciplina" @click="openCreateModal" />
     </div>
 
     <!-- Listagem -->
@@ -190,16 +260,21 @@ function handleOpenInsights(courseId: string) {
         actionColor="primary"
         :showInviteCode="true"
         :showInsightsBtn="authStore.user?.perfil.papel === 'professor'"
+        :showOptionsBtn="authStore.user?.perfil.papel === 'professor'"
         @action="openStartSessionDialog"
         @insights="handleOpenInsights"
+        @edit="openEditModal"
+        @delete="handleDeleteCourse"
       />
     </div>
 
-    <!-- Modal Nova Disciplina -->
-    <q-dialog v-model="isCreating">
+    <!-- Modal Nova/Editar Disciplina -->
+    <q-dialog v-model="isCourseModalOpen" @hide="resetForm">
       <q-card style="width: 700px; max-width: 90vw">
         <q-card-section>
-          <div class="tw-text-lg tw-font-bold">Nova Disciplina</div>
+          <div class="tw-text-lg tw-font-bold">
+            {{ editingCourseId ? 'Editar Disciplina' : 'Nova Disciplina' }}
+          </div>
           <p class="text-muted tw-text-sm">
             Preencha os dados da turma. Apenas o Nome é obrigatório.
           </p>
@@ -322,7 +397,12 @@ function handleOpenInsights(courseId: string) {
 
         <q-card-actions align="right" class="text-primary">
           <q-btn flat label="Cancelar" v-close-popup />
-          <q-btn flat label="Criar" @click="handleCreateCourse" :disable="!newCourseName" />
+          <q-btn
+            flat
+            :label="editingCourseId ? 'Salvar' : 'Criar'"
+            @click="handleSaveCourse"
+            :disable="!newCourseName"
+          />
         </q-card-actions>
       </q-card>
     </q-dialog>

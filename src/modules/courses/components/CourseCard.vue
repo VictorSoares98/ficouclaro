@@ -9,12 +9,15 @@ defineProps<{
   actionColor: string;
   showInviteCode?: boolean;
   showInsightsBtn?: boolean;
+  showOptionsBtn?: boolean;
   sessionStatus?: 'aguardando' | 'ativa' | 'encerrada' | 'nenhuma';
 }>();
 
 defineEmits<{
   (e: 'action', courseId: string): void;
   (e: 'insights', courseId: string): void;
+  (e: 'edit', courseId: string): void;
+  (e: 'delete', courseId: string): void;
 }>();
 </script>
 
@@ -59,6 +62,33 @@ defineEmits<{
             </q-badge>
             <q-badge v-else color="grey-7" class="tw-text-xs"> ⚪ SEM AULA </q-badge>
           </template>
+
+          <q-btn
+            v-if="showOptionsBtn"
+            flat
+            round
+            dense
+            icon="more_vert"
+            class="tw-text-grey-7 hover:tw-text-primary tw-transition-colors"
+          >
+            <q-menu auto-close>
+              <q-list style="min-width: 150px">
+                <q-item clickable @click="$emit('edit', course.id)">
+                  <q-item-section avatar class="tw-min-w-0 tw-pr-2">
+                    <q-icon name="edit" size="sm" />
+                  </q-item-section>
+                  <q-item-section>Editar</q-item-section>
+                </q-item>
+                <q-separator />
+                <q-item clickable @click="$emit('delete', course.id)" class="text-negative">
+                  <q-item-section avatar class="tw-min-w-0 tw-pr-2">
+                    <q-icon name="delete" size="sm" color="negative" />
+                  </q-item-section>
+                  <q-item-section>Excluir</q-item-section>
+                </q-item>
+              </q-list>
+            </q-menu>
+          </q-btn>
         </div>
       </div>
 

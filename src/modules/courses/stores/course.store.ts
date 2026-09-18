@@ -42,6 +42,46 @@ export const useCourseStore = defineStore('course', () => {
     }, 'Erro ao criar disciplina.');
   }
 
+  async function updateCourse(
+    courseId: string,
+    payload: {
+      nome: string;
+      descricao?: string;
+      curso?: string;
+      semestre?: string;
+      turma?: string;
+      horario?: string;
+      dia_semana?: string;
+      sala?: string;
+      bloco?: string;
+      icone?: string;
+    },
+  ) {
+    const user = authStore.user;
+    if (!user) throw new Error('Não autenticado');
+
+    return execute(async () => {
+      const updatedCourse = await courseService.updateCourse(courseId, payload);
+      // Atualiza na store
+      const index = courses.value.findIndex((c) => c.id === courseId);
+      if (index !== -1) {
+        courses.value[index] = updatedCourse;
+      }
+      return updatedCourse;
+    }, 'Erro ao atualizar disciplina.');
+  }
+
+  async function deleteCourse(courseId: string) {
+    const user = authStore.user;
+    if (!user) throw new Error('Não autenticado');
+
+    return execute(async () => {
+      await courseService.deleteCourse(courseId);
+      // Remove da store
+      courses.value = courses.value.filter((c) => c.id !== courseId);
+    }, 'Erro ao excluir disciplina.');
+  }
+
   async function enroll(codigoConvite: string) {
     const user = authStore.user;
     if (!user) throw new Error('Não autenticado');
@@ -59,6 +99,8 @@ export const useCourseStore = defineStore('course', () => {
     error,
     fetchMyCourses,
     createCourse,
+    updateCourse,
+    deleteCourse,
     enroll,
   };
 });
