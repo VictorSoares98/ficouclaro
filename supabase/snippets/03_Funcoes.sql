@@ -68,6 +68,39 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql STABLE SECURITY INVOKER SET search_path = public;
 
+-- Função para agregar métricas de sessões GLOBAIS (Dashboard Global)
+-- Retorna os insights de todas as turmas do professor logado.
+CREATE OR REPLACE FUNCTION public.get_global_insights()
+RETURNS TABLE (
+  sessao_id UUID,
+  disciplina_id UUID,
+  topico TEXT,
+  iniciada_em TIMESTAMPTZ,
+  status status_sessao,
+  media_estrelas NUMERIC,
+  total_avaliacoes BIGINT,
+  total_duvidas BIGINT,
+  total_sinais BIGINT,
+  total_enquetes BIGINT
+) AS $$
+BEGIN
+  RETURN QUERY
+  SELECT
+    s.id AS sessao_id,
+    s.disciplina_id,
+    s.topico,
+    s.iniciada_em,
+    s.status,
+    COALESCE((SELECT AVG(nota) FROM public.avaliacoes_rapidas ar WHERE ar.sessao_id = s.id), 0) AS media_estrelas,
+    (SELECT COUNT(*) FROM public.avaliacoes_rapidas ar WHERE ar.sessao_id = s.id) AS total_avaliacoes,
+    (SELECT COUNT(*) FROM public.duvidas d WHERE d.sessao_id = s.id) AS total_duvidas,
+    (SELECT COUNT(*) FROM public.sinais_ritmo sr WHERE sr.sessao_id = s.id) AS total_sinais,
+    (SELECT COUNT(*) FROM public.enquetes e WHERE e.sessao_id = s.id) AS total_enquetes
+  FROM public.sessoes s
+  WHERE s.professor_id = auth.uid();
+END;
+$$ LANGUAGE plpgsql STABLE SECURITY INVOKER SET search_path = public;
+
 -- Função para contagem agregada de sinais do termômetro (Performance)
 CREATE OR REPLACE FUNCTION public.get_thermometer_stats(p_sessao_id UUID)
 RETURNS TABLE (

@@ -4,12 +4,14 @@
 
 -- usuarios (Extensão do auth.users do Supabase)
 CREATE TABLE public.usuarios (
-  id             UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-  papel          papel_usuario NOT NULL DEFAULT 'aluno',
-  nome_completo  TEXT,
-  url_avatar     TEXT,
-  created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  id                 UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  papel              papel_usuario NOT NULL DEFAULT 'aluno',
+  nome_completo      TEXT,
+  url_avatar         TEXT,
+  termos_aceitos_em  TIMESTAMPTZ,
+  versao_termos      TEXT,
+  created_at         TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at         TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- disciplinas (Disciplinas do professor)
@@ -85,10 +87,11 @@ CREATE TABLE public.respostas_enquete (
   UNIQUE(enquete_id, hash_eleitor)
 );
 
--- duvidas (Painel de Q&A — Dúvidas Anônimas)
+-- duvidas (Painel de Q&A)
 CREATE TABLE public.duvidas (
   id             UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   sessao_id      UUID NOT NULL REFERENCES public.sessoes(id) ON DELETE CASCADE,
+  autor_id       UUID REFERENCES public.usuarios(id) ON DELETE SET NULL,
   texto          TEXT NOT NULL,
   votos          INTEGER NOT NULL DEFAULT 0,
   foi_respondida BOOLEAN NOT NULL DEFAULT FALSE,
@@ -109,7 +112,6 @@ CREATE TABLE public.votos_duvida (
 CREATE TABLE public.avaliacoes_rapidas (
   id           UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   sessao_id    UUID NOT NULL REFERENCES public.sessoes(id) ON DELETE CASCADE,
-  aluno_id     UUID REFERENCES public.usuarios(id) ON DELETE SET NULL,
   nota         SMALLINT NOT NULL CHECK (nota BETWEEN 1 AND 5),
   comentario   TEXT,
   hash_eleitor TEXT NOT NULL,

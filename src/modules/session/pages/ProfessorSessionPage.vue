@@ -1,24 +1,42 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useSessionStore } from '@/modules/session/stores/session.store';
+import { useCourseStore } from '@/modules/courses/stores/course.store';
 import { useQuasar } from 'quasar';
 import ThermometerDisplay from '@/modules/thermometer/components/ThermometerDisplay.vue';
 import QaPanel from '@/modules/qa/components/QaPanel.vue';
 import ProfessorPollPanel from '@/modules/poll/components/ProfessorPollPanel.vue';
 import ProfessorReviewPanel from '@/modules/flash-review/components/ProfessorReviewPanel.vue';
+import QrcodeVue from 'qrcode.vue';
 
 const route = useRoute();
 const router = useRouter();
 const sessionStore = useSessionStore();
+const courseStore = useCourseStore();
 const $q = useQuasar();
 
 const sessionId = String((route.params as Record<string, unknown>).id);
 const tab = ref('termometro');
 
+const currentCourse = computed(() => {
+  if (!sessionStore.currentSession) return null;
+  return (
+    courseStore.courses.find((c) => c.id === sessionStore.currentSession?.disciplina_id) || null
+  );
+});
+
+const qrValue = computed(() => {
+  if (!currentCourse.value) return '';
+  return `ficouclaro://join/${currentCourse.value.codigo_convite}`;
+});
+
 onMounted(async () => {
   try {
     await sessionStore.joinSession(sessionId);
+    if (courseStore.courses.length === 0) {
+      await courseStore.fetchMyCourses();
+    }
   } catch (err: unknown) {
     $q.notify({
       color: 'negative',
@@ -93,11 +111,15 @@ function handleEnd() {
       <!-- Controles de Ação -->
       <div v-if="sessionStore.currentSession" class="tw-flex tw-space-x-2">
         <q-btn
-          v-if="sessionStore.currentSession.status === 'aguardando'"
-          color="positive"
-          icon="play_arrow"
-          label="Iniciar Aula"
-          @click="handleStart"
+          v-if="
+            sessionStore.currentSession.status === 'aguardando' ||
+            sessionStore.currentSession.status === 'encerrada'
+          "
+          color="primary"
+          outline
+          icon="arrow_back"
+          label="Voltar"
+          to="/disciplinas"
         />
         <q-btn
           v-if="sessionStore.currentSession.status === 'ativa'"
@@ -105,14 +127,6 @@ function handleEnd() {
           icon="stop"
           label="Encerrar"
           @click="handleEnd"
-        />
-        <q-btn
-          v-if="sessionStore.currentSession.status === 'encerrada'"
-          color="primary"
-          outline
-          icon="arrow_back"
-          label="Voltar"
-          to="/professor"
         />
       </div>
     </div>
@@ -181,12 +195,35 @@ function handleEnd() {
       v-else-if="sessionStore.currentSession && sessionStore.currentSession.status === 'aguardando'"
     >
       <div class="tw-text-center">
-        <q-icon name="qr_code_scanner" size="6rem" color="primary" class="tw-mb-4" />
-        <h2 class="tw-text-xl tw-font-bold">Sala de Espera</h2>
-        <p class="text-muted tw-max-w-md tw-mx-auto tw-mt-2">
-          Os alunos já podem entrar na aula. Clique em "Iniciar Aula" quando estiver pronto para
-          liberar as ferramentas.
+        <h2 class="tw-text-2xl tw-font-bold tw-text-primary tw-mb-2">Sala de Espera</h2>
+        <p class="text-muted tw-max-w-md tw-mx-auto tw-mb-6">
+          Os alunos já podem entrar na aula. Escaneie o QR Code abaixo ou acesse pelo código da
+          turma.
         </p>
+
+        <!-- QR Code -->
+        <div
+          v-if="currentCourse"
+          class="tw-bg-white tw-p-4 tw-rounded-xl tw-shadow-sm tw-inline-block tw-mb-4"
+        >
+          <QrcodeVue :value="qrValue" :size="200" level="H" />
+        </div>
+
+        <div
+          v-if="currentCourse"
+          class="tw-text-4xl tw-font-black tw-tracking-widest tw-text-primary tw-uppercase tw-mb-8"
+        >
+          {{ currentCourse.codigo_convite }}
+        </div>
+
+        <q-btn
+          color="positive"
+          size="lg"
+          icon="play_arrow"
+          label="Iniciar Aula"
+          class="tw-w-full tw-max-w-xs tw-rounded-xl tw-shadow-md"
+          @click="handleStart"
+        />
       </div>
     </div>
   </q-page>

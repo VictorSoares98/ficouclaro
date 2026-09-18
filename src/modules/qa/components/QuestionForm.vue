@@ -6,15 +6,16 @@ defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: 'submit', text: string): void;
+  (e: 'submit', payload: { text: string; isAnonymous: boolean }): void;
 }>();
 
 const text = ref('');
+const isAnonymous = ref(true);
 
 function handleSubmit() {
   const trimmed = text.value.trim();
   if (trimmed.length >= 10) {
-    emit('submit', trimmed);
+    emit('submit', { text: trimmed, isAnonymous: isAnonymous.value });
     text.value = '';
   }
 }
@@ -22,8 +23,15 @@ function handleSubmit() {
 
 <template>
   <q-card flat bordered class="tw-p-4 tw-rounded-xl tw-w-full">
-    <div class="tw-text-sm tw-font-semibold tw-mb-2 text-muted">
-      Tem alguma dúvida? (Envio anônimo)
+    <div class="tw-flex tw-items-center tw-justify-between tw-mb-2">
+      <div class="tw-text-sm tw-font-semibold text-muted">Tem alguma dúvida?</div>
+      <q-checkbox
+        v-model="isAnonymous"
+        label="Enviar anonimamente"
+        color="primary"
+        dense
+        class="text-muted tw-text-sm"
+      />
     </div>
     <q-input
       v-model="text"

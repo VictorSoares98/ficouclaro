@@ -18,12 +18,14 @@ BEGIN
     v_papel := 'aluno'::public.papel_usuario;
   END;
 
-  INSERT INTO public.usuarios (id, nome_completo, url_avatar, papel)
+  INSERT INTO public.usuarios (id, nome_completo, url_avatar, papel, termos_aceitos_em, versao_termos)
   VALUES (
     NEW.id,
     COALESCE(NEW.raw_user_meta_data->>'nome_completo', NEW.raw_user_meta_data->>'full_name', NEW.raw_user_meta_data->>'name'),
     COALESCE(NEW.raw_user_meta_data->>'url_avatar', NEW.raw_user_meta_data->>'avatar_url', NEW.raw_user_meta_data->>'picture'),
-    COALESCE(v_papel, 'aluno'::public.papel_usuario)
+    COALESCE(v_papel, 'aluno'::public.papel_usuario),
+    (NEW.raw_user_meta_data->>'termos_aceitos_em')::TIMESTAMPTZ,
+    NEW.raw_user_meta_data->>'versao_termos'
   );
   
   RETURN NEW;
