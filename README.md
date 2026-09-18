@@ -2,7 +2,7 @@
 
 > Feedback em tempo real para conectar alunos e professores sem fricção.
 
-*Leia isto em outros idiomas: [🇺🇸 English](README.en.md) | [🇧🇷 Português](README.md)*
+_Leia isto em outros idiomas: [🇺🇸 English](README.en.md) | [🇧🇷 Português](README.md)_
 
 [![Vue 3](https://img.shields.io/badge/Vue.js-35495E?style=flat&logo=vuedotjs&logoColor=4FC08D)](https://vuejs.org/)
 [![Quasar](https://img.shields.io/badge/Quasar-1976D2?style=flat&logo=quasar&logoColor=white)](https://quasar.dev/)

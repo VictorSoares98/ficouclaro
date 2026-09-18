@@ -2,7 +2,7 @@
 
 > Real-time feedback to seamlessly connect students and professors.
 
-*Read this in other languages: [🇺🇸 English](README.en.md) | [🇧🇷 Português](README.md)*
+_Read this in other languages: [🇺🇸 English](README.en.md) | [🇧🇷 Português](README.md)_
 
 [![Vue 3](https://img.shields.io/badge/Vue.js-35495E?style=flat&logo=vuedotjs&logoColor=4FC08D)](https://vuejs.org/)
 [![Quasar](https://img.shields.io/badge/Quasar-1976D2?style=flat&logo=quasar&logoColor=white)](https://quasar.dev/)
@@ -83,13 +83,13 @@ To keep the codebase predictable and scalable, we follow inflexible rules:
 
 List of available commands via `npm run`:
 
-| Script          | Description                                                                                                       |
-| --------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `dev`           | Starts the Quasar CLI development server (HMR enabled).                                                           |
-| `build`         | Runs Type Check (`vue-tsc`) and generates the optimized static production bundle.                                 |
-| `lint`          | Runs ESLint + Prettier to ensure type compliance and visual code standardization across the project.              |
-| `db:build`      | Concatenates snippets from the `supabase/snippets` folder generating the consolidated `Master Schema.sql` file.   |
-| `build:android` | Generates the Quasar production build explicitly injecting `.env.production` via `dotenv-cli`.                    |
+| Script          | Description                                                                                                     |
+| --------------- | --------------------------------------------------------------------------------------------------------------- |
+| `dev`           | Starts the Quasar CLI development server (HMR enabled).                                                         |
+| `build`         | Runs Type Check (`vue-tsc`) and generates the optimized static production bundle.                               |
+| `lint`          | Runs ESLint + Prettier to ensure type compliance and visual code standardization across the project.            |
+| `db:build`      | Concatenates snippets from the `supabase/snippets` folder generating the consolidated `Master Schema.sql` file. |
+| `build:android` | Generates the Quasar production build explicitly injecting `.env.production` via `dotenv-cli`.                  |
 
 ### 📱 Mobile Development (Capacitor)
 
@@ -107,11 +107,13 @@ The application has been packaged for native execution via Quasar + Capacitor. W
 The core architecture divides the experience into two distinct profiles (Role-Based Access Control) interacting in the same Virtual Classroom:
 
 ### Profiles Architecture (RBAC)
+
 - **Professor Dashboard:** The teacher creates classes (with rich metadata: semester, shift, room), generating a unique alphanumeric `Invite Code`. From the dashboard, they start "Classrooms" (Sessions).
 - **Student Hub:** The student enters the Invite Code, is instantly enrolled, and waits for the classroom to open.
 - **Hybrid Gateway (`/sala/:id`):** The application uses the same URL for the class, but Vue Router renders completely different panels depending on the user's role (`ProfessorSessionPage` with controls vs `StudentSessionPage` with voting buttons).
 
 ### Core Features
+
 1. **Polls and Real-Time Interactions:** Didactic check-in during class (Multiple choice, Word cloud, Scales).
 2. **Class Rhythm Thermometer:** Continuous and visual feedback ("Too fast", "Lost", "All good") operating via _Supabase Realtime_, with anti-spam protection via a 10s throttle.
 3. **Q&A Panel with Upvote:** 100% anonymous textual Q&A system for students (LGPD by design) prioritized by the class itself.
