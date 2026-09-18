@@ -33,5 +33,19 @@ export default defineRouter((/* { store, ssrContext } */) => {
     history: createHistory(import.meta.env.QUASAR_VUE_ROUTER_BASE),
   });
 
+  Router.onError((error, to) => {
+    // Quando o app é atualizado no Cloudflare, chunks antigos somem.
+    // Se o usuário clicar num link com o app aberto, esse erro ocorre (MIME text/html ou failed to fetch).
+    // Solução: Recarregar a página para puxar o novo index.html com os novos hashes.
+    const isChunkLoadFailed =
+      error.message.includes('dynamically imported module') ||
+      error.message.includes('Failed to fetch');
+
+    if (isChunkLoadFailed) {
+      console.warn('[Router] Chunk desatualizado detectado. Forçando reload...');
+      window.location.href = to.fullPath;
+    }
+  });
+
   return Router;
 });
