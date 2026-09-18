@@ -4,9 +4,11 @@ import { supabaseClient } from '@/core/supabase/client';
 import { useAuthStore } from '@/stores/auth.store';
 import { useThemeStore } from '@/stores/theme.store';
 import type { AuthChangeEvent, Session, Subscription } from '@supabase/supabase-js';
+import { useQuasar } from 'quasar';
 
 const authStore = useAuthStore();
 const themeStore = useThemeStore();
+const $q = useQuasar();
 
 import { useNetworkStatus } from '@/core/composables/useNetworkStatus';
 
@@ -17,6 +19,19 @@ themeStore.initTheme();
 let authListener: Subscription | null = null;
 
 onMounted(() => {
+  // Catch nativo do Vite: Se o usuário tentar baixar um chunk antigo que o Cloudflare já apagou, recarregamos silenciosamente.
+  window.addEventListener('vite:preloadError', (event) => {
+    event.preventDefault();
+    $q.notify({
+      type: 'warning',
+      icon: 'cloud_sync',
+      message: 'Sincronizando com a nuvem...',
+      position: 'top',
+      timeout: 1000,
+      onDismiss: () => window.location.reload()
+    });
+  });
+
   // Configura o listener global para expiração ou login em outras abas
   const { data } = supabaseClient.auth.onAuthStateChange(
     async (event: AuthChangeEvent, session: Session | null) => {
