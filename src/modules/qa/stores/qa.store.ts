@@ -85,9 +85,11 @@ export const useQaStore = defineStore('qa', () => {
     myUpvotes.value.clear();
   }
 
-  async function submitQuestion(sessionId: string, texto: string) {
+  async function submitQuestion(sessionId: string, texto: string, isAnonymous: boolean) {
+    const autorId = isAnonymous ? null : authStore.user?.auth.id;
+
     return executeAction(async () => {
-      await qaService.submitQuestion(sessionId, texto);
+      await qaService.submitQuestion(sessionId, texto, autorId);
     }, 'Erro ao enviar pergunta.');
   }
 

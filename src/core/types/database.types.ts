@@ -135,6 +135,7 @@ export type Database = {
       };
       duvidas: {
         Row: {
+          autor_id: string | null;
           created_at: string;
           foi_respondida: boolean;
           id: string;
@@ -144,6 +145,7 @@ export type Database = {
           votos: number;
         };
         Insert: {
+          autor_id?: string | null;
           created_at?: string;
           foi_respondida?: boolean;
           id?: string;
@@ -153,6 +155,7 @@ export type Database = {
           votos?: number;
         };
         Update: {
+          autor_id?: string | null;
           created_at?: string;
           foi_respondida?: boolean;
           id?: string;

@@ -87,10 +87,11 @@ CREATE TABLE public.respostas_enquete (
   UNIQUE(enquete_id, hash_eleitor)
 );
 
--- duvidas (Painel de Q&A — Dúvidas Anônimas)
+-- duvidas (Painel de Q&A)
 CREATE TABLE public.duvidas (
   id             UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   sessao_id      UUID NOT NULL REFERENCES public.sessoes(id) ON DELETE CASCADE,
+  autor_id       UUID REFERENCES public.usuarios(id) ON DELETE SET NULL,
   texto          TEXT NOT NULL,
   votos          INTEGER NOT NULL DEFAULT 0,
   foi_respondida BOOLEAN NOT NULL DEFAULT FALSE,

@@ -27,10 +27,14 @@ onUnmounted(() => {
   }
 });
 
-async function handleSubmit(texto: string) {
+async function handleSubmit(payload: { text: string; isAnonymous: boolean }) {
   if (sessionStore.currentSession) {
     try {
-      await qaStore.submitQuestion(sessionStore.currentSession.id, texto);
+      await qaStore.submitQuestion(
+        sessionStore.currentSession.id,
+        payload.text,
+        payload.isAnonymous
+      );
 
       // O tratamento de erro já é feito globalmente pelo executeAction da Store.
       // Aqui só emitimos o sucesso se a promessa não disparar throw.
