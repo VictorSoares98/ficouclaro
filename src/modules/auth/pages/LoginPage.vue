@@ -127,7 +127,11 @@ async function onSubmit() {
       position: 'top',
     });
 
-    if (papel === 'professor') {
+    const redirect = router.currentRoute.value.query.redirect as string;
+
+    if (redirect) {
+      void router.push(redirect);
+    } else if (papel === 'professor') {
       void router.push('/disciplinas');
     } else if (papel === 'aluno') {
       void router.push('/hub');
