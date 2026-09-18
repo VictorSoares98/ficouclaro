@@ -28,6 +28,27 @@ export class DashboardService {
       return dateA - dateB;
     });
   }
+
+  /**
+   * Busca os insights GLOBAIS de todas as sessões de todas as disciplinas do professor logado.
+   * Utiliza a function `get_global_insights`.
+   */
+  async getGlobalInsights(): Promise<SessionInsights[]> {
+    const { data, error } = await supabaseClient.rpc('get_global_insights');
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    const sessions = data || [];
+
+    // Retorna ordenado do mais antigo para o mais novo
+    return [...sessions].sort((a, b) => {
+      const dateA = a.iniciada_em ? new Date(a.iniciada_em).getTime() : 0;
+      const dateB = b.iniciada_em ? new Date(b.iniciada_em).getTime() : 0;
+      return dateA - dateB;
+    });
+  }
 }
 
 export const dashboardService = new DashboardService();

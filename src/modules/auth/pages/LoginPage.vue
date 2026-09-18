@@ -148,10 +148,15 @@ async function onSubmit() {
   >
     <div class="tw-space-y-6">
       <!-- Botão Premium de Biometria -->
-      <div v-if="isBiometricAvailable" class="tw-flex tw-flex-col tw-items-center tw-justify-center tw-mb-2">
+      <div
+        v-if="isBiometricAvailable"
+        class="tw-flex tw-flex-col tw-items-center tw-justify-center tw-mb-2"
+      >
         <div class="tw-relative tw-group tw-cursor-pointer" @click="onBiometricLogin">
           <!-- Efeito Glow / Pulse de fundo -->
-          <div class="tw-absolute -tw-inset-2 tw-bg-gradient-to-r tw-from-primary tw-to-secondary tw-rounded-full tw-blur-md tw-opacity-40 group-hover:tw-opacity-75 tw-transition tw-duration-500 tw-animate-pulse"></div>
+          <div
+            class="tw-absolute -tw-inset-2 tw-bg-gradient-to-r tw-from-primary tw-to-secondary tw-rounded-full tw-blur-md tw-opacity-40 group-hover:tw-opacity-75 tw-transition tw-duration-500 tw-animate-pulse"
+          ></div>
           <!-- Botão Circular -->
           <q-btn
             round
@@ -164,7 +169,9 @@ async function onSubmit() {
             :loading="authStore.isLoading"
           />
         </div>
-        <p class="tw-mt-4 tw-text-xs tw-font-semibold tw-text-gray-500 dark:tw-text-gray-400 tw-tracking-widest tw-uppercase">
+        <p
+          class="tw-mt-4 tw-text-xs tw-font-semibold tw-text-gray-500 dark:tw-text-gray-400 tw-tracking-widest tw-uppercase"
+        >
           Desbloqueio Rápido
         </p>
       </div>

@@ -7,7 +7,11 @@ import {
 import { useAsyncOperation } from '@/core/composables/useAsyncOperation';
 
 export const useDashboardStore = defineStore('dashboard', () => {
+  // Insights de uma disciplina específica (Painel Local)
   const insights = ref<SessionInsights[]>([]);
+  // Insights consolidados de todas as disciplinas do professor (Painel Global)
+  const globalInsights = ref<SessionInsights[]>([]);
+
   const currentCourseId = ref<string | null>(null);
   const { isLoading, error, execute } = useAsyncOperation();
 
@@ -27,37 +31,54 @@ export const useDashboardStore = defineStore('dashboard', () => {
       currentCourseId.value = null; // força limpeza do cache visual
       return loadCourseInsights(id);
     }
+    // Se não tiver curso ativo, pode estar forçando reload global
+    return loadGlobalInsights();
+  }
+
+  async function loadGlobalInsights() {
+    return execute(async () => {
+      globalInsights.value = await dashboardService.getGlobalInsights();
+    }, 'Erro ao carregar os dados da Dashboard Global.');
   }
 
   // Agregações Globais
   const globalAverageRating = computed(() => {
-    const validSessions = insights.value.filter((s) => s.total_avaliacoes > 0);
+    // Usamos globalInsights.value na rota Global, ou insights.value na rota Local
+    // Neste caso, as agregações globais devem usar a união, mas vamos deixar flexível
+    // Para simplificar a API, passamos a usar globalInsights
+    const source = globalInsights.value.length > 0 ? globalInsights.value : insights.value;
+    const validSessions = source.filter((s) => s.total_avaliacoes > 0);
     if (validSessions.length === 0) return 0;
     const sum = validSessions.reduce((acc, curr) => acc + curr.media_estrelas, 0);
     return Number((sum / validSessions.length).toFixed(1));
   });
 
   const totalQuestions = computed(() => {
-    return insights.value.reduce((acc, curr) => acc + curr.total_duvidas, 0);
+    const source = globalInsights.value.length > 0 ? globalInsights.value : insights.value;
+    return source.reduce((acc, curr) => acc + curr.total_duvidas, 0);
   });
 
   const totalPaceSignals = computed(() => {
-    return insights.value.reduce((acc, curr) => acc + curr.total_sinais, 0);
+    const source = globalInsights.value.length > 0 ? globalInsights.value : insights.value;
+    return source.reduce((acc, curr) => acc + curr.total_sinais, 0);
   });
 
   // Sessão com pior avaliação (que tenha ao menos 1 avaliação)
   const lowestRatedSession = computed(() => {
-    const valid = insights.value.filter((s) => s.total_avaliacoes > 0);
+    const source = globalInsights.value.length > 0 ? globalInsights.value : insights.value;
+    const valid = source.filter((s) => s.total_avaliacoes > 0);
     if (valid.length === 0) return null;
     return valid.reduce((prev, curr) => (curr.media_estrelas < prev.media_estrelas ? curr : prev));
   });
 
   return {
     insights,
+    globalInsights,
     isLoading,
     error,
     currentCourseId,
     loadCourseInsights,
+    loadGlobalInsights,
     forceReload,
     globalAverageRating,
     totalQuestions,
