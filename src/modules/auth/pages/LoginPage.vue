@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
 import { useAuthStore } from '@/stores/auth.store';
+import { biometricService } from '@/core/services/biometric.service';
 import AuthFormContainer from '@/modules/auth/components/AuthFormContainer.vue';
 
 interface PasswordCredentialExt {
@@ -21,8 +22,13 @@ const authStore = useAuthStore();
 const email = ref('');
 const password = ref('');
 const isPasswordVisible = ref(false);
+const isBiometricAvailable = ref(false);
 
 onMounted(async () => {
+  // Verifica se o dispositivo possui suporte a biometria/digital
+  const bioStatus = await biometricService.checkAvailability();
+  isBiometricAvailable.value = bioStatus.isAvailable;
+
   // Dispara o modal nativo do sistema (Google Password Manager / Samsung Pass / iCloud) ao carregar a página
   if (typeof window !== 'undefined' && 'credentials' in navigator && navigator.credentials.get) {
     try {
@@ -40,9 +46,46 @@ onMounted(async () => {
   }
 });
 
+async function onBiometricLogin() {
+  const success = await biometricService.authenticate('Escaneie sua digital para entrar');
+  if (!success) return;
+
+  const creds = await biometricService.getCredentials();
+  if (creds && creds.username && creds.password) {
+    email.value = creds.username;
+    password.value = creds.password;
+    await onSubmit();
+  } else {
+    $q.notify({
+      type: 'warning',
+      message:
+        'Nenhuma digital cadastrada para esta conta. Faça login com e-mail e senha para ativar.',
+      position: 'top',
+    });
+  }
+}
+
 async function onSubmit() {
   try {
     await authStore.login({ email: email.value, password: password.value });
+
+    // Se o dispositivo suporta biometria mas o usuário ainda não ativou, sugere ativar
+    if (isBiometricAvailable.value && !biometricService.isBiometricsEnabled()) {
+      $q.dialog({
+        title: 'Ativar Biometria',
+        message:
+          'Deseja ativar o login por digital/biometria para os próximos acessos neste aparelho?',
+        ok: { label: 'Ativar Biometria', color: 'primary', unelevated: true },
+        cancel: { label: 'Agora não', flat: true, color: 'grey-7' },
+      }).onOk(() => {
+        void biometricService.saveCredentials(email.value, password.value);
+        $q.notify({
+          type: 'positive',
+          message: 'Biometria ativada com sucesso!',
+          position: 'top',
+        });
+      });
+    }
 
     // Registra a credencial no gerenciador nativo do dispositivo após login bem-sucedido
     if (
@@ -83,7 +126,6 @@ async function onSubmit() {
     }
   } catch {
     // O erro já é tratado e notificado globalmente pelo authStore (useAsyncOperation)
-    // Este catch serve apenas para interromper o fluxo e evitar o redirecionamento indevido
   }
 }
 </script>
@@ -95,16 +137,31 @@ async function onSubmit() {
     :isLoading="authStore.isLoading"
   >
     <div class="tw-space-y-6">
-      <q-btn
-        class="tw-w-full tw-h-14 tw-rounded-xl tw-text-base sm:tw-text-lg tw-font-bold tw-shadow-md tw-bg-white hover:tw-bg-gray-50"
-        text-color="grey-9"
-        icon="img:https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
-        label="Continuar com Google"
-        unelevated
-        no-wrap
-        @click="authStore.loginWithGoogle()"
-        :loading="authStore.isLoading"
-      />
+      <div class="tw-space-y-3">
+        <q-btn
+          v-if="isBiometricAvailable"
+          class="tw-w-full tw-h-14 tw-rounded-xl tw-text-base sm:tw-text-lg tw-font-bold tw-shadow-md"
+          color="primary"
+          icon="fingerprint"
+          label="Entrar com Biometria"
+          unelevated
+          no-wrap
+          @click="onBiometricLogin"
+          :loading="authStore.isLoading"
+        />
+
+        <q-btn
+          class="tw-w-full tw-h-14 tw-rounded-xl tw-text-base sm:tw-text-lg tw-font-bold tw-shadow-md tw-bg-white hover:tw-bg-gray-50"
+          text-color="grey-9"
+          icon="img:https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
+          label="Continuar com Google"
+          unelevated
+          no-wrap
+          @click="authStore.loginWithGoogle()"
+          :loading="authStore.isLoading"
+        />
+      </div>
+
       <p class="tw-text-xs tw-text-center text-muted tw-mt-2">
         Ao continuar, você concorda com nossos
         <router-link to="/termos" class="tw-text-primary hover:tw-underline">Termos</router-link> e
