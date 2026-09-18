@@ -134,11 +134,11 @@ export class CourseService {
   }
 
   async enrollByCode(alunoId: string, codigoConvite: string): Promise<Matricula> {
-    // Busca o curso pelo código
+    // Busca o curso pelo código ignorando case sensitivity (hexcode no banco é minúsculo)
     const { data: curso, error: courseError } = await supabase
       .from('disciplinas')
       .select('id')
-      .eq('codigo_convite', codigoConvite)
+      .eq('codigo_convite', codigoConvite.toLowerCase())
       .single();
 
     if (courseError || !curso) {
