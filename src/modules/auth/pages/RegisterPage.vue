@@ -103,11 +103,12 @@ async function onGoogleLogin() {
   >
     <div class="tw-space-y-6">
       <q-btn
-        class="tw-w-full tw-h-14 tw-rounded-xl tw-text-lg tw-font-bold tw-shadow-md tw-bg-white hover:tw-bg-gray-50"
+        class="tw-w-full tw-h-14 tw-rounded-xl tw-text-base sm:tw-text-lg tw-font-bold tw-shadow-md tw-bg-white hover:tw-bg-gray-50"
         text-color="grey-9"
         icon="img:https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
         label="Continuar com Google"
         unelevated
+        no-wrap
         @click="onGoogleLogin"
         :loading="authStore.isLoading"
       />
@@ -123,9 +124,8 @@ async function onGoogleLogin() {
           <q-btn-toggle
             v-model="role"
             spread
-            class="tw-w-full tw-shadow-sm"
+            class="tw-w-full tw-shadow-sm tw-rounded-xl"
             no-caps
-            rounded
             unelevated
             toggle-color="primary"
             color="white"
