@@ -50,16 +50,19 @@ async function onBiometricLogin() {
   const success = await biometricService.authenticate('Escaneie sua digital para entrar');
   if (!success) return;
 
-  const creds = await biometricService.getCredentials();
-  if (creds && creds.username && creds.password) {
-    email.value = creds.username;
-    password.value = creds.password;
-    await onSubmit();
-  } else {
+  try {
+    const creds = await biometricService.getCredentials();
+    if (creds && creds.username && creds.password) {
+      email.value = creds.username;
+      password.value = creds.password;
+      await onSubmit();
+    } else {
+      throw new Error('No credentials');
+    }
+  } catch {
     $q.notify({
       type: 'warning',
-      message:
-        'Nenhuma digital cadastrada para esta conta. Faça login com e-mail e senha para ativar.',
+      message: 'Nenhuma digital vinculada. Faça login com e-mail e senha para ativar.',
       position: 'top',
     });
   }
@@ -70,20 +73,27 @@ async function onSubmit() {
     await authStore.login({ email: email.value, password: password.value });
 
     // Se o dispositivo suporta biometria mas o usuário ainda não ativou, sugere ativar
+    // Transformamos o dialog num bloqueio usando Promise para ele não ser engolido pelo router.push
     if (isBiometricAvailable.value && !biometricService.isBiometricsEnabled()) {
-      $q.dialog({
-        title: 'Ativar Biometria',
-        message:
-          'Deseja ativar o login por digital/biometria para os próximos acessos neste aparelho?',
-        ok: { label: 'Ativar Biometria', color: 'primary', unelevated: true },
-        cancel: { label: 'Agora não', flat: true, color: 'grey-7' },
-      }).onOk(() => {
-        void biometricService.saveCredentials(email.value, password.value);
-        $q.notify({
-          type: 'positive',
-          message: 'Biometria ativada com sucesso!',
-          position: 'top',
-        });
+      await new Promise<void>((resolve) => {
+        $q.dialog({
+          title: 'Ativar Biometria',
+          message:
+            'Deseja ativar o login por digital/biometria para os próximos acessos neste aparelho?',
+          ok: { label: 'Ativar Biometria', color: 'primary', unelevated: true },
+          cancel: { label: 'Agora não', flat: true, color: 'grey-7' },
+        })
+          .onOk(() => {
+            void biometricService.saveCredentials(email.value, password.value);
+            $q.notify({
+              type: 'positive',
+              message: 'Biometria ativada com sucesso!',
+              position: 'top',
+            });
+            resolve();
+          })
+          .onCancel(() => resolve())
+          .onDismiss(() => resolve());
       });
     }
 
