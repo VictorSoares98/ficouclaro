@@ -26,7 +26,7 @@ onMounted(async () => {
     pollStore.subscribeToSessionPolls(sessionId, false);
   } catch (err: unknown) {
     $q.notify({ color: 'negative', message: err instanceof Error ? err.message : 'Erro' });
-    void router.replace('/aluno'); // Voltar em caso de erro
+    void router.replace('/hub'); // Voltar em caso de erro
   }
 });
 
@@ -110,7 +110,7 @@ onUnmounted(() => {
         <q-icon name="task_alt" size="4rem" color="warning" />
         <h2 class="tw-text-2xl tw-font-bold tw-text-warning">Aula Encerrada</h2>
         <p class="text-muted">Obrigado por participar.</p>
-        <q-btn color="primary" label="Voltar" to="/aluno" class="tw-mt-4" />
+        <q-btn color="primary" label="Voltar" to="/hub" class="tw-mt-4" />
       </div>
     </div>
     <ReviewModal />

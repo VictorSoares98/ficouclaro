@@ -28,7 +28,7 @@ const currentCourse = computed(() => {
 
 const qrValue = computed(() => {
   if (!currentCourse.value) return '';
-  const baseUrl = window.location.origin + window.location.pathname;
+  const baseUrl = 'https://ficouclaro.pages.dev/';
   return `${baseUrl}#/hub?join=${currentCourse.value.codigo_convite}`;
 });
 
@@ -43,7 +43,7 @@ onMounted(async () => {
       color: 'negative',
       message: err instanceof Error ? err.message : 'Erro ao entrar na sessão',
     });
-    void router.replace('/professor'); // Voltar em caso de erro
+    void router.replace('/disciplinas'); // Voltar em caso de erro
   }
 });
 
