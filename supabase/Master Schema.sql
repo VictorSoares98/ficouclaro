@@ -1,7 +1,7 @@
 -- ====================================================================
 -- ⚠️ AVISO: ARQUIVO AUTO-GERADO!
 -- NÃO EDITE ESTE ARQUIVO DIRETAMENTE. ALTERE OS SNIPPETS E RODE db:build
--- Gerado em: 2026-09-18T19:45:07.554Z
+-- Gerado em: 2026-09-18T19:47:30.017Z
 -- ====================================================================
 
 -- >>> INÍCIO DO SNIPPET: 00_Init_Extensions.sql <<<
@@ -34,12 +34,14 @@ CREATE TYPE sinal_ritmo AS ENUM ('muito_rapido', 'boiando', 'tudo_certo', 'muito
 
 -- usuarios (Extensão do auth.users do Supabase)
 CREATE TABLE public.usuarios (
-  id             UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-  papel          papel_usuario NOT NULL DEFAULT 'aluno',
-  nome_completo  TEXT,
-  url_avatar     TEXT,
-  created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  id                 UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  papel              papel_usuario NOT NULL DEFAULT 'aluno',
+  nome_completo      TEXT,
+  url_avatar         TEXT,
+  termos_aceitos_em  TIMESTAMPTZ,
+  versao_termos      TEXT,
+  created_at         TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at         TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- disciplinas (Disciplinas do professor)
@@ -363,12 +365,14 @@ BEGIN
     v_papel := 'aluno'::public.papel_usuario;
   END;
 
-  INSERT INTO public.usuarios (id, nome_completo, url_avatar, papel)
+  INSERT INTO public.usuarios (id, nome_completo, url_avatar, papel, termos_aceitos_em, versao_termos)
   VALUES (
     NEW.id,
     COALESCE(NEW.raw_user_meta_data->>'nome_completo', NEW.raw_user_meta_data->>'full_name', NEW.raw_user_meta_data->>'name'),
     COALESCE(NEW.raw_user_meta_data->>'url_avatar', NEW.raw_user_meta_data->>'avatar_url', NEW.raw_user_meta_data->>'picture'),
-    COALESCE(v_papel, 'aluno'::public.papel_usuario)
+    COALESCE(v_papel, 'aluno'::public.papel_usuario),
+    (NEW.raw_user_meta_data->>'termos_aceitos_em')::TIMESTAMPTZ,
+    NEW.raw_user_meta_data->>'versao_termos'
   );
   
   RETURN NEW;

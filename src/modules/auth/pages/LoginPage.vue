@@ -79,7 +79,7 @@ async function onSubmit() {
         $q.dialog({
           title: 'Ativar Biometria',
           message:
-            'Deseja ativar o login por digital/biometria para os próximos acessos neste aparelho?',
+            'Deseja ativar o acesso rápido por digital/biometria? Sua credencial fica armazenada apenas no chip de segurança do seu próprio aparelho, não sendo enviada ou guardada em nossos servidores.',
           ok: { label: 'Ativar Biometria', color: 'primary', unelevated: true },
           cancel: { label: 'Agora não', flat: true, color: 'grey-7' },
         })

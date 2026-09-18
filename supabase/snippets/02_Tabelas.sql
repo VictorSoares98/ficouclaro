@@ -4,12 +4,14 @@
 
 -- usuarios (Extensão do auth.users do Supabase)
 CREATE TABLE public.usuarios (
-  id             UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-  papel          papel_usuario NOT NULL DEFAULT 'aluno',
-  nome_completo  TEXT,
-  url_avatar     TEXT,
-  created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  id                 UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  papel              papel_usuario NOT NULL DEFAULT 'aluno',
+  nome_completo      TEXT,
+  url_avatar         TEXT,
+  termos_aceitos_em  TIMESTAMPTZ,
+  versao_termos      TEXT,
+  created_at         TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at         TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- disciplinas (Disciplinas do professor)

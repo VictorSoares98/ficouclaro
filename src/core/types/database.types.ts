@@ -393,6 +393,8 @@ export type Database = {
           id: string;
           nome_completo: string | null;
           papel: Database['public']['Enums']['papel_usuario'];
+          termos_aceitos_em: string | null;
+          versao_termos: string | null;
           updated_at: string;
           url_avatar: string | null;
         };
@@ -401,6 +403,8 @@ export type Database = {
           id: string;
           nome_completo?: string | null;
           papel?: Database['public']['Enums']['papel_usuario'];
+          termos_aceitos_em?: string | null;
+          versao_termos?: string | null;
           updated_at?: string;
           url_avatar?: string | null;
         };
@@ -409,6 +413,8 @@ export type Database = {
           id?: string;
           nome_completo?: string | null;
           papel?: Database['public']['Enums']['papel_usuario'];
+          termos_aceitos_em?: string | null;
+          versao_termos?: string | null;
           updated_at?: string;
           url_avatar?: string | null;
         };

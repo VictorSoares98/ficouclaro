@@ -42,6 +42,8 @@ async function onSubmit() {
         data: {
           nome_completo: fullName.value,
           papel: role.value,
+          termos_aceitos_em: new Date().toISOString(),
+          versao_termos: '1.0.0', // Versão atual da Política de Privacidade
         },
       },
     });
