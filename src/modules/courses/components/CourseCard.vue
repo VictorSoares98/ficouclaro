@@ -22,29 +22,19 @@ defineEmits<{
 </script>
 
 <template>
-  <BaseSurfaceCard class="tw-h-full">
-    <q-card-section>
-      <div class="tw-flex tw-justify-between tw-items-start">
-        <div class="tw-flex tw-items-center tw-gap-3">
-          <q-avatar v-if="course.icone" size="md" color="primary" text-color="white">
-            <q-icon :name="course.icone" />
-          </q-avatar>
-          <div>
-            <h2 class="tw-text-xl tw-font-bold">{{ course.nome }}</h2>
-            <div
-              v-if="course.curso || course.semestre"
-              class="tw-text-xs tw-text-primary tw-font-medium tw-mt-0.5"
-            >
-              {{ course.curso || '' }} {{ course.curso && course.semestre ? '•' : '' }}
-              {{ course.semestre || '' }}
-            </div>
-          </div>
-        </div>
-        <div class="tw-flex tw-flex-col tw-items-end tw-gap-2">
+  <BaseSurfaceCard class="tw-h-full tw-flex tw-flex-col">
+    <q-card-section class="tw-flex-grow tw-flex tw-flex-col">
+      <!-- HEADER ROW: Badges (Left) & Options (Right) -->
+      <div class="tw-flex tw-justify-between tw-items-center tw-mb-3">
+        <!-- Left: Invite Code -->
+        <div>
           <q-badge v-if="showInviteCode" color="secondary" class="tw-text-sm tw-uppercase">
             Cód: {{ course.codigo_convite }}
           </q-badge>
+        </div>
 
+        <!-- Right: Status & 3 Dots -->
+        <div class="tw-flex tw-items-center tw-gap-2">
           <template v-if="sessionStatus !== undefined">
             <q-badge
               v-if="sessionStatus === 'ativa'"
@@ -58,7 +48,7 @@ defineEmits<{
               color="warning"
               class="tw-text-xs text-black"
             >
-              🟡 SALA DE ESPERA
+              🟡 ESPERA
             </q-badge>
             <q-badge v-else color="grey-7" class="tw-text-xs"> ⚪ SEM AULA </q-badge>
           </template>
@@ -92,14 +82,40 @@ defineEmits<{
         </div>
       </div>
 
-      <p class="text-muted tw-mt-3 tw-text-sm tw-min-h-[20px]">
+      <!-- MAIN INFO ROW: Avatar + Title -->
+      <div class="tw-flex tw-items-center tw-gap-3 tw-w-full">
+        <q-avatar
+          v-if="course.icone"
+          size="md"
+          color="primary"
+          text-color="white"
+          class="tw-shrink-0"
+        >
+          <q-icon :name="course.icone" />
+        </q-avatar>
+        <div class="tw-min-w-0 tw-flex-1">
+          <h2 class="tw-text-xl tw-font-bold tw-truncate" :title="course.nome">
+            {{ course.nome }}
+          </h2>
+          <div
+            v-if="course.curso || course.semestre"
+            class="tw-text-xs tw-text-primary tw-font-medium tw-mt-0.5 tw-truncate"
+          >
+            {{ course.curso || '' }} {{ course.curso && course.semestre ? '•' : '' }}
+            {{ course.semestre || '' }}
+          </div>
+        </div>
+      </div>
+
+      <!-- DESCRIPTION -->
+      <p class="text-muted tw-mt-4 tw-text-sm tw-flex-grow">
         {{ course.descricao || 'Sem descrição' }}
       </p>
 
-      <!-- Metadados de Espaço/Tempo -->
+      <!-- METADATA (Turma/Horário) -->
       <div
         v-if="course.turma || course.horario || course.dia_semana || course.sala || course.bloco"
-        class="tw-mt-3 tw-flex tw-flex-wrap tw-gap-2 tw-text-xs text-muted"
+        class="tw-mt-4 tw-flex tw-flex-wrap tw-gap-3 tw-text-xs text-muted"
       >
         <div v-if="course.turma" class="tw-flex tw-items-center tw-gap-1">
           <q-icon name="group" size="xs" /> {{ course.turma }}
