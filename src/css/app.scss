@@ -23,6 +23,16 @@ body {
   --q-dark: #1d1d1d;
   --q-dark-page: #121212;
 
+  // --- DIRETRIZ: Acessibilidade Mobile (WebView / Capacitor) ---
+  // MANDATÓRIO: O Quasar bloqueia `user-select` nativamente no body em touch devices, o que quebra o Autofill e Copy/Paste.
+  // REGRA DE ESPECIFICIDADE: Mantenha as classes `.q-field__native` e `.q-field__input` abaixo para forçar a 
+  // liberação destas funções (Gestor de Senhas) no Android/iOS sem recorrer ao uso de `!important`. Jamais remova.
+  .q-field__native,
+  .q-field__input {
+    -webkit-user-select: auto;
+    user-select: auto;
+  }
+
   // Safe area nativa exposta como variáveis do CSS (Capacitor)
   // Removido o padding do body para não conflitar com componentes fixed (AppHeader)
   --safe-top: env(safe-area-inset-top, 0px);

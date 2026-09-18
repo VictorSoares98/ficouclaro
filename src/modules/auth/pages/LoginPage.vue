@@ -78,6 +78,7 @@ async function onSubmit() {
             (val) => !!val || 'O e-mail é obrigatório',
             (val) => /.+@.+\..+/.test(val) || 'E-mail inválido',
           ]"
+          id="email"
           autocomplete="email"
           name="email"
           enterkeyhint="next"
@@ -95,6 +96,7 @@ async function onSubmit() {
             (val) => !!val || 'A senha é obrigatória',
             (val) => val.length >= 6 || 'A senha deve ter no mínimo 6 caracteres',
           ]"
+          id="password"
           autocomplete="current-password"
           name="password"
           enterkeyhint="done"
