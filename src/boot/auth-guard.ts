@@ -34,7 +34,7 @@ export default defineBoot(({ router, store }) => {
 
     // Rota Protegida, mas sem login
     if (!authStore.isAuthenticated) {
-      return '/login';
+      return { path: '/login', query: { redirect: to.fullPath } };
     }
 
     // Rota Protegida com login (Checagem RBAC)

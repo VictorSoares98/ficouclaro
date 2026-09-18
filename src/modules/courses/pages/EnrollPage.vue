@@ -38,6 +38,18 @@ async function handleRefresh() {
 
 onMounted(async () => {
   await handleRefresh();
+
+  // Abordagem Premium (Universal/Deep Links):
+  // Se o aluno escanear um QR code web, a URL trará ?join=CODIGO
+  const joinCode = router.currentRoute.value.query.join;
+  if (joinCode && typeof joinCode === 'string') {
+    inviteCode.value = joinCode.toUpperCase();
+    isEnrolling.value = true;
+    await handleEnroll();
+
+    // Limpa a URL para não matricular de novo caso ele atualize a página
+    void router.replace({ query: { ...router.currentRoute.value.query, join: undefined } });
+  }
 });
 
 async function handleEnroll() {
