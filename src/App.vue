@@ -1,16 +1,18 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { App } from '@capacitor/app';
 import { supabaseClient } from '@/core/supabase/client';
 import { useAuthStore } from '@/stores/auth.store';
 import { useThemeStore } from '@/stores/theme.store';
 import type { AuthChangeEvent, Session, Subscription } from '@supabase/supabase-js';
 import { useQuasar } from 'quasar';
+import { useNetworkStatus } from '@/core/composables/useNetworkStatus';
 
 const authStore = useAuthStore();
 const themeStore = useThemeStore();
+const router = useRouter();
 const $q = useQuasar();
-
-import { useNetworkStatus } from '@/core/composables/useNetworkStatus';
 
 const { isOnline } = useNetworkStatus();
 
@@ -19,6 +21,24 @@ themeStore.initTheme();
 let authListener: Subscription | null = null;
 
 onMounted(() => {
+  // Listener do Capacitor para abertura de QR Code e Deep Links
+  void App.addListener('appUrlOpen', (event) => {
+    try {
+      const url = new URL(event.url);
+      const path = url.pathname + url.search + url.hash;
+      if (path && path !== '/') {
+        void router.push(path);
+      }
+    } catch {
+      const path = event.url
+        .replace(/^ficouclaro:\/\//, '/')
+        .replace(/^com\.ficouclaro\.app:\/\//, '/');
+      if (path && path !== '/') {
+        void router.push(path);
+      }
+    }
+  });
+
   // Catch nativo do Vite: Se o usuário tentar baixar um chunk antigo que o Cloudflare já apagou, recarregamos silenciosamente.
   window.addEventListener('vite:preloadError', (event) => {
     event.preventDefault();

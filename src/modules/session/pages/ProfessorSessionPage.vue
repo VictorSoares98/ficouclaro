@@ -28,7 +28,8 @@ const currentCourse = computed(() => {
 
 const qrValue = computed(() => {
   if (!currentCourse.value) return '';
-  return `ficouclaro://join/${currentCourse.value.codigo_convite}`;
+  const baseUrl = window.location.origin + window.location.pathname;
+  return `${baseUrl}#/hub?join=${currentCourse.value.codigo_convite}`;
 });
 
 onMounted(async () => {

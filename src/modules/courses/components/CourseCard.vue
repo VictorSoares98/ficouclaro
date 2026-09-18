@@ -5,7 +5,10 @@ import BaseSurfaceCard from '@/core/components/BaseSurfaceCard.vue';
 import QrcodeVue from 'qrcode.vue';
 
 const showQrCode = ref(false);
-const qrValue = computed(() => `ficouclaro://join/${props.course.codigo_convite}`);
+const qrValue = computed(() => {
+  const baseUrl = 'https://ficouclaro.pages.dev/';
+  return `${baseUrl}#/hub?join=${props.course.codigo_convite}`;
+});
 
 const props = defineProps<{
   course: Disciplina;

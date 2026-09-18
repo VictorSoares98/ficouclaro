@@ -124,6 +124,15 @@ A arquitetura central divide a experiência em dois perfis distintos (Role-Based
 4. **Avaliação Flash Pós-Aula:** Sistema de avaliação instantânea pós-sessão para criar um histórico de qualidade da disciplina.
 5. **Dashboard & Insights:** Tela que consolida as avaliações rápidas, o volume de dúvidas e o pico do termômetro, permitindo que o professor entenda o engajamento e a recepção geral da sua disciplina de forma clara e objetiva.
 
+## 🔐 7. Conformidade e Privacidade (LGPD)
+
+O **Ficou Claro?** adota a filosofia de _Privacy by Design_. Sendo um aplicativo voltado para interações educacionais, a proteção dos dados dos usuários é prioridade técnica:
+
+- **Controle de Termos e Consentimento:** Sistema versionado de aceite de termos. Sempre que a política muda, o banco exige um novo consentimento criptografado (timestamp e versão) do usuário no próximo login.
+- **Direito à Portabilidade:** Central de Privacidade nativa (`/privacidade-seguranca`) que permite ao usuário exportar toda a sua carga de dados consolidados (Perfil, Dúvidas enviadas, Histórico) em formatos portáveis (JSON, CSV).
+- **Direito ao Esquecimento:** Exclusão automatizada da conta (Hard Delete) com proteção rigorosa contra ações acidentais (verificação de frase-chave "EXCLUIR MINHA CONTA").
+- **Anonimato Integrado:** Por padrão, todas as dúvidas enviadas por alunos e os votos nas enquetes não expõem a identidade perante o professor, favorecendo a segurança psicológica no processo de aprendizado.
+
 ---
 
 **Equipe Responsável:** Victor Soares

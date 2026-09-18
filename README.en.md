@@ -124,6 +124,15 @@ The core architecture divides the experience into two distinct profiles (Role-Ba
 4. **Post-Class Flash Review:** Instant post-session evaluation system to create a quality history for the discipline.
 5. **Dashboard & Insights:** Screen that consolidates flash reviews, Q&A volume, and thermometer peaks, allowing the professor to understand the general engagement and reception of their discipline clearly and objectively.
 
+## 🔐 7. Compliance and Privacy (GDPR/LGPD)
+
+**Ficou Claro?** adopts the _Privacy by Design_ philosophy. As an application aimed at educational interactions, protecting user data is a technical priority:
+
+- **Terms and Consent Versioning:** Versioned system for terms acceptance. Whenever the policy changes, the database strictly requires a new encrypted consent (timestamp and version) from the user upon their next login.
+- **Right to Data Portability:** Native Privacy Hub (`/privacidade-seguranca`) that allows users to export all their consolidated data (Profile, Q&A history, etc.) in portable formats (JSON, CSV).
+- **Right to be Forgotten:** Automated account deletion (Hard Delete) featuring strict protection against accidental actions (requires an exact match challenge phrase "EXCLUIR MINHA CONTA").
+- **Built-in Anonymity:** By default, all questions submitted by students and poll votes do not expose their identity to the professor, fostering psychological safety in the learning process.
+
 ---
 
 **Lead Developer:** Victor Soares
