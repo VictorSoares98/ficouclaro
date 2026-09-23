@@ -20,7 +20,7 @@ _Read this in other languages: [🇺🇸 English](README.en.md) | [🇧🇷 Port
 
 ## 🏗️ 2. Architecture and Stack
 
-Our stack was rigorously chosen to deliver a highly reactive, low-initial-cost Hybrid MVP.
+Our stack was rigorously chosen to deliver a highly reactive, scalable and production-ready Hybrid Application.
 
 - **Frontend & Mobile:** [Vue 3](https://vuejs.org/) (Composition API), [Quasar Framework](https://quasar.dev/) (UI System), [Tailwind CSS](https://tailwindcss.com/) (Utility Styling), [Pinia](https://pinia.vuejs.org/) (State Management).
 - **Backend & Database:** [Supabase](https://supabase.com/) (PostgreSQL + Auth + Realtime), Strict Row Level Security (RLS) protection, Modular SQL Architecture.
