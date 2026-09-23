@@ -22,7 +22,8 @@ dev/
 .env.development
 .env.local
 .env.*.local
-
+*.keystore
+*.jks
 # ==========================================
 # 4. Capacitor (Integração Mobile)
 # ==========================================
