@@ -46,7 +46,8 @@
             (CDN).
           </li>
           <li>
-            <strong>Google Fontes/Ícones:</strong> Fornecimento de tipografia e recursos visuais.
+            <strong>Google (OAuth & Recursos):</strong> Fornecimento de infraestrutura para Login
+            seguro via conta Google, além de tipografia e recursos visuais (Google Fonts).
           </li>
         </ul>
 
