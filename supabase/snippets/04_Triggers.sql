@@ -32,6 +32,7 @@ BEGIN
 END;
 $$;
 
+DROP TRIGGER IF EXISTS ao_criar_usuario_auth ON auth.users;
 CREATE TRIGGER ao_criar_usuario_auth
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION private.processar_novo_usuario();
@@ -49,6 +50,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+DROP TRIGGER IF EXISTS ao_alterar_voto ON public.votos_duvida;
 CREATE TRIGGER ao_alterar_voto
   AFTER INSERT OR DELETE ON public.votos_duvida
   FOR EACH ROW EXECUTE FUNCTION private.atualizar_contagem_votos();
@@ -62,22 +64,27 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+DROP TRIGGER IF EXISTS ao_atualizar_usuario ON public.usuarios;
 CREATE TRIGGER ao_atualizar_usuario
   BEFORE UPDATE ON public.usuarios
   FOR EACH ROW EXECUTE FUNCTION private.handle_updated_at();
 
+DROP TRIGGER IF EXISTS ao_atualizar_disciplina ON public.disciplinas;
 CREATE TRIGGER ao_atualizar_disciplina
   BEFORE UPDATE ON public.disciplinas
   FOR EACH ROW EXECUTE FUNCTION private.handle_updated_at();
 
+DROP TRIGGER IF EXISTS ao_atualizar_sessao ON public.sessoes;
 CREATE TRIGGER ao_atualizar_sessao
   BEFORE UPDATE ON public.sessoes
   FOR EACH ROW EXECUTE FUNCTION private.handle_updated_at();
 
+DROP TRIGGER IF EXISTS ao_atualizar_enquete ON public.enquetes;
 CREATE TRIGGER ao_atualizar_enquete
   BEFORE UPDATE ON public.enquetes
   FOR EACH ROW EXECUTE FUNCTION private.handle_updated_at();
 
+DROP TRIGGER IF EXISTS ao_atualizar_duvida ON public.duvidas;
 CREATE TRIGGER ao_atualizar_duvida
   BEFORE UPDATE ON public.duvidas
   FOR EACH ROW EXECUTE FUNCTION private.handle_updated_at();
