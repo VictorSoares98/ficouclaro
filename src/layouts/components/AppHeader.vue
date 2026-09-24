@@ -20,7 +20,7 @@ async function handleLogout() {
     await authStore.signOut();
     $q.notify({ color: 'positive', message: 'Sessão encerrada com sucesso!' });
     setTimeout(() => {
-      window.location.href = '/'; // Hard reload após a notificação
+      window.location.href = '/login'; // Hard reload após a notificação redirecionando para login
     }, 500);
   } catch (error) {
     const err = error as Error;
