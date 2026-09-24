@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import BaseSurfaceCard from '@/core/components/BaseSurfaceCard.vue';
+import { useQuasar } from 'quasar';
+
+const $q = useQuasar();
 
 const props = defineProps<{
   modelValue: boolean;
@@ -39,6 +42,7 @@ function handleCancel() {
   <q-dialog
     :model-value="modelValue"
     @update:model-value="emit('update:modelValue', $event)"
+    :position="$q.screen.lt.md ? 'bottom' : 'standard'"
     persistent
     backdrop-filter="blur(4px)"
     transition-show="scale"

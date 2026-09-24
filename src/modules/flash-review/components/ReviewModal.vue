@@ -74,6 +74,7 @@ function skip() {
   <!-- persistent impede fechamento acidental clicando fora, mas o botão Pular permite saída intencional -->
   <q-dialog
     v-model="isOpen"
+    :position="$q.screen.lt.md ? 'bottom' : 'standard'"
     persistent
     backdrop-filter="blur(4px)"
     transition-show="slide-up"
