@@ -6,7 +6,10 @@ const authStore = useAuthStore();
 
 <template>
   <!-- MobileNavBottom: Exibido apenas em viewports lt-md (<1024px) -->
-  <q-footer bordered class="tw-bg-white dark:tw-bg-dark-page tw-text-gray-600 dark:tw-text-gray-400 lt-md">
+  <q-footer
+    bordered
+    class="tw-bg-white dark:tw-bg-dark-page tw-text-gray-600 dark:tw-text-gray-400 lt-md"
+  >
     <q-tabs
       no-caps
       active-color="primary"
@@ -14,13 +17,7 @@ const authStore = useAuthStore();
       class="tw-text-xs"
       align="justify"
     >
-      <q-route-tab
-        v-if="!authStore.isAuthenticated"
-        to="/"
-        icon="home"
-        label="Início"
-        exact
-      />
+      <q-route-tab v-if="!authStore.isAuthenticated" to="/" icon="home" label="Início" exact />
       <q-route-tab
         v-if="authStore.user?.perfil.papel === 'aluno'"
         to="/hub"
