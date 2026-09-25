@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted } from 'vue';
+import { onMounted, onUnmounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { App as CapacitorApp } from '@capacitor/app';
+import { SplashScreen } from '@capacitor/splash-screen';
+import { Platform } from 'quasar';
+import AnimatedSplash from '@/components/AnimatedSplash.vue';
 import { supabaseClient } from '@/core/supabase/client';
 import { useAuthStore } from '@/stores/auth.store';
 import { useThemeStore } from '@/stores/theme.store';
@@ -20,7 +23,30 @@ const { isOnline } = useNetworkStatus();
 themeStore.initTheme();
 let authListener: Subscription | null = null;
 
-onMounted(() => {
+const splashRef = ref<InstanceType<typeof AnimatedSplash> | null>(null);
+const showVueSplash = ref(true);
+
+onMounted(async () => {
+  // 1. Handoff: Esconde o nativo brutalmente. O Vue Splash já está desenhado por trás.
+  if (Platform.is.capacitor) {
+    try {
+      await SplashScreen.hide();
+    } catch (e) {
+      console.warn('Erro ao ocultar splash nativo', e);
+    }
+  }
+
+  // 2. Aguarda um curto período de apreciação (estilo Netflix/iFood)
+  setTimeout(() => {
+    // 3. Inicia animação de saída (zoom out + fade)
+    splashRef.value?.hide();
+
+    // 4. Remove o componente do DOM após o término da animação
+    setTimeout(() => {
+      showVueSplash.value = false;
+    }, 700);
+  }, 1000);
+
   // Listener do Capacitor para abertura de QR Code e Deep Links (Universal Links + Custom Schemes)
   void CapacitorApp.addListener('appUrlOpen', (event) => {
     try {
@@ -87,6 +113,10 @@ onUnmounted(() => {
   >
     <strong>Sem conexão com a internet</strong>. O aplicativo pode não funcionar corretamente.
   </q-banner>
+
+  <!-- SPLASH ANIMADO SOBREPOSTO A TUDO -->
+  <AnimatedSplash v-if="showVueSplash" ref="splashRef" />
+
   <router-view v-slot="{ Component }">
     <transition name="q-transition--fade" mode="out-in">
       <component :is="Component" />

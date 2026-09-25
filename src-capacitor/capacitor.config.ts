@@ -14,8 +14,8 @@ export default defineCapacitorConfig({
       resizeOnFullScreen: true,
     },
     SplashScreen: {
-      launchShowDuration: 2500,
-      launchAutoHide: true,
+      launchShowDuration: 3000,
+      launchAutoHide: false,
       launchFadeOutDuration: 500,
       backgroundColor: '#1976D2',
       showSpinner: false,
