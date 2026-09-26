@@ -17,7 +17,7 @@ export default defineCapacitorConfig({
       launchShowDuration: 3000,
       launchAutoHide: false,
       launchFadeOutDuration: 500,
-      backgroundColor: '#1976D2',
+      backgroundColor: '#FFFFFF',
       showSpinner: false,
       splashFullScreen: false,
       splashImmersive: false,
