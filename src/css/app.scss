@@ -6,6 +6,11 @@
 // SISTEMA MULTI-TEMAS ORTOGONAL (Quasar + Tailwind)
 // ============================================================
 
+html {
+  --fc-font-scale: 1;
+  font-size: calc(16px * var(--fc-font-scale));
+}
+
 // --- Eixo 1: Iluminação (Dark / Light Mode) ---
 // O Quasar injeta a classe .body--dark no <body> dinamicamente.
 body {
@@ -18,6 +23,7 @@ body {
     Helvetica,
     Arial,
     sans-serif;
+  font-size: 1rem;
 
   // Fundo Claro (Light Mode)
   --q-dark: #1d1d1d;

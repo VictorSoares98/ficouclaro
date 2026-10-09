@@ -8,12 +8,15 @@ import AnimatedSplash from '@/components/AnimatedSplash.vue';
 import { supabaseClient } from '@/core/supabase/client';
 import { useAuthStore } from '@/stores/auth.store';
 import { useThemeStore } from '@/stores/theme.store';
+import { useAccessibilityStore } from '@/stores/accessibility.store';
 import type { AuthChangeEvent, Session, Subscription } from '@supabase/supabase-js';
 import { useQuasar } from 'quasar';
 import { useNetworkStatus } from '@/core/composables/useNetworkStatus';
+import LibrasWidget from '@/components/LibrasWidget.vue';
 
 const authStore = useAuthStore();
 const themeStore = useThemeStore();
+const accessibilityStore = useAccessibilityStore();
 const router = useRouter();
 const $q = useQuasar();
 
@@ -21,6 +24,7 @@ const { isOnline } = useNetworkStatus();
 
 // Inicialização síncrona do tema antes de montar o DOM para prevenir FOUC visual
 themeStore.initTheme();
+accessibilityStore.initAccessibility();
 let authListener: Subscription | null = null;
 
 const splashRef = ref<InstanceType<typeof AnimatedSplash> | null>(null);
@@ -116,6 +120,8 @@ onUnmounted(() => {
 
   <!-- SPLASH ANIMADO SOBREPOSTO A TUDO -->
   <AnimatedSplash v-if="showVueSplash" ref="splashRef" />
+  
+  <LibrasWidget />
 
   <router-view v-slot="{ Component }">
     <transition name="q-transition--fade" mode="out-in">

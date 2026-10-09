@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth.store';
-import { useThemeStore } from '@/stores/theme.store';
 import { useQuasar } from 'quasar';
-import ThemeSwitcher from '@/components/ThemeSwitcher.vue';
-import BaseIconButton from '@/core/components/BaseIconButton.vue';
+import AccessibilityMenu from '@/components/AccessibilityMenu.vue';
 
 defineProps<{
   subtitle?: string;
@@ -12,7 +10,6 @@ defineProps<{
 }>();
 
 const authStore = useAuthStore();
-const themeStore = useThemeStore();
 const $q = useQuasar();
 
 async function handleLogout() {
@@ -37,87 +34,8 @@ async function handleLogout() {
         <span v-if="subtitle" class="tw-text-sm tw-font-normal text-muted">| {{ subtitle }}</span>
       </q-toolbar-title>
 
-      <!-- Dropdown de Temas (Branding) -->
-      <q-btn-dropdown
-        v-if="showBrandingMenu"
-        flat
-        dense
-        color="white"
-        icon="palette"
-        class="tw-mr-2"
-        aria-label="Selecionar Marca"
-      >
-        <q-list>
-          <q-item
-            clickable
-            v-close-popup
-            @click="themeStore.setTheme('default')"
-            :active="themeStore.activeTheme === 'default'"
-          >
-            <q-item-section>Default (Azul)</q-item-section>
-          </q-item>
-          <q-item
-            clickable
-            v-close-popup
-            @click="themeStore.setTheme('ocean')"
-            :active="themeStore.activeTheme === 'ocean'"
-          >
-            <q-item-section>Ocean (Ciano)</q-item-section>
-          </q-item>
-          <q-item
-            clickable
-            v-close-popup
-            @click="themeStore.setTheme('dracula')"
-            :active="themeStore.activeTheme === 'dracula'"
-          >
-            <q-item-section>Dracula (Roxo)</q-item-section>
-          </q-item>
-          <q-item
-            clickable
-            v-close-popup
-            @click="themeStore.setTheme('summer_berries')"
-            :active="themeStore.activeTheme === 'summer_berries'"
-          >
-            <q-item-section>Amoras do Verão</q-item-section>
-          </q-item>
-          <q-item
-            clickable
-            v-close-popup
-            @click="themeStore.setTheme('lunar_twilight')"
-            :active="themeStore.activeTheme === 'lunar_twilight'"
-          >
-            <q-item-section>Crepúsculo Lunar</q-item-section>
-          </q-item>
-          <q-item
-            clickable
-            v-close-popup
-            @click="themeStore.setTheme('nature_terrain')"
-            :active="themeStore.activeTheme === 'nature_terrain'"
-          >
-            <q-item-section>Natura e Terreno</q-item-section>
-          </q-item>
-        </q-list>
-      </q-btn-dropdown>
-
-      <!-- Theme Switcher Geral (Usado nas Áreas Restritas) -->
-      <ThemeSwitcher v-if="!showBrandingMenu" />
-
-      <!-- Toggle Simples de Iluminação (Usado na Área Pública) -->
-      <BaseIconButton
-        v-if="showBrandingMenu"
-        :icon="
-          themeStore.activeMode === 'dark'
-            ? 'dark_mode'
-            : themeStore.activeMode === 'light'
-              ? 'light_mode'
-              : 'brightness_auto'
-        "
-        @click="themeStore.toggleMode()"
-        color="white"
-        ariaLabel="Alternar Iluminação"
-      >
-        <q-tooltip>Iluminação: {{ themeStore.activeMode }}</q-tooltip>
-      </BaseIconButton>
+      <!-- Accessibility Menu Unificado (Substitui o ThemeSwitcher antigo e os botões individuais) -->
+      <AccessibilityMenu />
 
       <!-- Menu de Perfil (Áreas Restritas) -->
       <q-btn-dropdown
