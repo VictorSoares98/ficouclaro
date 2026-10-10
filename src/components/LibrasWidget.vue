@@ -16,17 +16,16 @@ declare global {
   }
 }
 
-let instance: unknown = null;
-
 async function initVLibras() {
   if (!accessibilityStore.librasEnabled) return;
   
   try {
     await vlibrasService.load();
     if (window.VLibras) {
-      instance = new window.VLibras.Widget('https://vlibras.gov.br/app');
+      new window.VLibras.Widget('https://vlibras.gov.br/app');
     }
   } catch (error) {
+    console.warn('Erro VLibras:', error);
     $q.notify({
       type: 'warning',
       message: 'Não foi possível carregar o intérprete de Libras. Verifique sua conexão.',
@@ -37,16 +36,15 @@ async function initVLibras() {
 
 watch(() => accessibilityStore.librasEnabled, (enabled) => {
   if (enabled) {
-    initVLibras();
+    void initVLibras();
   } else {
     vlibrasService.unload();
-    instance = null;
   }
 });
 
 onMounted(() => {
   if (accessibilityStore.librasEnabled) {
-    initVLibras();
+    void initVLibras();
   }
 });
 
