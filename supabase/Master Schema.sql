@@ -1,7 +1,7 @@
 -- ====================================================================
 -- ⚠️ AVISO: ARQUIVO AUTO-GERADO!
 -- NÃO EDITE ESTE ARQUIVO DIRETAMENTE. ALTERE OS SNIPPETS E RODE db:build
--- Gerado em: 2026-09-18T23:39:26.790Z
+-- Gerado em: 2026-10-10T06:03:17.037Z
 -- ====================================================================
 
 -- >>> INÍCIO DO SNIPPET: 00_Init_Extensions.sql <<<
@@ -111,6 +111,7 @@ CREATE TABLE public.respostas_enquete (
   id           UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   enquete_id   UUID NOT NULL REFERENCES public.enquetes(id) ON DELETE CASCADE,
   sessao_id    UUID NOT NULL REFERENCES public.sessoes(id) ON DELETE CASCADE,
+  aluno_id     UUID REFERENCES public.usuarios(id) ON DELETE SET NULL,
   resposta     JSONB NOT NULL,
   hash_eleitor TEXT NOT NULL,
   created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -142,11 +143,20 @@ CREATE TABLE public.votos_duvida (
 CREATE TABLE public.avaliacoes_rapidas (
   id           UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   sessao_id    UUID NOT NULL REFERENCES public.sessoes(id) ON DELETE CASCADE,
+  aluno_id     UUID REFERENCES public.usuarios(id) ON DELETE SET NULL,
   nota         SMALLINT NOT NULL CHECK (nota BETWEEN 1 AND 5),
   comentario   TEXT,
   hash_eleitor TEXT NOT NULL,
   created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   UNIQUE(sessao_id, hash_eleitor)
+);
+
+-- strikes_moderacao (Controle de suspensões)
+CREATE SCHEMA IF NOT EXISTS private;
+CREATE TABLE private.strikes_moderacao (
+  aluno_id UUID PRIMARY KEY REFERENCES public.usuarios(id) ON DELETE CASCADE,
+  quantidade INT NOT NULL DEFAULT 0,
+  ultima_ocorrencia TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- >>> FIM DO SNIPPET: 02_Tabelas.sql <<<
@@ -159,6 +169,39 @@ CREATE TABLE public.avaliacoes_rapidas (
 
 -- Retorna o papel do usuário autenticado
 CREATE SCHEMA IF NOT EXISTS private;
+
+-- Função auxiliar para gerar HMAC (Proteção contra doxxing)
+CREATE OR REPLACE FUNCTION private.gerar_hash_eleitor(p_alvo_id UUID)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN encode(extensions.hmac(auth.uid()::text || p_alvo_id::text, COALESCE(current_setting('app.settings.hash_secret', true), 'FICOU_CLARO_DEFAULT_SECRET'), 'sha256'), 'hex');
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Função para motor de regras de moderação (Custo Zero)
+CREATE OR REPLACE FUNCTION private.verificar_moderacao(p_texto TEXT)
+RETURNS JSONB AS $$
+DECLARE
+  v_sensitive BOOLEAN := false;
+  v_offensive BOOLEAN := false;
+BEGIN
+  IF p_texto IS NULL OR p_texto = '' THEN
+    RETURN '{"sensitive": false, "offensive": false}'::jsonb;
+  END IF;
+
+  -- Regex para dados sensíveis (CPF, E-mail, Telefone)
+  IF p_texto ~* '([0-9]{3}\.?[0-9]{3}\.?[0-9]{3}\-?[0-9]{2})|([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})|(\(?[0-9]{2}\)?\s?9?[0-9]{4}\-?[0-9]{4})' THEN
+    v_sensitive := true;
+  END IF;
+
+  -- Regex para ofensas (Xingamentos)
+  IF p_texto ~* '\b(porra|caralho|merda|buceta|carai|fdp|puta|vsf|tnc|cuzão|cu|desgraça|corno|babaca|idiota|imbecil|retardado|otario|otário|vagabundo|arrombado)\b' THEN
+    v_offensive := true;
+  END IF;
+
+  RETURN jsonb_build_object('sensitive', v_sensitive, 'offensive', v_offensive);
+END;
+$$ LANGUAGE plpgsql STABLE;
 
 CREATE OR REPLACE FUNCTION private.obter_meu_papel()
 RETURNS papel_usuario AS $$
@@ -289,7 +332,7 @@ BEGIN
   IF auth.uid() IS NULL THEN
     RAISE EXCEPTION 'Usuário não autenticado.';
   END IF;
-  v_hash := encode(extensions.digest(auth.uid()::text || p_enquete_id::text, 'sha256'), 'hex');
+  v_hash := private.gerar_hash_eleitor(p_enquete_id);
 
   INSERT INTO public.respostas_enquete (enquete_id, sessao_id, resposta, hash_eleitor)
   VALUES (p_enquete_id, p_sessao_id, p_resposta, v_hash);
@@ -308,7 +351,7 @@ BEGIN
   IF auth.uid() IS NULL THEN
     RAISE EXCEPTION 'Usuário não autenticado.';
   END IF;
-  v_hash := encode(extensions.digest(auth.uid()::text || p_duvida_id::text, 'sha256'), 'hex');
+  v_hash := private.gerar_hash_eleitor(p_duvida_id);
 
   INSERT INTO public.votos_duvida (duvida_id, hash_eleitor)
   VALUES (p_duvida_id, v_hash);
@@ -329,7 +372,7 @@ BEGIN
     RAISE EXCEPTION 'Usuário não autenticado.';
   END IF;
   
-  v_hash := encode(extensions.digest(auth.uid()::text || p_sessao_id::text, 'sha256'), 'hex');
+  v_hash := private.gerar_hash_eleitor(p_sessao_id);
   
   IF p_anonimo THEN
     v_aluno_id := NULL;
@@ -411,6 +454,67 @@ BEGIN
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Trigger: Moderação Automática de Conteúdo
+CREATE OR REPLACE FUNCTION private.trigger_moderacao_texto()
+RETURNS TRIGGER AS $$
+DECLARE
+  v_mod JSONB;
+  v_strikes INT;
+BEGIN
+  IF auth.uid() IS NOT NULL THEN
+    SELECT quantidade INTO v_strikes FROM private.strikes_moderacao WHERE aluno_id = auth.uid();
+    IF v_strikes >= 3 THEN
+      RAISE EXCEPTION 'MODERATION_SUSPENDED: Usuário suspenso por múltiplas violações das regras.';
+    END IF;
+  END IF;
+
+  v_mod := private.verificar_moderacao(
+    COALESCE(
+      CASE 
+        WHEN TG_TABLE_NAME = 'duvidas' THEN NEW.texto 
+        WHEN TG_TABLE_NAME = 'avaliacoes_rapidas' THEN NEW.comentario 
+        ELSE ''
+      END, ''
+    )
+  );
+
+  IF (v_mod->>'sensitive')::boolean THEN
+    RAISE EXCEPTION 'MODERATION_BLOCKED: Dados sensíveis não são permitidos por questões de privacidade.';
+  END IF;
+
+  IF (v_mod->>'offensive')::boolean THEN
+    IF auth.uid() IS NOT NULL THEN
+      IF TG_TABLE_NAME = 'duvidas' THEN
+        NEW.autor_id := auth.uid();
+      ELSIF TG_TABLE_NAME = 'avaliacoes_rapidas' OR TG_TABLE_NAME = 'respostas_enquete' THEN
+        NEW.aluno_id := auth.uid();
+      END IF;
+      
+      INSERT INTO private.strikes_moderacao (aluno_id, quantidade)
+      VALUES (auth.uid(), 1)
+      ON CONFLICT (aluno_id) DO UPDATE SET quantidade = private.strikes_moderacao.quantidade + 1, ultima_ocorrencia = NOW();
+    END IF;
+  END IF;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DROP TRIGGER IF EXISTS ao_inserir_duvida_mod ON public.duvidas;
+CREATE TRIGGER ao_inserir_duvida_mod
+  BEFORE INSERT ON public.duvidas
+  FOR EACH ROW EXECUTE FUNCTION private.trigger_moderacao_texto();
+
+DROP TRIGGER IF EXISTS ao_inserir_avaliacao_mod ON public.avaliacoes_rapidas;
+CREATE TRIGGER ao_inserir_avaliacao_mod
+  BEFORE INSERT ON public.avaliacoes_rapidas
+  FOR EACH ROW EXECUTE FUNCTION private.trigger_moderacao_texto();
+
+DROP TRIGGER IF EXISTS ao_inserir_enquete_mod ON public.respostas_enquete;
+CREATE TRIGGER ao_inserir_enquete_mod
+  BEFORE INSERT ON public.respostas_enquete
+  FOR EACH ROW EXECUTE FUNCTION private.trigger_moderacao_texto();
 
 DROP TRIGGER IF EXISTS ao_atualizar_usuario ON public.usuarios;
 CREATE TRIGGER ao_atualizar_usuario

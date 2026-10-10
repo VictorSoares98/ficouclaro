@@ -5,6 +5,39 @@
 -- Retorna o papel do usuário autenticado
 CREATE SCHEMA IF NOT EXISTS private;
 
+-- Função auxiliar para gerar HMAC (Proteção contra doxxing)
+CREATE OR REPLACE FUNCTION private.gerar_hash_eleitor(p_alvo_id UUID)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN encode(extensions.hmac(auth.uid()::text || p_alvo_id::text, COALESCE(current_setting('app.settings.hash_secret', true), 'FICOU_CLARO_DEFAULT_SECRET'), 'sha256'), 'hex');
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Função para motor de regras de moderação (Custo Zero)
+CREATE OR REPLACE FUNCTION private.verificar_moderacao(p_texto TEXT)
+RETURNS JSONB AS $$
+DECLARE
+  v_sensitive BOOLEAN := false;
+  v_offensive BOOLEAN := false;
+BEGIN
+  IF p_texto IS NULL OR p_texto = '' THEN
+    RETURN '{"sensitive": false, "offensive": false}'::jsonb;
+  END IF;
+
+  -- Regex para dados sensíveis (CPF, E-mail, Telefone)
+  IF p_texto ~* '([0-9]{3}\.?[0-9]{3}\.?[0-9]{3}\-?[0-9]{2})|([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})|(\(?[0-9]{2}\)?\s?9?[0-9]{4}\-?[0-9]{4})' THEN
+    v_sensitive := true;
+  END IF;
+
+  -- Regex para ofensas (Xingamentos)
+  IF p_texto ~* '\b(porra|caralho|merda|buceta|carai|fdp|puta|vsf|tnc|cuzão|cu|desgraça|corno|babaca|idiota|imbecil|retardado|otario|otário|vagabundo|arrombado)\b' THEN
+    v_offensive := true;
+  END IF;
+
+  RETURN jsonb_build_object('sensitive', v_sensitive, 'offensive', v_offensive);
+END;
+$$ LANGUAGE plpgsql STABLE;
+
 CREATE OR REPLACE FUNCTION private.obter_meu_papel()
 RETURNS papel_usuario AS $$
   SELECT papel FROM public.usuarios WHERE id = auth.uid();
@@ -134,7 +167,7 @@ BEGIN
   IF auth.uid() IS NULL THEN
     RAISE EXCEPTION 'Usuário não autenticado.';
   END IF;
-  v_hash := encode(extensions.digest(auth.uid()::text || p_enquete_id::text, 'sha256'), 'hex');
+  v_hash := private.gerar_hash_eleitor(p_enquete_id);
 
   INSERT INTO public.respostas_enquete (enquete_id, sessao_id, resposta, hash_eleitor)
   VALUES (p_enquete_id, p_sessao_id, p_resposta, v_hash);
@@ -153,7 +186,7 @@ BEGIN
   IF auth.uid() IS NULL THEN
     RAISE EXCEPTION 'Usuário não autenticado.';
   END IF;
-  v_hash := encode(extensions.digest(auth.uid()::text || p_duvida_id::text, 'sha256'), 'hex');
+  v_hash := private.gerar_hash_eleitor(p_duvida_id);
 
   INSERT INTO public.votos_duvida (duvida_id, hash_eleitor)
   VALUES (p_duvida_id, v_hash);
@@ -174,7 +207,7 @@ BEGIN
     RAISE EXCEPTION 'Usuário não autenticado.';
   END IF;
   
-  v_hash := encode(extensions.digest(auth.uid()::text || p_sessao_id::text, 'sha256'), 'hex');
+  v_hash := private.gerar_hash_eleitor(p_sessao_id);
   
   IF p_anonimo THEN
     v_aluno_id := NULL;
