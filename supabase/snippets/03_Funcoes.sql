@@ -13,24 +13,31 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Função para motor de regras de moderação (Custo Zero)
+-- Função para motor de regras de moderação (Padrão Indústria / Custo Zero)
 CREATE OR REPLACE FUNCTION private.verificar_moderacao(p_texto TEXT)
 RETURNS JSONB AS $$
 DECLARE
   v_sensitive BOOLEAN := false;
   v_offensive BOOLEAN := false;
+  v_texto_normalizado TEXT;
 BEGIN
-  IF p_texto IS NULL OR p_texto = '' THEN
+  IF p_texto IS NULL OR TRIM(p_texto) = '' THEN
     RETURN '{"sensitive": false, "offensive": false}'::jsonb;
   END IF;
 
-  -- Regex para dados sensíveis (CPF, E-mail, Telefone)
-  IF p_texto ~* '([0-9]{3}\.?[0-9]{3}\.?[0-9]{3}\-?[0-9]{2})|([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})|(\(?[0-9]{2}\)?\s?9?[0-9]{4}\-?[0-9]{4})' THEN
+  -- 1. Verificação de Dados Sensíveis (no texto original)
+  -- Captura CPFs, E-mails e Telefones (BR)
+  IF p_texto ~* '([0-9]{3}\.?[0-9]{3}\.?[0-9]{3}\-?[0-9]{2})|([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})|(\(?[0-9]{2}\)?\s*9?[0-9]{4}\-?[0-9]{4})' THEN
     v_sensitive := true;
   END IF;
 
-  -- Regex para ofensas (Xingamentos)
-  IF p_texto ~* '\b(porra|caralho|merda|buceta|carai|fdp|puta|vsf|tnc|cuzão|cu|desgraça|corno|babaca|idiota|imbecil|retardado|otario|otário|vagabundo|arrombado)\b' THEN
+  -- 2. Normalização do Texto para contornar "Leetspeak" (ex: p0rr@ -> porra, m3rd4 -> merda)
+  -- Remove acentos e converte números/símbolos usados para mascarar xingamentos para letras base
+  v_texto_normalizado := lower(p_texto);
+  v_texto_normalizado := translate(v_texto_normalizado, 'áàãâäéèêëíìîïóòõôöúùûüç@03415', 'aaaaaeeeeiiiiooooouuuucaoeais');
+
+  -- 3. Dicionário Robusto de Ofensas e Assédio (utiliza word-boundaries \b para evitar falsos positivos como "documento" pegando "cu")
+  IF v_texto_normalizado ~ '\b(porra|caralho|merda|buceta|boceta|xereca|xota|cacete|carai|fdp|puta|puto|vsf|tnc|cuzao|desgraca|corno|babaca|idiota|imbecil|retardado|otario|vagabundo|vagabunda|arrombado|viado|piranha|foder|fuder|fudendo|safado|safada|pica|rola|piroca|cu)\b' THEN
     v_offensive := true;
   END IF;
 
