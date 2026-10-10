@@ -14,6 +14,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   // Flag para prevenção de FOUC (Flash of Unauthenticated Content)
   const isReady = ref(false);
+  const isLocked = ref(false);
   const { isLoading, error, execute } = useAsyncOperation();
 
   const isAuthenticated = computed(() => !!user.value);
@@ -49,11 +50,38 @@ export const useAuthStore = defineStore('auth', () => {
 
   function clearUser() {
     user.value = null;
+    isLocked.value = false;
   }
 
   async function signOut() {
     await authService.signOut();
     clearUser();
+  }
+
+  function lockSession() {
+    if (isAuthenticated.value) {
+      isLocked.value = true;
+    }
+  }
+
+  function unlockSession() {
+    isLocked.value = false;
+  }
+
+  async function unlockWithPassword(password: string) {
+    if (!user.value?.auth.email) return false;
+    
+    return execute(async () => {
+      const data = await authService.signIn({
+        email: user.value!.auth.email!,
+        password
+      });
+      if (data.user) {
+        unlockSession();
+        return true;
+      }
+      return false;
+    }, 'Senha incorreta.');
   }
 
   async function deleteAccount() {
@@ -90,6 +118,7 @@ export const useAuthStore = defineStore('auth', () => {
   return {
     user,
     isReady,
+    isLocked,
     isLoading,
     error,
     isAuthenticated,
@@ -99,6 +128,9 @@ export const useAuthStore = defineStore('auth', () => {
     reloadProfile,
     clearUser,
     signOut,
+    lockSession,
+    unlockSession,
+    unlockWithPassword,
     login,
     loginWithGoogle,
     register,

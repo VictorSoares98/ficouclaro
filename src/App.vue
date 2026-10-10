@@ -13,6 +13,8 @@ import type { AuthChangeEvent, Session, Subscription } from '@supabase/supabase-
 import { useQuasar } from 'quasar';
 import { useNetworkStatus } from '@/core/composables/useNetworkStatus';
 import LibrasWidget from '@/components/LibrasWidget.vue';
+import LockScreen from '@/components/LockScreen.vue';
+import { useSessionTimeout } from '@/core/composables/useSessionTimeout';
 
 const authStore = useAuthStore();
 const themeStore = useThemeStore();
@@ -21,6 +23,9 @@ const router = useRouter();
 const $q = useQuasar();
 
 const { isOnline } = useNetworkStatus();
+
+// Ativa temporizadores de inatividade e background (Padrão 3)
+useSessionTimeout();
 
 // Inicialização síncrona do tema antes de montar o DOM para prevenir FOUC visual
 themeStore.initTheme();
@@ -122,6 +127,7 @@ onUnmounted(() => {
   <AnimatedSplash v-if="showVueSplash" ref="splashRef" />
   
   <LibrasWidget />
+  <LockScreen v-if="authStore.isLocked" />
 
   <router-view v-slot="{ Component }">
     <transition name="q-transition--fade" mode="out-in">
