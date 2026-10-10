@@ -70,11 +70,11 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function unlockWithPassword(password: string) {
     if (!user.value?.auth.email) return false;
-    
+
     return execute(async () => {
       const data = await authService.signIn({
         email: user.value!.auth.email!,
-        password
+        password,
       });
       if (data.user) {
         unlockSession();

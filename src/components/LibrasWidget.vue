@@ -18,7 +18,7 @@ declare global {
 
 async function initVLibras() {
   if (!accessibilityStore.librasEnabled) return;
-  
+
   try {
     await vlibrasService.load();
     if (window.VLibras) {
@@ -29,18 +29,21 @@ async function initVLibras() {
     $q.notify({
       type: 'warning',
       message: 'Não foi possível carregar o intérprete de Libras. Verifique sua conexão.',
-      position: 'top'
+      position: 'top',
     });
   }
 }
 
-watch(() => accessibilityStore.librasEnabled, (enabled) => {
-  if (enabled) {
-    void initVLibras();
-  } else {
-    vlibrasService.unload();
-  }
-});
+watch(
+  () => accessibilityStore.librasEnabled,
+  (enabled) => {
+    if (enabled) {
+      void initVLibras();
+    } else {
+      vlibrasService.unload();
+    }
+  },
+);
 
 onMounted(() => {
   if (accessibilityStore.librasEnabled) {

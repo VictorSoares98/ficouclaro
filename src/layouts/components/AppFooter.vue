@@ -13,12 +13,6 @@ const currentYear = new Date().getFullYear();
       </div>
       <div class="tw-flex tw-space-x-6 tw-text-sm">
         <!-- Links para as novas páginas institucionais -->
-        <router-link to="/sobre" class="hover:tw-text-primary tw-transition-colors"
-          >Sobre</router-link
-        >
-        <router-link to="/ajuda" class="hover:tw-text-primary tw-transition-colors"
-          >Ajuda</router-link
-        >
         <router-link to="/termos" class="hover:tw-text-primary tw-transition-colors"
           >Termos</router-link
         >

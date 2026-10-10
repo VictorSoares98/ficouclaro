@@ -125,7 +125,7 @@ onUnmounted(() => {
 
   <!-- SPLASH ANIMADO SOBREPOSTO A TUDO -->
   <AnimatedSplash v-if="showVueSplash" ref="splashRef" />
-  
+
   <LibrasWidget />
   <LockScreen v-if="authStore.isLocked" />
 

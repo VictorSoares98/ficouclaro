@@ -5,7 +5,7 @@ import type { FontScale } from '@/core/types/accessibility.types';
 
 export const useAccessibilityStore = defineStore('accessibility', () => {
   const prefs = accessibilityStorageService.getPreferences();
-  
+
   const fontScale = ref<FontScale>(prefs.fontScale);
   const librasEnabled = ref<boolean>(prefs.librasEnabled);
 

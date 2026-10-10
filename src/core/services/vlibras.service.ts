@@ -5,7 +5,7 @@ export const vlibrasService = {
         resolve();
         return;
       }
-      
+
       const script = document.createElement('script');
       script.id = 'vlibras-script';
       script.src = 'https://vlibras.gov.br/app/vlibras-plugin.js';
@@ -18,7 +18,7 @@ export const vlibrasService = {
       document.body.appendChild(script);
     });
   },
-  
+
   unload() {
     const script = document.getElementById('vlibras-script');
     if (script) {
@@ -28,5 +28,5 @@ export const vlibrasService = {
     if (widget) {
       widget.remove();
     }
-  }
+  },
 };

@@ -44,8 +44,8 @@ class AuthService {
 
   /**
    * Busca os metadados da tabela pública de perfis associada ao Auth.
-   * Utiliza um sistema de deduplicação (Promise Caching) de 1000ms para evitar Race Conditions 
-   * (Double Fetch) que deixam o login mais lento quando eventos do Supabase Realtime disparam 
+   * Utiliza um sistema de deduplicação (Promise Caching) de 1000ms para evitar Race Conditions
+   * (Double Fetch) que deixam o login mais lento quando eventos do Supabase Realtime disparam
    * ao mesmo tempo que a conclusão da função de Login manual.
    */
   async getProfile(userId: string): Promise<Perfil> {

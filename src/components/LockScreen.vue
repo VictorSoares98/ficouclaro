@@ -10,7 +10,7 @@ const isCheckingBiometry = ref(false);
 
 async function unlockWithBiometry() {
   if (!Platform.is.capacitor || !biometricService.isBiometricsEnabled()) return;
-  
+
   isCheckingBiometry.value = true;
   const success = await biometricService.authenticate();
   if (success) {
@@ -40,15 +40,19 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="tw-fixed tw-inset-0 tw-z-[9999] tw-bg-dark-page tw-flex tw-flex-col tw-items-center tw-justify-center tw-p-6">
+  <div
+    class="tw-fixed tw-inset-0 tw-z-[9999] tw-bg-dark-page tw-flex tw-flex-col tw-items-center tw-justify-center tw-p-6"
+  >
     <!-- Overlay de fundo borrado sobre o app -->
     <div class="tw-absolute tw-inset-0 tw-backdrop-blur-md tw-bg-black/90"></div>
-    
-    <div class="tw-relative tw-z-10 tw-w-full tw-max-w-md tw-flex tw-flex-col tw-items-center tw-text-center">
+
+    <div
+      class="tw-relative tw-z-10 tw-w-full tw-max-w-md tw-flex tw-flex-col tw-items-center tw-text-center"
+    >
       <q-avatar size="100px" class="tw-mb-6 tw-bg-primary tw-text-white">
         <q-icon name="lock" size="50px" />
       </q-avatar>
-      
+
       <h2 class="tw-text-2xl tw-font-bold tw-text-white tw-mb-2">Sessão Bloqueada</h2>
       <p class="tw-text-gray-400 tw-mb-8">
         {{ authStore.user?.perfil.nome_completo || authStore.user?.auth.email }}
@@ -88,13 +92,7 @@ onMounted(() => {
         :loading="isCheckingBiometry"
       />
 
-      <q-btn
-        flat
-        color="negative"
-        label="Sair desta conta"
-        class="tw-w-full"
-        @click="logout"
-      />
+      <q-btn flat color="negative" label="Sair desta conta" class="tw-w-full" @click="logout" />
     </div>
   </div>
 </template>
