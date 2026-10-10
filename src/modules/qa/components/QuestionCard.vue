@@ -76,6 +76,13 @@ const searchWiki = async () => {
 
       <!-- Conteúdo -->
       <div class="tw-flex-1 tw-flex tw-flex-col tw-justify-center">
+        <div
+          v-if="question.usuarios?.nome_completo"
+          class="tw-mb-1 tw-flex tw-items-center tw-gap-1 tw-text-xs tw-font-semibold tw-text-primary"
+        >
+          <q-icon name="person" size="14px" />
+          <span>{{ question.usuarios.nome_completo }}</span>
+        </div>
         <p class="tw-text-sm tw-m-0 tw-leading-relaxed tw-whitespace-pre-wrap">
           {{ question.texto }}
         </p>
