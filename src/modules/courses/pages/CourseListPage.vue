@@ -278,7 +278,11 @@ function handleOpenInsights(courseId: string) {
     </div>
 
     <!-- Modal Nova/Editar Disciplina -->
-    <q-dialog v-model="isCourseModalOpen" @hide="resetForm">
+    <q-dialog
+      v-model="isCourseModalOpen"
+      @hide="resetForm"
+      :position="$q.screen.lt.md ? 'bottom' : 'standard'"
+    >
       <q-card style="width: 700px; max-width: 90vw">
         <q-card-section>
           <div class="tw-text-lg tw-font-bold">

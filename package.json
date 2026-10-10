@@ -23,6 +23,7 @@
     "@capacitor/cli": "^8.4.3",
     "@capacitor/core": "^8.5.0",
     "@capacitor/haptics": "^8.0.2",
+    "@capacitor/splash-screen": "^8.0.2",
     "@capgo/capacitor-native-biometric": "^8.6.10",
     "@quasar/extras": "^2.0.3",
     "@supabase/supabase-js": "^2.112.3",

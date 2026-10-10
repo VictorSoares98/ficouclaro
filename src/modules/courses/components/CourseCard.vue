@@ -3,6 +3,9 @@ import { ref, computed } from 'vue';
 import type { Disciplina } from '@/modules/courses/services/course.service';
 import BaseSurfaceCard from '@/core/components/BaseSurfaceCard.vue';
 import QrcodeVue from 'qrcode.vue';
+import { useQuasar } from 'quasar';
+
+const $q = useQuasar();
 
 const showQrCode = ref(false);
 const qrValue = computed(() => {
@@ -178,7 +181,7 @@ defineEmits<{
   </BaseSurfaceCard>
 
   <!-- Modal de QR Code -->
-  <q-dialog v-model="showQrCode">
+  <q-dialog v-model="showQrCode" :position="$q.screen.lt.md ? 'bottom' : 'standard'">
     <q-card class="tw-rounded-2xl tw-p-4 tw-text-center tw-bg-white dark:tw-bg-dark-page">
       <q-card-section>
         <div class="tw-text-xl tw-font-bold tw-mb-2">Convite para Turma</div>

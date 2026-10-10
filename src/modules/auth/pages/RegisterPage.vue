@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
 import { useAuthStore } from '@/stores/auth.store';
@@ -18,6 +18,31 @@ const confirmPassword = ref('');
 const isPasswordVisible = ref(false);
 const role = ref<PapelUsuario>('aluno');
 const acceptTerms = ref(false);
+
+onMounted(() => {
+  const saved = localStorage.getItem('ficouclaro_register_draft');
+  if (saved) {
+    try {
+      const data = JSON.parse(saved);
+      if (data.fullName) fullName.value = data.fullName;
+      if (data.email) email.value = data.email;
+      if (data.role) role.value = data.role;
+    } catch {
+      localStorage.removeItem('ficouclaro_register_draft');
+    }
+  }
+});
+
+watch([fullName, email, role], () => {
+  localStorage.setItem(
+    'ficouclaro_register_draft',
+    JSON.stringify({
+      fullName: fullName.value,
+      email: email.value,
+      role: role.value,
+    }),
+  );
+});
 
 const roleOptions: { label: string; value: PapelUsuario }[] = [
   { label: 'Sou Aluno', value: 'aluno' },
@@ -75,6 +100,8 @@ async function onSubmit() {
       message: 'Conta criada com sucesso!',
       position: 'top',
     });
+
+    localStorage.removeItem('ficouclaro_register_draft');
 
     if (role.value === 'professor') {
       void router.push('/disciplinas');
