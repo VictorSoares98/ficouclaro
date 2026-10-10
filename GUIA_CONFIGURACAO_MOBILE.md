@@ -110,11 +110,59 @@ Para evitar que o Prettier aponte erros em arquivos gerados pelo build do Androi
 
 ---
 
-## 🕵️‍♂️ 6. Dicas do Agent Sagaz
+## 🔗 6. Android App Links (Deep Links Inteligentes)
+
+O projeto está configurado para capturar links da web (ex: `https://ficouclaro.pages.dev`) e redirecioná-los de forma inteligente:
+
+- **Se o usuário TIVER o APK instalado:** O Android abrirá o aplicativo nativo imediatamente.
+- **Se o usuário NÃO TIVER o APK:** O link será aberto normalmente no navegador, carregando o Progressive Web App (PWA).
+
+### O que foi feito:
+
+1. **`AndroidManifest.xml`:** Configurado o `<intent-filter android:autoVerify="true">` para capturar os schemas `http` e `https` no domínio do Cloudflare Pages.
+2. **`assetlinks.json`:** Criado na pasta `public/.well-known/` (servido com `Content-Type: application/json` via `_headers`) contendo o _Fingerprint SHA-256_ da nossa chave de release. Isso prova ao Google que o app é "dono" do site.
+3. **`src/App.vue`:** O listener do `@capacitor/app` captura o evento `appUrlOpen` e navega suavemente via Vue Router.
+
+---
+
+## 🕵️‍♂️ 7. Dicas do Agent Sagaz
 
 1.  **Logs no Android Studio:** Use a aba **Logcat** e filtre por `Capacitor/Console` para debugar o JavaScript como um ninja.
 2.  **IP Dinâmico:** Se o seu IP mudar, você deve atualizar o arquivo `.env` e o `network_security_config.xml`.
 3.  **Permissões:** Novas permissões (Câmera, Galeria) devem ser adicionadas no `AndroidManifest.xml`.
+
+---
+
+## 📋 8. Checklist de Configurações Manuais do Capacitor (Cheat Sheet)
+
+Se precisar recriar o projeto do zero ou replicar essa arquitetura no futuro, este é o "caminho das pedras" dos arquivos da pasta `src-capacitor` que devem ser ajustados **manualmente** (além do que o comando `npx cap sync` gera):
+
+### Globais
+
+- **`src-capacitor/capacitor.config.ts`**:
+  - Habilitado `server.cleartext: true` e `androidScheme: 'http'` para contornar o bloqueio de desenvolvimento local.
+  - Comportamento do plugin `Keyboard` (`resize: 'body'`) ajustado para responsividade perfeita em inputs.
+  - Setup do `SplashScreen` (cores, timers, modo imersivo).
+
+### Nativas (Android)
+
+- **`src-capacitor/android/app/src/main/AndroidManifest.xml`**:
+  - Referenciada a `network_security_config` para conexões locais no emulador.
+  - Inserido o bloco `<intent-filter>` de `App Links` (com `autoVerify="true"`).
+- **`src-capacitor/android/app/src/main/res/xml/network_security_config.xml`**:
+  - Criado manualmente para liberar tráfego das portas `localhost` e `10.0.2.2`.
+- **`src-capacitor/android/gradle.properties`** e **`gradle-wrapper.properties`**:
+  - Atualizada a distribuição do Gradle (para `9.5.0`) e otimização R8 habilitada.
+- **`src-capacitor/android/build.gradle`** e **`app/build.gradle`**:
+  - Atualizada a versão do AGP (Android Gradle Plugin).
+  - Renomeado o output final para `Ficou-Claro.apk`.
+- **`src-capacitor/android/settings.gradle`**:
+  - Inclusão do plugin `foojay-resolver` para o gradle baixar e fixar o `JDK 21` sozinho.
+
+### Recursos (Assets)
+
+- **`src-capacitor/android/app/src/main/res/...`**:
+  - Substituição de toda a árvore de imagens (`ic_launcher.png`, `splash.png`) para alinhar com o branding "Ficou Claro".
 
 ---
 

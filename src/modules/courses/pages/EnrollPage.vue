@@ -142,7 +142,7 @@ async function handleJoinActiveSession(courseId: string) {
     </div>
 
     <!-- Modal Entrar em Turma -->
-    <q-dialog v-model="isEnrolling">
+    <q-dialog v-model="isEnrolling" :position="$q.screen.lt.md ? 'bottom' : 'standard'">
       <q-card style="min-width: 350px">
         <q-card-section>
           <div class="tw-text-lg tw-font-bold">Matricular-se</div>

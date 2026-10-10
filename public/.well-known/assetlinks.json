@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.ficouclaro.app",
+      "sha256_cert_fingerprints": [
+        "E9:EC:D8:17:1C:54:CD:26:13:69:CD:88:1D:84:26:6A:A1:32:EB:5A:9A:0E:41:0F:5B:51:B4:0B:F5:E1:4E:34"
+      ]
+    }
+  }
+]

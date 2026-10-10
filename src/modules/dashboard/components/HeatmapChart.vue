@@ -141,7 +141,7 @@ const calendarData = computed(() => {
 </script>
 
 <template>
-  <div class="tw-w-full tw-flex tw-flex-col tw-overflow-x-auto tw-pb-2">
+  <div class="tw-w-full tw-flex tw-flex-col tw-overflow-x-auto tw-pb-2" role="img" aria-label="Gráfico de mapa de calor mostrando o engajamento e sinais de dúvida ao longo dos meses">
     <!-- Eixo Y (Dias) e Grid -->
     <div class="tw-flex tw-gap-2 tw-min-w-max">
       <!-- Dia da Semana (Eixo Y) Alinhado em Grid Idêntico -->

@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { usePollStore } from '@/modules/poll/stores/poll.store';
+import { useQuasar } from 'quasar';
 import PollCard from './PollCard.vue';
+
+const $q = useQuasar();
 
 const pollStore = usePollStore();
 
@@ -16,6 +19,7 @@ const isModalOpen = computed(() => !!pendingPoll.value);
 <template>
   <q-dialog
     v-model="isModalOpen"
+    :position="$q.screen.lt.md ? 'bottom' : 'standard'"
     persistent
     backdrop-filter="blur(4px)"
     transition-show="slide-up"

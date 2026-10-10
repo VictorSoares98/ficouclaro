@@ -46,7 +46,8 @@
             (CDN).
           </li>
           <li>
-            <strong>Google Fontes/Ícones:</strong> Fornecimento de tipografia e recursos visuais.
+            <strong>Google (OAuth & Recursos):</strong> Fornecimento de infraestrutura para Login
+            seguro via conta Google, além de tipografia e recursos visuais (Google Fonts).
           </li>
         </ul>
 
@@ -87,7 +88,14 @@
       </div>
 
       <div class="tw-mt-12 tw-flex tw-justify-start">
-        <q-btn color="primary" unelevated icon="arrow_back" label="Voltar" to="/" no-caps />
+        <q-btn
+          color="primary"
+          unelevated
+          icon="arrow_back"
+          label="Voltar"
+          @click="$router.back()"
+          no-caps
+        />
       </div>
     </div>
   </q-page>
