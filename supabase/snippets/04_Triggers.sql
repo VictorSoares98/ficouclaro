@@ -71,6 +71,11 @@ DECLARE
   v_mod JSONB;
   v_strikes INT;
 BEGIN
+  -- Prevenção de Falsidade Ideológica (Impersonation)
+  IF TG_TABLE_NAME = 'duvidas' AND NEW.autor_id IS NOT NULL AND NEW.autor_id != auth.uid() THEN
+    RAISE EXCEPTION 'IMPERSONATION_BLOCKED: Não é permitido assinar uma dúvida em nome de outro usuário.';
+  END IF;
+
   IF auth.uid() IS NOT NULL THEN
     SELECT quantidade INTO v_strikes FROM private.strikes_moderacao WHERE aluno_id = auth.uid();
     IF v_strikes >= 3 THEN

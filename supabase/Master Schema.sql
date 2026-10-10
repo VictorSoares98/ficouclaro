@@ -1,7 +1,7 @@
 -- ====================================================================
 -- ⚠️ AVISO: ARQUIVO AUTO-GERADO!
 -- NÃO EDITE ESTE ARQUIVO DIRETAMENTE. ALTERE OS SNIPPETS E RODE db:build
--- Gerado em: 2026-10-10T06:03:17.037Z
+-- Gerado em: 2026-10-10T06:12:08.829Z
 -- ====================================================================
 
 -- >>> INÍCIO DO SNIPPET: 00_Init_Extensions.sql <<<
@@ -462,6 +462,11 @@ DECLARE
   v_mod JSONB;
   v_strikes INT;
 BEGIN
+  -- Prevenção de Falsidade Ideológica (Impersonation)
+  IF TG_TABLE_NAME = 'duvidas' AND NEW.autor_id IS NOT NULL AND NEW.autor_id != auth.uid() THEN
+    RAISE EXCEPTION 'IMPERSONATION_BLOCKED: Não é permitido assinar uma dúvida em nome de outro usuário.';
+  END IF;
+
   IF auth.uid() IS NOT NULL THEN
     SELECT quantidade INTO v_strikes FROM private.strikes_moderacao WHERE aluno_id = auth.uid();
     IF v_strikes >= 3 THEN
@@ -474,6 +479,7 @@ BEGIN
       CASE 
         WHEN TG_TABLE_NAME = 'duvidas' THEN NEW.texto 
         WHEN TG_TABLE_NAME = 'avaliacoes_rapidas' THEN NEW.comentario 
+        WHEN TG_TABLE_NAME = 'respostas_enquete' THEN (NEW.resposta->>'texto')
         ELSE ''
       END, ''
     )
