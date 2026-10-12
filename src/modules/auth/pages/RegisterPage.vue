@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
 import { useAuthStore } from '@/stores/auth.store';
@@ -18,6 +18,12 @@ const confirmPassword = ref('');
 const isPasswordVisible = ref(false);
 const role = ref<PapelUsuario>('aluno');
 const acceptTerms = ref(false);
+
+const googleButtonLabel = computed(() =>
+  role.value === 'professor'
+    ? 'Cadastrar como Professor com Google'
+    : 'Cadastrar como Aluno com Google',
+);
 
 onMounted(() => {
   const saved = localStorage.getItem('ficouclaro_register_draft');
@@ -124,7 +130,11 @@ async function onGoogleLogin() {
     });
     return;
   }
-  await authStore.loginWithGoogle();
+  await authStore.loginWithGoogle({
+    papel: role.value,
+    termos_aceitos_em: new Date().toISOString(),
+    versao_termos: '1.0.0',
+  });
 }
 </script>
 
@@ -135,38 +145,60 @@ async function onGoogleLogin() {
     :isLoading="authStore.isLoading"
   >
     <div class="tw-space-y-6">
+      <!-- 1. Seleção de Papel no Topo (Role-First) -->
+      <div class="tw-flex tw-justify-center">
+        <q-btn-toggle
+          v-model="role"
+          spread
+          class="tw-w-full tw-shadow-sm tw-rounded-xl"
+          no-caps
+          unelevated
+          toggle-color="primary"
+          color="white"
+          text-color="grey-8"
+          :options="roleOptions"
+        />
+      </div>
+
+      <!-- 2. Aceite dos Termos de Uso e Privacidade (LGPD) -->
+      <q-checkbox v-model="acceptTerms" color="primary" class="tw-w-full">
+        Li e concordo com os
+        <router-link
+          to="/termos"
+          @click.stop
+          class="tw-text-primary tw-font-semibold hover:tw-underline"
+          >Termos de Uso</router-link
+        >
+        e a
+        <router-link
+          to="/privacidade"
+          @click.stop
+          class="tw-text-primary tw-font-semibold hover:tw-underline"
+          >Política de Privacidade</router-link
+        >.
+      </q-checkbox>
+
+      <!-- 3. Botão de Cadastro Social com Papel Contextualizado -->
       <q-btn
-        class="tw-w-full tw-h-14 tw-rounded-xl tw-text-base sm:tw-text-lg tw-font-bold tw-shadow-md tw-bg-white hover:tw-bg-gray-50"
+        class="tw-w-full tw-h-14 tw-rounded-xl tw-text-base sm:tw-text-lg tw-font-bold tw-shadow-md tw-bg-white hover:tw-bg-gray-50 dark:tw-bg-dark-page dark:hover:tw-bg-dark"
         text-color="grey-9"
         icon="img:https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
-        label="Continuar com Google"
+        :label="googleButtonLabel"
         unelevated
         no-wrap
         @click="onGoogleLogin"
         :loading="authStore.isLoading"
       />
 
+      <!-- 4. Divisor -->
       <div class="tw-flex tw-items-center">
         <div class="tw-flex-1 tw-h-px tw-bg-gray-300"></div>
-        <span class="tw-px-4 text-muted tw-font-medium">ou</span>
+        <span class="tw-px-4 text-muted tw-font-medium">ou cadastre-se com e-mail</span>
         <div class="tw-flex-1 tw-h-px tw-bg-gray-300"></div>
       </div>
 
+      <!-- 5. Formulário de Cadastro Tradicional -->
       <q-form @submit.prevent="onSubmit" class="tw-space-y-6">
-        <div class="tw-flex tw-justify-center tw-mb-6">
-          <q-btn-toggle
-            v-model="role"
-            spread
-            class="tw-w-full tw-shadow-sm tw-rounded-xl"
-            no-caps
-            unelevated
-            toggle-color="primary"
-            color="white"
-            text-color="grey-8"
-            :options="roleOptions"
-          />
-        </div>
-
         <q-input
           v-model="fullName"
           type="text"
@@ -255,23 +287,6 @@ async function onGoogleLogin() {
           </template>
         </q-input>
 
-        <q-checkbox v-model="acceptTerms" color="primary" class="tw-w-full tw-mt-2 tw-mb-2">
-          Li e concordo com os
-          <router-link
-            to="/termos"
-            @click.stop
-            class="tw-text-primary tw-font-semibold hover:tw-underline"
-            >Termos de Uso</router-link
-          >
-          e a
-          <router-link
-            to="/privacidade"
-            @click.stop
-            class="tw-text-primary tw-font-semibold hover:tw-underline"
-            >Política de Privacidade</router-link
-          >.
-        </q-checkbox>
-
         <q-btn
           type="submit"
           color="primary"
@@ -279,7 +294,7 @@ async function onGoogleLogin() {
           :loading="authStore.isLoading"
           :disable="!acceptTerms"
           unelevated
-          label="Cadastrar"
+          label="Cadastrar com E-mail"
         />
       </q-form>
     </div>

@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { authService } from '@/modules/auth/services/auth.service';
 import { useAsyncOperation } from '@/core/composables/useAsyncOperation';
-import type { AppUser } from '@/core/types/auth.types';
+import type { AppUser, OAuthMetadata } from '@/core/types/auth.types';
 import type {
   User as SupabaseUser,
   SignInWithPasswordCredentials,
@@ -100,9 +100,9 @@ export const useAuthStore = defineStore('auth', () => {
     }, 'Erro ao fazer login. Verifique suas credenciais.');
   }
 
-  async function loginWithGoogle() {
+  async function loginWithGoogle(metadata?: OAuthMetadata) {
     return execute(async () => {
-      await authService.signInWithOAuth('google');
+      await authService.signInWithOAuth('google', metadata);
     }, 'Erro ao inicializar login com Google.');
   }
 

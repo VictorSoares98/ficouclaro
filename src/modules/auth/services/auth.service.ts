@@ -1,5 +1,5 @@
 import { supabaseClient } from '@/core/supabase/client';
-import type { AppUser, Perfil } from '@/core/types/auth.types';
+import type { AppUser, Perfil, OAuthMetadata } from '@/core/types/auth.types';
 import type {
   SignInWithPasswordCredentials,
   SignUpWithPasswordCredentials,
@@ -23,11 +23,12 @@ class AuthService {
     if (error) throw new Error(error.message);
   }
 
-  async signInWithOAuth(provider: 'google' | 'github') {
+  async signInWithOAuth(provider: 'google' | 'github', metadata?: OAuthMetadata) {
     const { error } = await supabaseClient.auth.signInWithOAuth({
       provider,
       options: {
         redirectTo: window.location.origin,
+        ...(metadata ? { data: metadata } : {}),
       },
     });
     if (error) throw new Error(error.message);

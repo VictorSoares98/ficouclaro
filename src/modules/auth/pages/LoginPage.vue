@@ -186,7 +186,7 @@ async function onSubmit() {
           class="tw-w-full tw-h-14 tw-rounded-xl tw-text-base sm:tw-text-lg tw-font-bold tw-shadow-md tw-bg-white hover:tw-bg-gray-50 dark:tw-bg-dark-page dark:hover:tw-bg-dark"
           text-color="grey-9"
           icon="img:https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
-          label="Continuar com Google"
+          label="Entrar com Google"
           unelevated
           no-wrap
           @click="authStore.loginWithGoogle()"
