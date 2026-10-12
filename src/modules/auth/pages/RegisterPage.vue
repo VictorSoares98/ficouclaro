@@ -140,7 +140,7 @@ async function onGoogleLogin() {
         <q-btn-toggle
           v-model="role"
           spread
-          class="tw-w-full tw-shadow-sm tw-rounded-xl"
+          class="tw-w-full tw-shadow-sm tw-rounded-2xl"
           no-caps
           unelevated
           toggle-color="primary"
@@ -153,7 +153,7 @@ async function onGoogleLogin() {
       <!-- 2. Botão de Cadastro Social com Papel Contextualizado -->
       <div class="tw-space-y-3">
         <q-btn
-          class="tw-w-full tw-h-12 tw-rounded-xl tw-text-base tw-font-bold tw-shadow-md tw-bg-white hover:tw-bg-gray-50 dark:tw-bg-dark-page dark:hover:tw-bg-dark"
+          class="tw-w-full tw-h-12 tw-rounded-2xl tw-text-base tw-font-bold tw-shadow-sm tw-bg-white hover:tw-bg-gray-50 dark:tw-bg-dark-page dark:hover:tw-bg-dark tw-border tw-border-gray-200 dark:tw-border-gray-800"
           text-color="grey-9"
           icon="img:https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
           :label="googleButtonLabel"
@@ -173,47 +173,54 @@ async function onGoogleLogin() {
 
       <!-- 4. Divisor -->
       <div class="tw-flex tw-items-center">
-        <div class="tw-flex-1 tw-h-px tw-bg-gray-300"></div>
-        <span class="tw-px-4 text-muted tw-font-medium">ou cadastre-se com e-mail</span>
-        <div class="tw-flex-1 tw-h-px tw-bg-gray-300"></div>
+        <div class="tw-flex-1 tw-h-px tw-bg-gray-300 dark:tw-bg-gray-700"></div>
+        <span class="tw-px-4 text-muted tw-text-xs sm:tw-text-sm tw-font-medium">ou cadastre-se com e-mail</span>
+        <div class="tw-flex-1 tw-h-px tw-bg-gray-300 dark:tw-bg-gray-700"></div>
       </div>
 
       <!-- 5. Formulário de Cadastro Tradicional -->
-      <q-form @submit.prevent="onSubmit" class="tw-space-y-6">
-        <q-input
-          v-model="fullName"
-          type="text"
-          label="Nome Completo"
-          outlined
-          lazy-rules
-          :rules="[(val) => !!val || 'O nome é obrigatório']"
-          autocomplete="name"
-          name="name"
-          enterkeyhint="next"
-          color="primary"
-        />
-
-        <q-input
-          v-model="email"
-          type="email"
-          label="E-mail"
-          outlined
-          lazy-rules
-          :rules="[
-            (val) => !!val || 'O e-mail é obrigatório',
-            (val) => /.+@.+\..+/.test(val) || 'E-mail inválido',
-          ]"
-          autocomplete="email"
-          name="email"
-          enterkeyhint="next"
-          color="primary"
-        />
+      <q-form @submit.prevent="onSubmit" class="tw-space-y-5">
+        <div>
+          <label class="tw-text-muted tw-text-xs sm:tw-text-sm tw-font-bold tw-mb-1.5 tw-block">Nome Completo</label>
+          <q-input
+            v-model="fullName"
+            type="text"
+            placeholder="Ex: Carlos Silva"
+            outlined
+            lazy-rules
+            :rules="[(val) => !!val || 'O nome é obrigatório']"
+            autocomplete="name"
+            name="name"
+            enterkeyhint="next"
+            color="primary"
+          />
+        </div>
 
         <div>
+          <label class="tw-text-muted tw-text-xs sm:tw-text-sm tw-font-bold tw-mb-1.5 tw-block">E-mail de Acesso</label>
+          <q-input
+            v-model="email"
+            type="email"
+            placeholder="seu.email@faculdade.edu"
+            outlined
+            lazy-rules
+            :rules="[
+              (val) => !!val || 'O e-mail é obrigatório',
+              (val) => /.+@.+\..+/.test(val) || 'E-mail inválido',
+            ]"
+            autocomplete="email"
+            name="email"
+            enterkeyhint="next"
+            color="primary"
+          />
+        </div>
+
+        <div>
+          <label class="tw-text-muted tw-text-xs sm:tw-text-sm tw-font-bold tw-mb-1.5 tw-block">Criar Senha</label>
           <q-input
             v-model="password"
             :type="isPasswordVisible ? 'text' : 'password'"
-            label="Senha"
+            placeholder="Mínimo 12 caracteres (maiúscula, número e símbolo)"
             outlined
             lazy-rules
             :rules="[
@@ -242,50 +249,44 @@ async function onGoogleLogin() {
           <PasswordStrengthMeter :password="password" />
         </div>
 
-        <q-input
-          v-model="confirmPassword"
-          :type="isPasswordVisible ? 'text' : 'password'"
-          label="Confirmar Senha"
-          outlined
-          lazy-rules
-          :rules="[
-            (val) => !!val || 'A confirmação é obrigatória',
-            (val) => val === password || 'As senhas não coincidem',
-          ]"
-          autocomplete="new-password"
-          enterkeyhint="done"
-          color="primary"
-        >
-          <template v-slot:append>
-            <q-btn
-              round
-              dense
-              flat
-              :icon="isPasswordVisible ? 'visibility_off' : 'visibility'"
-              :aria-label="isPasswordVisible ? 'Ocultar senha' : 'Mostrar senha'"
-              @click="isPasswordVisible = !isPasswordVisible"
-            />
-          </template>
-        </q-input>
+        <div>
+          <label class="tw-text-muted tw-text-xs sm:tw-text-sm tw-font-bold tw-mb-1.5 tw-block">Confirmar Senha</label>
+          <q-input
+            v-model="confirmPassword"
+            :type="isPasswordVisible ? 'text' : 'password'"
+            placeholder="Repita a senha criada"
+            outlined
+            lazy-rules
+            :rules="[
+              (val) => !!val || 'A confirmação é obrigatória',
+              (val) => val === password || 'As senhas não coincidem',
+            ]"
+            autocomplete="new-password"
+            enterkeyhint="done"
+            color="primary"
+          >
+            <template v-slot:append>
+              <q-btn
+                round
+                dense
+                flat
+                :icon="isPasswordVisible ? 'visibility_off' : 'visibility'"
+                :aria-label="isPasswordVisible ? 'Ocultar senha' : 'Mostrar senha'"
+                @click="isPasswordVisible = !isPasswordVisible"
+              />
+            </template>
+          </q-input>
+        </div>
 
         <q-btn
           type="submit"
           color="primary"
-          class="tw-w-full tw-h-12 tw-rounded-xl tw-text-base tw-font-bold tw-shadow-md"
+          class="tw-w-full tw-h-12 tw-rounded-2xl tw-text-base tw-font-bold tw-shadow-lg"
           :loading="authStore.isLoading"
           unelevated
-          label="Cadastrar com E-mail"
+          label="Cadastrar na Plataforma"
         />
       </q-form>
     </div>
-
-    <template #footer>
-      <p class="text-muted">
-        Já possui uma conta?
-        <router-link to="/login" class="tw-text-primary tw-font-semibold hover:tw-underline">
-          Faça login
-        </router-link>
-      </p>
-    </template>
   </AuthFormContainer>
 </template>

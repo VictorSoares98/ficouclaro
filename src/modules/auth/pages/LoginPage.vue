@@ -146,8 +146,8 @@ async function onSubmit() {
 
 <template>
   <AuthFormContainer
-    title="Entrar"
-    subtitle="Insira suas credenciais para acessar a plataforma."
+    title="Bem-vindo(a)"
+    subtitle="Acesse sua conta para continuar sua jornada no Ficou Claro?"
     :isLoading="authStore.isLoading"
   >
     <div class="tw-space-y-6">
@@ -181,9 +181,9 @@ async function onSubmit() {
       </div>
 
       <div class="tw-space-y-3">
-        <!-- Login Google mantido com estilo limpo -->
+        <!-- Login Google no padrão Find My Pockets -->
         <q-btn
-          class="tw-w-full tw-h-12 tw-rounded-xl tw-text-base tw-font-bold tw-shadow-md tw-bg-white hover:tw-bg-gray-50 dark:tw-bg-dark-page dark:hover:tw-bg-dark"
+          class="tw-w-full tw-h-12 tw-rounded-2xl tw-text-base tw-font-bold tw-shadow-sm tw-bg-white hover:tw-bg-gray-50 dark:tw-bg-dark-page dark:hover:tw-bg-dark tw-border tw-border-gray-200 dark:tw-border-gray-800"
           text-color="grey-9"
           icon="img:https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
           label="Entrar com Google"
@@ -203,75 +203,72 @@ async function onSubmit() {
       </p>
 
       <div class="tw-flex tw-items-center">
-        <div class="tw-flex-1 tw-h-px tw-bg-gray-300"></div>
-        <span class="tw-px-4 text-muted tw-font-medium">ou</span>
-        <div class="tw-flex-1 tw-h-px tw-bg-gray-300"></div>
+        <div class="tw-flex-1 tw-h-px tw-bg-gray-300 dark:tw-bg-gray-700"></div>
+        <span class="tw-px-4 text-muted tw-text-xs sm:tw-text-sm tw-font-medium">ou continue com e-mail</span>
+        <div class="tw-flex-1 tw-h-px tw-bg-gray-300 dark:tw-bg-gray-700"></div>
       </div>
 
-      <q-form @submit.prevent="onSubmit" class="tw-space-y-6">
-        <q-input
-          v-model="email"
-          type="email"
-          label="E-mail"
-          outlined
-          lazy-rules
-          :rules="[
-            (val) => !!val || 'O e-mail é obrigatório',
-            (val) => /.+@.+\..+/.test(val) || 'E-mail inválido',
-          ]"
-          id="email"
-          autocomplete="email"
-          name="email"
-          enterkeyhint="next"
-          color="primary"
-        />
+      <q-form @submit.prevent="onSubmit" class="tw-space-y-5">
+        <div>
+          <label class="tw-text-muted tw-text-xs sm:tw-text-sm tw-font-bold tw-mb-1.5 tw-block">E-mail de Acesso</label>
+          <q-input
+            v-model="email"
+            type="email"
+            placeholder="seu.email@faculdade.edu"
+            outlined
+            lazy-rules
+            :rules="[
+              (val) => !!val || 'O e-mail é obrigatório',
+              (val) => /.+@.+\..+/.test(val) || 'E-mail inválido',
+            ]"
+            id="email"
+            autocomplete="email"
+            name="email"
+            enterkeyhint="next"
+            color="primary"
+          />
+        </div>
 
-        <q-input
-          v-model="password"
-          :type="isPasswordVisible ? 'text' : 'password'"
-          label="Senha"
-          outlined
-          lazy-rules
-          :rules="[
-            (val) => !!val || 'A senha é obrigatória',
-            (val) => val.length >= 6 || 'A senha deve ter no mínimo 6 caracteres',
-          ]"
-          id="password"
-          autocomplete="current-password"
-          name="password"
-          enterkeyhint="done"
-          color="primary"
-        >
-          <template v-slot:append>
-            <q-btn
-              round
-              dense
-              flat
-              :icon="isPasswordVisible ? 'visibility_off' : 'visibility'"
-              :aria-label="isPasswordVisible ? 'Ocultar senha' : 'Mostrar senha'"
-              @click="isPasswordVisible = !isPasswordVisible"
-            />
-          </template>
-        </q-input>
+        <div>
+          <label class="tw-text-muted tw-text-xs sm:tw-text-sm tw-font-bold tw-mb-1.5 tw-block">Senha</label>
+          <q-input
+            v-model="password"
+            :type="isPasswordVisible ? 'text' : 'password'"
+            placeholder="Sua senha secreta"
+            outlined
+            lazy-rules
+            :rules="[
+              (val) => !!val || 'A senha é obrigatória',
+              (val) => val.length >= 6 || 'A senha deve ter no mínimo 6 caracteres',
+            ]"
+            id="password"
+            autocomplete="current-password"
+            name="password"
+            enterkeyhint="done"
+            color="primary"
+          >
+            <template v-slot:append>
+              <q-btn
+                round
+                dense
+                flat
+                :icon="isPasswordVisible ? 'visibility_off' : 'visibility'"
+                :aria-label="isPasswordVisible ? 'Ocultar senha' : 'Mostrar senha'"
+                @click="isPasswordVisible = !isPasswordVisible"
+              />
+            </template>
+          </q-input>
+        </div>
 
         <q-btn
           type="submit"
           color="primary"
-          class="tw-w-full tw-h-12 tw-rounded-xl tw-text-base tw-font-bold tw-shadow-md"
+          class="tw-w-full tw-h-12 tw-rounded-2xl tw-text-base tw-font-bold tw-shadow-lg"
           :loading="authStore.isLoading"
           unelevated
-          label="Entrar"
+          label="Entrar na Plataforma"
         />
       </q-form>
     </div>
-
-    <template #footer>
-      <p class="text-muted">
-        Não tem uma conta?
-        <router-link to="/register" class="tw-text-primary tw-font-semibold hover:tw-underline">
-          Cadastre-se
-        </router-link>
-      </p>
-    </template>
   </AuthFormContainer>
 </template>
