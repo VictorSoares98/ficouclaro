@@ -134,13 +134,14 @@ async function onGoogleLogin() {
     subtitle="Junte-se à revolução do aprendizado síncrono."
     :isLoading="authStore.isLoading"
   >
-    <div class="tw-space-y-6">
-      <!-- 1. Seleção de Papel no Topo (Role-First) -->
+    <div class="tw-space-y-3.5">
+      <!-- 1. Seleção de Papel no Topo (Role-First Compacto) -->
       <div class="tw-flex tw-justify-center">
         <q-btn-toggle
           v-model="role"
           spread
-          class="tw-w-full tw-shadow-sm tw-rounded-2xl"
+          dense
+          class="tw-w-full tw-shadow-sm tw-rounded-xl tw-h-9 sm:tw-h-10"
           no-caps
           unelevated
           toggle-color="primary"
@@ -151,9 +152,9 @@ async function onGoogleLogin() {
       </div>
 
       <!-- 2. Botão de Cadastro Social com Papel Contextualizado -->
-      <div class="tw-space-y-3">
+      <div>
         <q-btn
-          class="tw-w-full tw-h-12 tw-rounded-2xl tw-text-base tw-font-bold tw-shadow-sm tw-bg-white hover:tw-bg-gray-50 dark:tw-bg-dark-page dark:hover:tw-bg-dark tw-border tw-border-gray-200 dark:tw-border-gray-800"
+          class="tw-w-full tw-h-10 sm:tw-h-11 tw-rounded-xl tw-text-xs sm:tw-text-sm tw-font-bold tw-shadow-sm tw-bg-white hover:tw-bg-gray-50 dark:tw-bg-dark-page dark:hover:tw-bg-dark tw-border tw-border-gray-200 dark:tw-border-gray-800"
           text-color="grey-9"
           icon="img:https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
           :label="googleButtonLabel"
@@ -165,27 +166,28 @@ async function onGoogleLogin() {
       </div>
 
       <!-- 3. Consentimento Legal Claro (Padrão Sign-in-wrap / LGPD) -->
-      <p class="tw-text-xs tw-text-center text-muted tw-mt-2">
+      <p class="tw-text-[11px] tw-text-center text-muted tw-mt-1">
         Ao se cadastrar, você concorda com nossos
         <router-link to="/termos" class="tw-text-primary hover:tw-underline">Termos de Uso</router-link> e a
         <router-link to="/privacidade" class="tw-text-primary hover:tw-underline">Política de Privacidade</router-link>.
       </p>
 
       <!-- 4. Divisor -->
-      <div class="tw-flex tw-items-center">
+      <div class="tw-flex tw-items-center tw-my-1.5">
         <div class="tw-flex-1 tw-h-px tw-bg-gray-300 dark:tw-bg-gray-700"></div>
-        <span class="tw-px-4 text-muted tw-text-xs sm:tw-text-sm tw-font-medium">ou cadastre-se com e-mail</span>
+        <span class="tw-px-3 text-muted tw-text-xs tw-font-medium">ou com e-mail</span>
         <div class="tw-flex-1 tw-h-px tw-bg-gray-300 dark:tw-bg-gray-700"></div>
       </div>
 
-      <!-- 5. Formulário de Cadastro Tradicional -->
-      <q-form @submit.prevent="onSubmit" class="tw-space-y-5">
+      <!-- 5. Formulário de Cadastro Tradicional Compacto -->
+      <q-form @submit.prevent="onSubmit" class="tw-space-y-2.5 sm:tw-space-y-3">
         <div>
-          <label class="tw-text-muted tw-text-xs sm:tw-text-sm tw-font-bold tw-mb-1.5 tw-block">Nome Completo</label>
+          <label class="tw-text-muted tw-text-xs tw-font-bold tw-mb-0.5 tw-block">Nome Completo</label>
           <q-input
             v-model="fullName"
             type="text"
             placeholder="Ex: Carlos Silva"
+            dense
             outlined
             lazy-rules
             :rules="[(val) => !!val || 'O nome é obrigatório']"
@@ -197,11 +199,12 @@ async function onGoogleLogin() {
         </div>
 
         <div>
-          <label class="tw-text-muted tw-text-xs sm:tw-text-sm tw-font-bold tw-mb-1.5 tw-block">E-mail de Acesso</label>
+          <label class="tw-text-muted tw-text-xs tw-font-bold tw-mb-0.5 tw-block">E-mail de Acesso</label>
           <q-input
             v-model="email"
             type="email"
             placeholder="seu.email@faculdade.edu"
+            dense
             outlined
             lazy-rules
             :rules="[
@@ -216,11 +219,12 @@ async function onGoogleLogin() {
         </div>
 
         <div>
-          <label class="tw-text-muted tw-text-xs sm:tw-text-sm tw-font-bold tw-mb-1.5 tw-block">Criar Senha</label>
+          <label class="tw-text-muted tw-text-xs tw-font-bold tw-mb-0.5 tw-block">Criar Senha</label>
           <q-input
             v-model="password"
             :type="isPasswordVisible ? 'text' : 'password'"
             placeholder="Mínimo 12 caracteres (maiúscula, número e símbolo)"
+            dense
             outlined
             lazy-rules
             :rules="[
@@ -239,6 +243,7 @@ async function onGoogleLogin() {
                 round
                 dense
                 flat
+                size="sm"
                 :icon="isPasswordVisible ? 'visibility_off' : 'visibility'"
                 :aria-label="isPasswordVisible ? 'Ocultar senha' : 'Mostrar senha'"
                 @click="isPasswordVisible = !isPasswordVisible"
@@ -250,11 +255,12 @@ async function onGoogleLogin() {
         </div>
 
         <div>
-          <label class="tw-text-muted tw-text-xs sm:tw-text-sm tw-font-bold tw-mb-1.5 tw-block">Confirmar Senha</label>
+          <label class="tw-text-muted tw-text-xs tw-font-bold tw-mb-0.5 tw-block">Confirmar Senha</label>
           <q-input
             v-model="confirmPassword"
             :type="isPasswordVisible ? 'text' : 'password'"
             placeholder="Repita a senha criada"
+            dense
             outlined
             lazy-rules
             :rules="[
@@ -270,6 +276,7 @@ async function onGoogleLogin() {
                 round
                 dense
                 flat
+                size="sm"
                 :icon="isPasswordVisible ? 'visibility_off' : 'visibility'"
                 :aria-label="isPasswordVisible ? 'Ocultar senha' : 'Mostrar senha'"
                 @click="isPasswordVisible = !isPasswordVisible"
@@ -281,7 +288,7 @@ async function onGoogleLogin() {
         <q-btn
           type="submit"
           color="primary"
-          class="tw-w-full tw-h-12 tw-rounded-2xl tw-text-base tw-font-bold tw-shadow-lg"
+          class="tw-w-full tw-h-10 sm:tw-h-11 tw-rounded-xl tw-text-sm sm:tw-text-base tw-font-bold tw-shadow-md tw-mt-1"
           :loading="authStore.isLoading"
           unelevated
           label="Cadastrar na Plataforma"

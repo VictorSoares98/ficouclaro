@@ -150,40 +150,25 @@ async function onSubmit() {
     subtitle="Acesse sua conta para continuar sua jornada no Ficou Claro?"
     :isLoading="authStore.isLoading"
   >
-    <div class="tw-space-y-6">
-      <!-- Botão Premium de Biometria -->
-      <div
-        v-if="isBiometricAvailable"
-        class="tw-flex tw-flex-col tw-items-center tw-justify-center tw-mb-2"
-      >
-        <div class="tw-relative tw-group tw-cursor-pointer" @click="onBiometricLogin">
-          <!-- Efeito Glow / Pulse de fundo -->
-          <div
-            class="tw-absolute -tw-inset-2 tw-bg-gradient-to-r tw-from-primary tw-to-secondary tw-rounded-full tw-blur-md tw-opacity-40 group-hover:tw-opacity-75 tw-transition tw-duration-500 tw-animate-pulse"
-          ></div>
-          <!-- Botão Circular -->
-          <q-btn
-            round
-            size="24px"
-            color="primary"
-            text-color="white"
-            icon="fingerprint"
-            class="tw-relative tw-shadow-2xl hover:tw-scale-110 tw-transition-transform tw-duration-300"
-            @click.stop="onBiometricLogin"
-            :loading="authStore.isLoading"
-          />
-        </div>
-        <p
-          class="tw-mt-4 tw-text-xs tw-font-semibold tw-text-gray-500 dark:tw-text-gray-400 tw-tracking-widest tw-uppercase"
-        >
-          Desbloqueio Rápido
-        </p>
+    <div class="tw-space-y-3.5">
+      <!-- Desbloqueio Biométrico Compacto -->
+      <div v-if="isBiometricAvailable">
+        <q-btn
+          outline
+          color="primary"
+          class="tw-w-full tw-h-10 tw-rounded-xl tw-text-xs sm:tw-text-sm tw-font-semibold tw-border-primary/40 hover:tw-bg-primary/5"
+          icon="fingerprint"
+          label="Desbloquear com Biometria"
+          @click.stop="onBiometricLogin"
+          :loading="authStore.isLoading"
+          no-caps
+        />
       </div>
 
-      <div class="tw-space-y-3">
-        <!-- Login Google no padrão Find My Pockets -->
+      <div>
+        <!-- Login Google Compacto -->
         <q-btn
-          class="tw-w-full tw-h-12 tw-rounded-2xl tw-text-base tw-font-bold tw-shadow-sm tw-bg-white hover:tw-bg-gray-50 dark:tw-bg-dark-page dark:hover:tw-bg-dark tw-border tw-border-gray-200 dark:tw-border-gray-800"
+          class="tw-w-full tw-h-10 sm:tw-h-11 tw-rounded-xl tw-text-xs sm:tw-text-sm tw-font-bold tw-shadow-sm tw-bg-white hover:tw-bg-gray-50 dark:tw-bg-dark-page dark:hover:tw-bg-dark tw-border tw-border-gray-200 dark:tw-border-gray-800"
           text-color="grey-9"
           icon="img:https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
           label="Entrar com Google"
@@ -194,7 +179,7 @@ async function onSubmit() {
         />
       </div>
 
-      <p class="tw-text-xs tw-text-center text-muted tw-mt-2">
+      <p class="tw-text-[11px] tw-text-center text-muted tw-mt-1">
         Ao continuar, você concorda com nossos
         <router-link to="/termos" class="tw-text-primary hover:tw-underline">Termos</router-link> e
         <router-link to="/privacidade" class="tw-text-primary hover:tw-underline"
@@ -202,19 +187,20 @@ async function onSubmit() {
         >.
       </p>
 
-      <div class="tw-flex tw-items-center">
+      <div class="tw-flex tw-items-center tw-my-1.5">
         <div class="tw-flex-1 tw-h-px tw-bg-gray-300 dark:tw-bg-gray-700"></div>
-        <span class="tw-px-4 text-muted tw-text-xs sm:tw-text-sm tw-font-medium">ou continue com e-mail</span>
+        <span class="tw-px-3 text-muted tw-text-xs tw-font-medium">ou com e-mail</span>
         <div class="tw-flex-1 tw-h-px tw-bg-gray-300 dark:tw-bg-gray-700"></div>
       </div>
 
-      <q-form @submit.prevent="onSubmit" class="tw-space-y-5">
+      <q-form @submit.prevent="onSubmit" class="tw-space-y-3">
         <div>
-          <label class="tw-text-muted tw-text-xs sm:tw-text-sm tw-font-bold tw-mb-1.5 tw-block">E-mail de Acesso</label>
+          <label class="tw-text-muted tw-text-xs tw-font-bold tw-mb-1 tw-block">E-mail de Acesso</label>
           <q-input
             v-model="email"
             type="email"
             placeholder="seu.email@faculdade.edu"
+            dense
             outlined
             lazy-rules
             :rules="[
@@ -230,11 +216,12 @@ async function onSubmit() {
         </div>
 
         <div>
-          <label class="tw-text-muted tw-text-xs sm:tw-text-sm tw-font-bold tw-mb-1.5 tw-block">Senha</label>
+          <label class="tw-text-muted tw-text-xs tw-font-bold tw-mb-1 tw-block">Senha</label>
           <q-input
             v-model="password"
             :type="isPasswordVisible ? 'text' : 'password'"
             placeholder="Sua senha secreta"
+            dense
             outlined
             lazy-rules
             :rules="[
@@ -252,6 +239,7 @@ async function onSubmit() {
                 round
                 dense
                 flat
+                size="sm"
                 :icon="isPasswordVisible ? 'visibility_off' : 'visibility'"
                 :aria-label="isPasswordVisible ? 'Ocultar senha' : 'Mostrar senha'"
                 @click="isPasswordVisible = !isPasswordVisible"
@@ -263,7 +251,7 @@ async function onSubmit() {
         <q-btn
           type="submit"
           color="primary"
-          class="tw-w-full tw-h-12 tw-rounded-2xl tw-text-base tw-font-bold tw-shadow-lg"
+          class="tw-w-full tw-h-10 sm:tw-h-11 tw-rounded-xl tw-text-sm sm:tw-text-base tw-font-bold tw-shadow-md tw-mt-1"
           :loading="authStore.isLoading"
           unelevated
           label="Entrar na Plataforma"
