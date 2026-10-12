@@ -17,7 +17,6 @@ const password = ref('');
 const confirmPassword = ref('');
 const isPasswordVisible = ref(false);
 const role = ref<PapelUsuario>('aluno');
-const acceptTerms = ref(false);
 
 const googleButtonLabel = computed(() =>
   role.value === 'professor'
@@ -121,15 +120,6 @@ async function onSubmit() {
 }
 
 async function onGoogleLogin() {
-  if (!acceptTerms.value) {
-    $q.notify({
-      type: 'warning',
-      message:
-        'Você deve aceitar os Termos de Uso e a Política de Privacidade antes de continuar com o Google.',
-      position: 'top',
-    });
-    return;
-  }
   await authStore.loginWithGoogle({
     papel: role.value,
     termos_aceitos_em: new Date().toISOString(),
@@ -160,35 +150,26 @@ async function onGoogleLogin() {
         />
       </div>
 
-      <!-- 2. Aceite dos Termos de Uso e Privacidade (LGPD) -->
-      <q-checkbox v-model="acceptTerms" color="primary" class="tw-w-full">
-        Li e concordo com os
-        <router-link
-          to="/termos"
-          @click.stop
-          class="tw-text-primary tw-font-semibold hover:tw-underline"
-          >Termos de Uso</router-link
-        >
-        e a
-        <router-link
-          to="/privacidade"
-          @click.stop
-          class="tw-text-primary tw-font-semibold hover:tw-underline"
-          >Política de Privacidade</router-link
-        >.
-      </q-checkbox>
+      <!-- 2. Botão de Cadastro Social com Papel Contextualizado -->
+      <div class="tw-space-y-3">
+        <q-btn
+          class="tw-w-full tw-h-12 tw-rounded-xl tw-text-base tw-font-bold tw-shadow-md tw-bg-white hover:tw-bg-gray-50 dark:tw-bg-dark-page dark:hover:tw-bg-dark"
+          text-color="grey-9"
+          icon="img:https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
+          :label="googleButtonLabel"
+          unelevated
+          no-wrap
+          @click="onGoogleLogin"
+          :loading="authStore.isLoading"
+        />
+      </div>
 
-      <!-- 3. Botão de Cadastro Social com Papel Contextualizado -->
-      <q-btn
-        class="tw-w-full tw-h-12 tw-rounded-xl tw-text-base tw-font-bold tw-shadow-md tw-bg-white hover:tw-bg-gray-50 dark:tw-bg-dark-page dark:hover:tw-bg-dark"
-        text-color="grey-9"
-        icon="img:https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
-        :label="googleButtonLabel"
-        unelevated
-        no-wrap
-        @click="onGoogleLogin"
-        :loading="authStore.isLoading"
-      />
+      <!-- 3. Consentimento Legal Claro (Padrão Sign-in-wrap / LGPD) -->
+      <p class="tw-text-xs tw-text-center text-muted tw-mt-2">
+        Ao se cadastrar, você concorda com nossos
+        <router-link to="/termos" class="tw-text-primary hover:tw-underline">Termos de Uso</router-link> e a
+        <router-link to="/privacidade" class="tw-text-primary hover:tw-underline">Política de Privacidade</router-link>.
+      </p>
 
       <!-- 4. Divisor -->
       <div class="tw-flex tw-items-center">
@@ -292,7 +273,6 @@ async function onGoogleLogin() {
           color="primary"
           class="tw-w-full tw-h-12 tw-rounded-xl tw-text-base tw-font-bold tw-shadow-md"
           :loading="authStore.isLoading"
-          :disable="!acceptTerms"
           unelevated
           label="Cadastrar com E-mail"
         />
