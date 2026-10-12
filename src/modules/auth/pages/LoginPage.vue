@@ -183,7 +183,7 @@ async function onSubmit() {
       <div class="tw-space-y-3">
         <!-- Login Google mantido com estilo limpo -->
         <q-btn
-          class="tw-w-full tw-h-14 tw-rounded-xl tw-text-base sm:tw-text-lg tw-font-bold tw-shadow-md tw-bg-white hover:tw-bg-gray-50 dark:tw-bg-dark-page dark:hover:tw-bg-dark"
+          class="tw-w-full tw-h-12 tw-rounded-xl tw-text-base tw-font-bold tw-shadow-md tw-bg-white hover:tw-bg-gray-50 dark:tw-bg-dark-page dark:hover:tw-bg-dark"
           text-color="grey-9"
           icon="img:https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
           label="Entrar com Google"
@@ -224,7 +224,6 @@ async function onSubmit() {
           name="email"
           enterkeyhint="next"
           color="primary"
-          class="tw-text-lg"
         />
 
         <q-input
@@ -242,7 +241,6 @@ async function onSubmit() {
           name="password"
           enterkeyhint="done"
           color="primary"
-          class="tw-text-lg"
         >
           <template v-slot:append>
             <q-btn
@@ -259,7 +257,7 @@ async function onSubmit() {
         <q-btn
           type="submit"
           color="primary"
-          class="tw-w-full tw-h-14 tw-rounded-xl tw-text-lg tw-font-bold tw-shadow-md"
+          class="tw-w-full tw-h-12 tw-rounded-xl tw-text-base tw-font-bold tw-shadow-md"
           :loading="authStore.isLoading"
           unelevated
           label="Entrar"

@@ -10,11 +10,11 @@ import BaseSurfaceCard from '@/core/components/BaseSurfaceCard.vue';
 <template>
   <q-page class="tw-flex tw-flex-col tw-items-center tw-justify-center tw-p-4 tw-min-h-[100dvh]">
     <BaseSurfaceCard
-      class="tw-w-full tw-max-w-md tw-p-8 tw-relative tw-overflow-y-auto tw-max-h-[90dvh]"
+      class="tw-w-full tw-max-w-md tw-p-6 sm:tw-p-8 tw-relative tw-overflow-y-auto tw-max-h-[90dvh]"
     >
-      <div class="tw-text-center tw-mb-8">
-        <h2 class="tw-text-3xl tw-font-extrabold tw-mb-2">{{ title }}</h2>
-        <p class="text-muted">{{ subtitle }}</p>
+      <div class="tw-text-center tw-mb-6">
+        <h2 class="tw-text-2xl tw-font-bold tw-mb-1.5">{{ title }}</h2>
+        <p class="text-muted tw-text-sm sm:tw-text-base">{{ subtitle }}</p>
       </div>
 
       <slot></slot>

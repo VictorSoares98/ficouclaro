@@ -13,35 +13,35 @@ import BaseSurfaceCard from '@/core/components/BaseSurfaceCard.vue';
       <div class="tw-max-w-4xl tw-space-y-6 md:tw-space-y-8">
         <!-- Title -->
         <h1
-          class="tw-text-4xl sm:tw-text-5xl md:tw-text-7xl tw-font-extrabold tw-tracking-tight tw-leading-tight"
+          class="tw-text-3xl sm:tw-text-4xl md:tw-text-5xl tw-font-extrabold tw-tracking-tight tw-leading-tight"
         >
           O fim das dúvidas que
           <span class="tw-text-primary tw-block sm:tw-inline">ficaram para trás</span>
         </h1>
 
         <!-- Subtitle -->
-        <p class="tw-text-lg md:tw-text-2xl text-muted tw-max-w-2xl tw-mx-auto tw-leading-relaxed">
+        <p class="tw-text-base sm:tw-text-lg md:tw-text-xl text-muted tw-max-w-2xl tw-mx-auto tw-leading-relaxed">
           Acompanhe o ritmo da turma em tempo real. Uma plataforma conectando professores e alunos
           para garantir que todo o conteúdo realmente "ficou claro".
         </p>
 
         <!-- CTA Buttons -->
         <div
-          class="tw-flex tw-flex-col sm:tw-flex-row tw-items-center tw-justify-center tw-gap-4 tw-pt-8"
+          class="tw-flex tw-flex-col sm:tw-flex-row tw-items-center tw-justify-center tw-gap-4 tw-pt-6"
         >
           <q-btn
             color="primary"
             to="/register"
             label="Começar Agora"
             unelevated
-            class="tw-w-full sm:tw-w-auto tw-px-10 tw-h-14 tw-rounded-full tw-text-lg tw-font-bold tw-shadow-lg hover:tw-scale-105 tw-transition-transform"
+            class="tw-w-full sm:tw-w-auto tw-px-8 tw-h-12 tw-rounded-full tw-text-base tw-font-bold tw-shadow-lg hover:tw-scale-105 tw-transition-transform"
           />
           <q-btn
             color="secondary"
             to="/login"
             label="Já tenho uma conta"
             outline
-            class="tw-w-full sm:tw-w-auto tw-px-10 tw-h-14 tw-rounded-full tw-text-lg tw-font-bold hover:tw-bg-secondary/10 tw-transition-colors"
+            class="tw-w-full sm:tw-w-auto tw-px-8 tw-h-12 tw-rounded-full tw-text-base tw-font-bold hover:tw-bg-secondary/10 tw-transition-colors"
           />
         </div>
       </div>
@@ -53,11 +53,11 @@ import BaseSurfaceCard from '@/core/components/BaseSurfaceCard.vue';
         <!-- Feature 1 -->
         <BaseSurfaceCard
           variant="glass"
-          class="tw-p-8 tw-h-full tw-flex tw-flex-col tw-items-center tw-text-center hover:-tw-translate-y-2 tw-transition-transform tw-duration-300"
+          class="tw-p-6 sm:tw-p-8 tw-h-full tw-flex tw-flex-col tw-items-center tw-text-center hover:-tw-translate-y-2 tw-transition-transform tw-duration-300"
         >
-          <q-icon name="bolt" size="4rem" color="warning" class="tw-mb-6 tw-opacity-90" />
-          <h3 class="tw-text-xl tw-font-bold tw-mb-3">Feedback em Tempo Real</h3>
-          <p class="text-muted tw-leading-relaxed">
+          <q-icon name="bolt" size="3rem" color="warning" class="tw-mb-4 tw-opacity-90" />
+          <h3 class="tw-text-lg sm:tw-text-xl tw-font-bold tw-mb-2">Feedback em Tempo Real</h3>
+          <p class="text-muted tw-text-sm sm:tw-text-base tw-leading-relaxed">
             Alunos enviam sinais de ritmo ("Mais devagar", "Ficou Claro") sem interromper a aula. O
             professor ajusta a didática instantaneamente.
           </p>
@@ -66,11 +66,11 @@ import BaseSurfaceCard from '@/core/components/BaseSurfaceCard.vue';
         <!-- Feature 2 -->
         <BaseSurfaceCard
           variant="glass"
-          class="tw-p-8 tw-h-full tw-flex tw-flex-col tw-items-center tw-text-center hover:-tw-translate-y-2 tw-transition-transform tw-duration-300"
+          class="tw-p-6 sm:tw-p-8 tw-h-full tw-flex tw-flex-col tw-items-center tw-text-center hover:-tw-translate-y-2 tw-transition-transform tw-duration-300"
         >
-          <q-icon name="swipe" size="4rem" color="primary" class="tw-mb-6 tw-opacity-90" />
-          <h3 class="tw-text-xl tw-font-bold tw-mb-3">Sem Fricção</h3>
-          <p class="text-muted tw-leading-relaxed">
+          <q-icon name="swipe" size="3rem" color="primary" class="tw-mb-4 tw-opacity-90" />
+          <h3 class="tw-text-lg sm:tw-text-xl tw-font-bold tw-mb-2">Sem Fricção</h3>
+          <p class="text-muted tw-text-sm sm:tw-text-base tw-leading-relaxed">
             Sem downloads complexos ou burocracia. Acesso rápido via código da sala direto no
             navegador do celular do aluno.
           </p>
@@ -79,11 +79,11 @@ import BaseSurfaceCard from '@/core/components/BaseSurfaceCard.vue';
         <!-- Feature 3 -->
         <BaseSurfaceCard
           variant="glass"
-          class="tw-p-8 tw-h-full tw-flex tw-flex-col tw-items-center tw-text-center hover:-tw-translate-y-2 tw-transition-transform tw-duration-300"
+          class="tw-p-6 sm:tw-p-8 tw-h-full tw-flex tw-flex-col tw-items-center tw-text-center hover:-tw-translate-y-2 tw-transition-transform tw-duration-300"
         >
-          <q-icon name="insights" size="4rem" color="secondary" class="tw-mb-6 tw-opacity-90" />
-          <h3 class="tw-text-xl tw-font-bold tw-mb-3">Dados Instantâneos</h3>
-          <p class="text-muted tw-leading-relaxed">
+          <q-icon name="insights" size="3rem" color="secondary" class="tw-mb-4 tw-opacity-90" />
+          <h3 class="tw-text-lg sm:tw-text-xl tw-font-bold tw-mb-2">Dados Instantâneos</h3>
+          <p class="text-muted tw-text-sm sm:tw-text-base tw-leading-relaxed">
             Gráficos e termômetros gerados automaticamente durante a sessão, permitindo uma
             avaliação formativa contínua.
           </p>
