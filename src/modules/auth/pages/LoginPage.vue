@@ -168,12 +168,12 @@ async function onSubmit() {
       <div>
         <!-- Login Google Compacto -->
         <q-btn
-          class="tw-w-full tw-h-10 sm:tw-h-11 tw-rounded-xl tw-text-xs sm:tw-text-sm tw-font-bold tw-shadow-sm tw-bg-white hover:tw-bg-gray-50 dark:tw-bg-dark-page dark:hover:tw-bg-dark tw-border tw-border-gray-200 dark:tw-border-gray-800"
+          class="tw-w-full tw-min-h-10 sm:tw-min-h-11 tw-py-1.5 tw-px-3 tw-rounded-xl tw-text-xs sm:tw-text-sm tw-font-bold tw-shadow-sm tw-bg-white hover:tw-bg-gray-50 dark:tw-bg-dark-page dark:hover:tw-bg-dark tw-border tw-border-gray-200 dark:tw-border-gray-800"
           text-color="grey-9"
           icon="img:https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
           label="Entrar com Google"
           unelevated
-          no-wrap
+          no-caps
           @click="authStore.loginWithGoogle()"
           :loading="authStore.isLoading"
         />
@@ -202,6 +202,7 @@ async function onSubmit() {
             placeholder="seu.email@faculdade.edu"
             dense
             outlined
+            hide-bottom-space
             lazy-rules
             :rules="[
               (val) => !!val || 'O e-mail é obrigatório',
@@ -223,6 +224,7 @@ async function onSubmit() {
             placeholder="Sua senha secreta"
             dense
             outlined
+            hide-bottom-space
             lazy-rules
             :rules="[
               (val) => !!val || 'A senha é obrigatória',
@@ -251,9 +253,10 @@ async function onSubmit() {
         <q-btn
           type="submit"
           color="primary"
-          class="tw-w-full tw-h-10 sm:tw-h-11 tw-rounded-xl tw-text-sm sm:tw-text-base tw-font-bold tw-shadow-md tw-mt-1"
+          class="tw-w-full tw-min-h-10 sm:tw-min-h-11 tw-py-2 tw-rounded-xl tw-text-sm sm:tw-text-base tw-font-bold tw-shadow-md tw-mt-1"
           :loading="authStore.isLoading"
           unelevated
+          no-caps
           label="Entrar na Plataforma"
         />
       </q-form>

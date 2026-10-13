@@ -7,6 +7,15 @@ import type { FontScale } from '@/core/types/accessibility.types';
 const accessibilityStore = useAccessibilityStore();
 const themeStore = useThemeStore();
 
+withDefaults(
+  defineProps<{
+    color?: string;
+  }>(),
+  {
+    color: 'primary',
+  },
+);
+
 const themeOptions: { value: AppTheme; label: string }[] = [
   { value: 'default', label: 'Default (Azul)' },
   { value: 'ocean', label: 'Ocean (Ciano)' },
@@ -36,9 +45,9 @@ function selectTheme(theme: AppTheme) {
   <q-btn-dropdown
     flat
     dense
-    color="white"
+    :color="color"
     icon="settings_accessibility"
-    class="tw-mr-2"
+    class="tw-mr-2 tw-rounded-xl"
     aria-label="Menu de Acessibilidade e Aparência"
   >
     <q-list style="min-width: 250px">

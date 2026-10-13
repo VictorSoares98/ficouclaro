@@ -35,7 +35,7 @@ async function handleLogout() {
       </q-toolbar-title>
 
       <!-- Accessibility Menu Unificado (Substitui o ThemeSwitcher antigo e os botões individuais) -->
-      <AccessibilityMenu />
+      <AccessibilityMenu color="white" />
 
       <!-- Menu de Perfil (Áreas Restritas) -->
       <q-btn-dropdown

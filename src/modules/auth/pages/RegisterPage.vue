@@ -141,7 +141,7 @@ async function onGoogleLogin() {
           v-model="role"
           spread
           dense
-          class="tw-w-full tw-shadow-sm tw-rounded-xl tw-h-8 sm:tw-h-9"
+          class="tw-w-full tw-shadow-sm tw-rounded-xl tw-min-h-[36px]"
           no-caps
           unelevated
           toggle-color="primary"
@@ -154,12 +154,12 @@ async function onGoogleLogin() {
       <!-- 2. Botão de Cadastro Social com Papel Contextualizado -->
       <div>
         <q-btn
-          class="tw-w-full tw-h-9 sm:tw-h-10 tw-rounded-xl tw-text-xs sm:tw-text-sm tw-font-bold tw-shadow-sm tw-bg-white hover:tw-bg-gray-50 dark:tw-bg-dark-page dark:hover:tw-bg-dark tw-border tw-border-gray-200 dark:tw-border-gray-800"
+          class="tw-w-full tw-min-h-10 sm:tw-min-h-11 tw-py-1.5 tw-px-3 tw-rounded-xl tw-text-xs sm:tw-text-sm tw-font-bold tw-shadow-sm tw-bg-white hover:tw-bg-gray-50 dark:tw-bg-dark-page dark:hover:tw-bg-dark tw-border tw-border-gray-200 dark:tw-border-gray-800"
           text-color="grey-9"
           icon="img:https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
           :label="googleButtonLabel"
           unelevated
-          no-wrap
+          no-caps
           @click="onGoogleLogin"
           :loading="authStore.isLoading"
         />
@@ -292,9 +292,10 @@ async function onGoogleLogin() {
         <q-btn
           type="submit"
           color="primary"
-          class="tw-w-full tw-h-9 sm:tw-h-10 tw-rounded-xl tw-text-xs sm:tw-text-sm tw-font-bold tw-shadow-md tw-mt-1"
+          class="tw-w-full tw-min-h-10 sm:tw-min-h-11 tw-py-2 tw-rounded-xl tw-text-xs sm:tw-text-sm tw-font-bold tw-shadow-md tw-mt-1"
           :loading="authStore.isLoading"
           unelevated
+          no-caps
           label="Cadastrar na Plataforma"
         />
       </q-form>
