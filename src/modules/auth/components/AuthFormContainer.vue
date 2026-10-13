@@ -50,8 +50,10 @@ const route = useRoute();
           <router-link
             to="/login"
             :class="[
-              'tw-flex-1 tw-py-2 tw-text-sm sm:tw-text-base tw-font-semibold tw-transition-colors tw-relative tw-text-center',
-              route.path === '/login' ? 'tw-text-primary' : 'text-muted hover:tw-text-primary',
+              'tw-flex-1 tw-py-2 tw-text-sm sm:tw-text-base tw-font-semibold tw-transition-all tw-relative tw-text-center tw-no-underline',
+              route.path === '/login'
+                ? 'tw-text-primary tw-opacity-100'
+                : 'tw-opacity-75 hover:tw-opacity-100 hover:tw-text-primary',
             ]"
           >
             Entrar
@@ -64,8 +66,10 @@ const route = useRoute();
           <router-link
             to="/register"
             :class="[
-              'tw-flex-1 tw-py-2 tw-text-sm sm:tw-text-base tw-font-semibold tw-transition-colors tw-relative tw-text-center',
-              route.path === '/register' ? 'tw-text-primary' : 'text-muted hover:tw-text-primary',
+              'tw-flex-1 tw-py-2 tw-text-sm sm:tw-text-base tw-font-semibold tw-transition-all tw-relative tw-text-center tw-no-underline',
+              route.path === '/register'
+                ? 'tw-text-primary tw-opacity-100'
+                : 'tw-opacity-75 hover:tw-opacity-100 hover:tw-text-primary',
             ]"
           >
             Criar Conta

@@ -69,6 +69,12 @@ body.body--dark {
   }
 }
 
+// --- Reset de Links (Neutralização de :visited nativo do navegador) ---
+a {
+  color: inherit;
+  text-decoration: inherit;
+}
+
 // --- Classes Semânticas Globais (Acessibilidade e Contraste) ---
 .text-muted {
   opacity: 0.7 !important;
