@@ -16,3 +16,14 @@ CREATE INDEX IF NOT EXISTS idx_duvidas_sessao_id ON public.duvidas(sessao_id);
 CREATE INDEX IF NOT EXISTS idx_duvidas_votos ON public.duvidas(sessao_id, votos DESC);
 CREATE INDEX IF NOT EXISTS idx_votos_duvida_id ON public.votos_duvida(duvida_id);
 CREATE INDEX IF NOT EXISTS idx_avaliacoes_rapidas_sessao_id ON public.avaliacoes_rapidas(sessao_id);
+
+-- Índices: grupos_estudo, grupos_membros e registros_encontro
+CREATE INDEX IF NOT EXISTS idx_grupos_estudo_geo ON public.grupos_estudo(lat, lng);
+CREATE INDEX IF NOT EXISTS idx_grupos_estudo_status ON public.grupos_estudo(status);
+CREATE INDEX IF NOT EXISTS idx_grupos_estudo_instituicao ON public.grupos_estudo(instituicao);
+CREATE INDEX IF NOT EXISTS idx_grupos_estudo_criador_id ON public.grupos_estudo(criador_id);
+CREATE INDEX IF NOT EXISTS idx_grupos_estudo_disciplina_id ON public.grupos_estudo(disciplina_id);
+CREATE INDEX IF NOT EXISTS idx_grupos_membros_grupo_id ON public.grupos_membros(grupo_id);
+CREATE INDEX IF NOT EXISTS idx_grupos_membros_usuario_id ON public.grupos_membros(usuario_id);
+CREATE INDEX IF NOT EXISTS idx_registros_encontro_grupo_id ON public.registros_encontro(grupo_id);
+CREATE INDEX IF NOT EXISTS idx_registros_encontro_data ON public.registros_encontro(data_referencia DESC);

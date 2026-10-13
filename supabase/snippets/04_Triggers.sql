@@ -156,3 +156,24 @@ CREATE TRIGGER ao_atualizar_duvida
   BEFORE UPDATE ON public.duvidas
   FOR EACH ROW EXECUTE FUNCTION private.handle_updated_at();
 
+DROP TRIGGER IF EXISTS ao_atualizar_grupo_estudo ON public.grupos_estudo;
+CREATE TRIGGER ao_atualizar_grupo_estudo
+  BEFORE UPDATE ON public.grupos_estudo
+  FOR EACH ROW EXECUTE FUNCTION private.handle_updated_at();
+
+-- Trigger: Auto-vincular criador como monitor do grupo de estudo
+CREATE OR REPLACE FUNCTION private.vincular_criador_grupo()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO public.grupos_membros (grupo_id, usuario_id, is_monitor)
+  VALUES (NEW.id, NEW.criador_id, true)
+  ON CONFLICT (grupo_id, usuario_id) DO UPDATE SET is_monitor = true;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DROP TRIGGER IF EXISTS ao_criar_grupo_estudo ON public.grupos_estudo;
+CREATE TRIGGER ao_criar_grupo_estudo
+  AFTER INSERT ON public.grupos_estudo
+  FOR EACH ROW EXECUTE FUNCTION private.vincular_criador_grupo();
+

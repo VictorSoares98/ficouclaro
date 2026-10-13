@@ -128,3 +128,77 @@ CREATE TABLE private.strikes_moderacao (
   quantidade INT NOT NULL DEFAULT 0,
   ultima_ocorrencia TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+-- grupos_estudo (Grupos de Estudo e Reforço Acadêmico)
+CREATE TABLE public.grupos_estudo (
+  id             UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  criador_id     UUID NOT NULL REFERENCES public.usuarios(id) ON DELETE CASCADE,
+  nome           TEXT NOT NULL,
+  descricao      TEXT,
+  tipo           tipo_grupo_estudo NOT NULL DEFAULT 'estudo',
+  disciplina_id  UUID REFERENCES public.disciplinas(id) ON DELETE SET NULL,
+  instituicao    TEXT NOT NULL,
+  campus         TEXT,
+  predio_bloco   TEXT,
+  sala           TEXT,
+  lat            NUMERIC(10, 7) NOT NULL,
+  lng            NUMERIC(10, 7) NOT NULL,
+  dia_semana     TEXT,
+  horario        TEXT,
+  vagas          INTEGER DEFAULT 10,
+  codigo_convite TEXT UNIQUE NOT NULL DEFAULT encode(gen_random_bytes(4), 'hex'),
+  status         status_grupo_estudo NOT NULL DEFAULT 'ativo',
+  created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- grupos_membros (Membros vinculados e Monitores)
+CREATE TABLE public.grupos_membros (
+  id         UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  grupo_id   UUID NOT NULL REFERENCES public.grupos_estudo(id) ON DELETE CASCADE,
+  usuario_id UUID NOT NULL REFERENCES public.usuarios(id) ON DELETE CASCADE,
+  is_monitor BOOLEAN NOT NULL DEFAULT false,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE(grupo_id, usuario_id)
+);
+
+-- registros_encontro (Histórico de reuniões de estudo e reforço)
+CREATE TABLE public.registros_encontro (
+  id                  UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  grupo_id            UUID NOT NULL REFERENCES public.grupos_estudo(id) ON DELETE CASCADE,
+  registrado_por      UUID NOT NULL REFERENCES public.usuarios(id) ON DELETE CASCADE,
+  data_referencia     DATE NOT NULL DEFAULT CURRENT_DATE,
+  topico              TEXT,
+  participantes       INTEGER NOT NULL DEFAULT 1,
+  duracao_minutos     INTEGER DEFAULT 60,
+  duvidas_resolvidas  INTEGER DEFAULT 0,
+  observacoes         TEXT,
+  status              status_registro_encontro NOT NULL DEFAULT 'concluido',
+  motivo_cancelamento TEXT,
+  client_uuid         UUID UNIQUE,
+  created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- view_grupos_estudo_publicos (Exposição segura para o mapa, sem dados confidenciais)
+CREATE OR REPLACE VIEW public.view_grupos_estudo_publicos AS
+SELECT
+  g.id,
+  g.nome,
+  g.descricao,
+  g.tipo,
+  g.disciplina_id,
+  g.instituicao,
+  g.campus,
+  g.lat,
+  g.lng,
+  g.dia_semana,
+  g.horario,
+  g.vagas,
+  g.status,
+  g.created_at,
+  COUNT(m.id)::INT AS total_membros
+FROM public.grupos_estudo g
+LEFT JOIN public.grupos_membros m ON m.grupo_id = g.id
+WHERE g.status = 'ativo'
+GROUP BY g.id;
+

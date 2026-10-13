@@ -1,7 +1,7 @@
 -- ====================================================================
 -- ⚠️ AVISO: ARQUIVO AUTO-GERADO!
 -- NÃO EDITE ESTE ARQUIVO DIRETAMENTE. ALTERE OS SNIPPETS E RODE db:build
--- Gerado em: 2026-10-12T04:50:06.731Z
+-- Gerado em: 2026-10-13T23:49:59.632Z
 -- ====================================================================
 
 -- >>> INÍCIO DO SNIPPET: 00_Init_Extensions.sql <<<
@@ -23,6 +23,9 @@ CREATE TYPE status_sessao AS ENUM ('aguardando', 'ativa', 'encerrada');
 CREATE TYPE tipo_enquete AS ENUM ('multipla_escolha', 'nuvem_palavras', 'escala_clareza', 'ranking');
 CREATE TYPE status_enquete AS ENUM ('rascunho', 'ativa', 'encerrada');
 CREATE TYPE sinal_ritmo AS ENUM ('muito_rapido', 'boiando', 'tudo_certo', 'muito_devagar');
+CREATE TYPE tipo_grupo_estudo AS ENUM ('estudo', 'reforco');
+CREATE TYPE status_grupo_estudo AS ENUM ('ativo', 'inativo');
+CREATE TYPE status_registro_encontro AS ENUM ('concluido', 'pendente', 'cancelado');
 
 -- >>> FIM DO SNIPPET: 01_Enums.sql <<<
 
@@ -158,6 +161,80 @@ CREATE TABLE private.strikes_moderacao (
   quantidade INT NOT NULL DEFAULT 0,
   ultima_ocorrencia TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+-- grupos_estudo (Grupos de Estudo e Reforço Acadêmico)
+CREATE TABLE public.grupos_estudo (
+  id             UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  criador_id     UUID NOT NULL REFERENCES public.usuarios(id) ON DELETE CASCADE,
+  nome           TEXT NOT NULL,
+  descricao      TEXT,
+  tipo           tipo_grupo_estudo NOT NULL DEFAULT 'estudo',
+  disciplina_id  UUID REFERENCES public.disciplinas(id) ON DELETE SET NULL,
+  instituicao    TEXT NOT NULL,
+  campus         TEXT,
+  predio_bloco   TEXT,
+  sala           TEXT,
+  lat            NUMERIC(10, 7) NOT NULL,
+  lng            NUMERIC(10, 7) NOT NULL,
+  dia_semana     TEXT,
+  horario        TEXT,
+  vagas          INTEGER DEFAULT 10,
+  codigo_convite TEXT UNIQUE NOT NULL DEFAULT encode(gen_random_bytes(4), 'hex'),
+  status         status_grupo_estudo NOT NULL DEFAULT 'ativo',
+  created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- grupos_membros (Membros vinculados e Monitores)
+CREATE TABLE public.grupos_membros (
+  id         UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  grupo_id   UUID NOT NULL REFERENCES public.grupos_estudo(id) ON DELETE CASCADE,
+  usuario_id UUID NOT NULL REFERENCES public.usuarios(id) ON DELETE CASCADE,
+  is_monitor BOOLEAN NOT NULL DEFAULT false,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE(grupo_id, usuario_id)
+);
+
+-- registros_encontro (Histórico de reuniões de estudo e reforço)
+CREATE TABLE public.registros_encontro (
+  id                  UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  grupo_id            UUID NOT NULL REFERENCES public.grupos_estudo(id) ON DELETE CASCADE,
+  registrado_por      UUID NOT NULL REFERENCES public.usuarios(id) ON DELETE CASCADE,
+  data_referencia     DATE NOT NULL DEFAULT CURRENT_DATE,
+  topico              TEXT,
+  participantes       INTEGER NOT NULL DEFAULT 1,
+  duracao_minutos     INTEGER DEFAULT 60,
+  duvidas_resolvidas  INTEGER DEFAULT 0,
+  observacoes         TEXT,
+  status              status_registro_encontro NOT NULL DEFAULT 'concluido',
+  motivo_cancelamento TEXT,
+  client_uuid         UUID UNIQUE,
+  created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- view_grupos_estudo_publicos (Exposição segura para o mapa, sem dados confidenciais)
+CREATE OR REPLACE VIEW public.view_grupos_estudo_publicos AS
+SELECT
+  g.id,
+  g.nome,
+  g.descricao,
+  g.tipo,
+  g.disciplina_id,
+  g.instituicao,
+  g.campus,
+  g.lat,
+  g.lng,
+  g.dia_semana,
+  g.horario,
+  g.vagas,
+  g.status,
+  g.created_at,
+  COUNT(m.id)::INT AS total_membros
+FROM public.grupos_estudo g
+LEFT JOIN public.grupos_membros m ON m.grupo_id = g.id
+WHERE g.status = 'ativo'
+GROUP BY g.id;
+
 
 -- >>> FIM DO SNIPPET: 02_Tabelas.sql <<<
 
@@ -554,6 +631,27 @@ CREATE TRIGGER ao_atualizar_duvida
   BEFORE UPDATE ON public.duvidas
   FOR EACH ROW EXECUTE FUNCTION private.handle_updated_at();
 
+DROP TRIGGER IF EXISTS ao_atualizar_grupo_estudo ON public.grupos_estudo;
+CREATE TRIGGER ao_atualizar_grupo_estudo
+  BEFORE UPDATE ON public.grupos_estudo
+  FOR EACH ROW EXECUTE FUNCTION private.handle_updated_at();
+
+-- Trigger: Auto-vincular criador como monitor do grupo de estudo
+CREATE OR REPLACE FUNCTION private.vincular_criador_grupo()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO public.grupos_membros (grupo_id, usuario_id, is_monitor)
+  VALUES (NEW.id, NEW.criador_id, true)
+  ON CONFLICT (grupo_id, usuario_id) DO UPDATE SET is_monitor = true;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DROP TRIGGER IF EXISTS ao_criar_grupo_estudo ON public.grupos_estudo;
+CREATE TRIGGER ao_criar_grupo_estudo
+  AFTER INSERT ON public.grupos_estudo
+  FOR EACH ROW EXECUTE FUNCTION private.vincular_criador_grupo();
+
 
 -- >>> FIM DO SNIPPET: 04_Triggers.sql <<<
 
@@ -586,6 +684,12 @@ ALTER TABLE public.respostas_enquete ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.duvidas ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.votos_duvida ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.avaliacoes_rapidas ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.grupos_estudo ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.grupos_membros ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.registros_encontro ENABLE ROW LEVEL SECURITY;
+
+-- Grants para visualização pública de grupos no mapa
+GRANT SELECT ON public.view_grupos_estudo_publicos TO anon, authenticated;
 
 -- POLICIES: usuarios
 CREATE POLICY "Usuário lê o próprio perfil" ON public.usuarios FOR SELECT USING (id = auth.uid());
@@ -663,6 +767,84 @@ CREATE POLICY "Professor lê avaliações" ON public.avaliacoes_rapidas FOR SELE
 
 -- GRANT da função analítica (Dashboard)
 GRANT EXECUTE ON FUNCTION public.get_course_insights(UUID) TO authenticated;
+
+-- POLICIES: grupos_estudo
+CREATE POLICY "Qualquer um pode ver grupos de estudo ativos" ON public.grupos_estudo 
+  FOR SELECT USING (status = 'ativo' OR criador_id = auth.uid());
+
+CREATE POLICY "Usuário autenticado pode criar grupo de estudo" ON public.grupos_estudo 
+  FOR INSERT WITH CHECK (criador_id = auth.uid() AND auth.role() = 'authenticated');
+
+CREATE POLICY "Criador gerencia próprio grupo de estudo" ON public.grupos_estudo 
+  FOR UPDATE USING (criador_id = auth.uid());
+
+CREATE POLICY "Criador deleta próprio grupo de estudo" ON public.grupos_estudo 
+  FOR DELETE USING (criador_id = auth.uid());
+
+-- POLICIES: grupos_membros
+CREATE POLICY "Membros veem integrantes do mesmo grupo" ON public.grupos_membros 
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM public.grupos_membros gm 
+      WHERE gm.grupo_id = grupos_membros.grupo_id AND gm.usuario_id = auth.uid()
+    )
+    OR EXISTS (
+      SELECT 1 FROM public.grupos_estudo ge 
+      WHERE ge.id = grupos_membros.grupo_id AND ge.criador_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Usuário se inscreve em grupo de estudo" ON public.grupos_membros 
+  FOR INSERT WITH CHECK (usuario_id = auth.uid());
+
+CREATE POLICY "Usuário cancela inscrição ou monitor remove membro" ON public.grupos_membros 
+  FOR DELETE USING (
+    usuario_id = auth.uid() 
+    OR EXISTS (
+      SELECT 1 FROM public.grupos_estudo ge 
+      WHERE ge.id = grupos_membros.grupo_id AND ge.criador_id = auth.uid()
+    )
+    OR EXISTS (
+      SELECT 1 FROM public.grupos_membros gm 
+      WHERE gm.grupo_id = grupos_membros.grupo_id AND gm.usuario_id = auth.uid() AND gm.is_monitor = true
+    )
+  );
+
+-- POLICIES: registros_encontro
+CREATE POLICY "Membros veem registros de encontros do grupo" ON public.registros_encontro 
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM public.grupos_membros gm 
+      WHERE gm.grupo_id = registros_encontro.grupo_id AND gm.usuario_id = auth.uid()
+    )
+    OR EXISTS (
+      SELECT 1 FROM public.grupos_estudo ge 
+      WHERE ge.id = registros_encontro.grupo_id AND ge.criador_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Monitores e criadores registram encontros" ON public.registros_encontro 
+  FOR INSERT WITH CHECK (
+    registrado_por = auth.uid() AND (
+      EXISTS (
+        SELECT 1 FROM public.grupos_estudo ge 
+        WHERE ge.id = registros_encontro.grupo_id AND ge.criador_id = auth.uid()
+      )
+      OR EXISTS (
+        SELECT 1 FROM public.grupos_membros gm 
+        WHERE gm.grupo_id = registros_encontro.grupo_id AND gm.usuario_id = auth.uid() AND gm.is_monitor = true
+      )
+    )
+  );
+
+CREATE POLICY "Registrante ou criador atualiza registro de encontro" ON public.registros_encontro 
+  FOR UPDATE USING (
+    registrado_por = auth.uid() 
+    OR EXISTS (
+      SELECT 1 FROM public.grupos_estudo ge 
+      WHERE ge.id = registros_encontro.grupo_id AND ge.criador_id = auth.uid()
+    )
+  );
 -- >>> FIM DO SNIPPET: 05_RLS_e_Grants.sql <<<
 
 
@@ -685,6 +867,17 @@ CREATE INDEX IF NOT EXISTS idx_duvidas_sessao_id ON public.duvidas(sessao_id);
 CREATE INDEX IF NOT EXISTS idx_duvidas_votos ON public.duvidas(sessao_id, votos DESC);
 CREATE INDEX IF NOT EXISTS idx_votos_duvida_id ON public.votos_duvida(duvida_id);
 CREATE INDEX IF NOT EXISTS idx_avaliacoes_rapidas_sessao_id ON public.avaliacoes_rapidas(sessao_id);
+
+-- Índices: grupos_estudo, grupos_membros e registros_encontro
+CREATE INDEX IF NOT EXISTS idx_grupos_estudo_geo ON public.grupos_estudo(lat, lng);
+CREATE INDEX IF NOT EXISTS idx_grupos_estudo_status ON public.grupos_estudo(status);
+CREATE INDEX IF NOT EXISTS idx_grupos_estudo_instituicao ON public.grupos_estudo(instituicao);
+CREATE INDEX IF NOT EXISTS idx_grupos_estudo_criador_id ON public.grupos_estudo(criador_id);
+CREATE INDEX IF NOT EXISTS idx_grupos_estudo_disciplina_id ON public.grupos_estudo(disciplina_id);
+CREATE INDEX IF NOT EXISTS idx_grupos_membros_grupo_id ON public.grupos_membros(grupo_id);
+CREATE INDEX IF NOT EXISTS idx_grupos_membros_usuario_id ON public.grupos_membros(usuario_id);
+CREATE INDEX IF NOT EXISTS idx_registros_encontro_grupo_id ON public.registros_encontro(grupo_id);
+CREATE INDEX IF NOT EXISTS idx_registros_encontro_data ON public.registros_encontro(data_referencia DESC);
 
 -- >>> FIM DO SNIPPET: 06_Indexes_Performance.sql <<<
 

@@ -25,6 +25,12 @@ ALTER TABLE public.respostas_enquete ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.duvidas ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.votos_duvida ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.avaliacoes_rapidas ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.grupos_estudo ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.grupos_membros ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.registros_encontro ENABLE ROW LEVEL SECURITY;
+
+-- Grants para visualização pública de grupos no mapa
+GRANT SELECT ON public.view_grupos_estudo_publicos TO anon, authenticated;
 
 -- POLICIES: usuarios
 CREATE POLICY "Usuário lê o próprio perfil" ON public.usuarios FOR SELECT USING (id = auth.uid());
@@ -102,3 +108,81 @@ CREATE POLICY "Professor lê avaliações" ON public.avaliacoes_rapidas FOR SELE
 
 -- GRANT da função analítica (Dashboard)
 GRANT EXECUTE ON FUNCTION public.get_course_insights(UUID) TO authenticated;
+
+-- POLICIES: grupos_estudo
+CREATE POLICY "Qualquer um pode ver grupos de estudo ativos" ON public.grupos_estudo 
+  FOR SELECT USING (status = 'ativo' OR criador_id = auth.uid());
+
+CREATE POLICY "Usuário autenticado pode criar grupo de estudo" ON public.grupos_estudo 
+  FOR INSERT WITH CHECK (criador_id = auth.uid() AND auth.role() = 'authenticated');
+
+CREATE POLICY "Criador gerencia próprio grupo de estudo" ON public.grupos_estudo 
+  FOR UPDATE USING (criador_id = auth.uid());
+
+CREATE POLICY "Criador deleta próprio grupo de estudo" ON public.grupos_estudo 
+  FOR DELETE USING (criador_id = auth.uid());
+
+-- POLICIES: grupos_membros
+CREATE POLICY "Membros veem integrantes do mesmo grupo" ON public.grupos_membros 
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM public.grupos_membros gm 
+      WHERE gm.grupo_id = grupos_membros.grupo_id AND gm.usuario_id = auth.uid()
+    )
+    OR EXISTS (
+      SELECT 1 FROM public.grupos_estudo ge 
+      WHERE ge.id = grupos_membros.grupo_id AND ge.criador_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Usuário se inscreve em grupo de estudo" ON public.grupos_membros 
+  FOR INSERT WITH CHECK (usuario_id = auth.uid());
+
+CREATE POLICY "Usuário cancela inscrição ou monitor remove membro" ON public.grupos_membros 
+  FOR DELETE USING (
+    usuario_id = auth.uid() 
+    OR EXISTS (
+      SELECT 1 FROM public.grupos_estudo ge 
+      WHERE ge.id = grupos_membros.grupo_id AND ge.criador_id = auth.uid()
+    )
+    OR EXISTS (
+      SELECT 1 FROM public.grupos_membros gm 
+      WHERE gm.grupo_id = grupos_membros.grupo_id AND gm.usuario_id = auth.uid() AND gm.is_monitor = true
+    )
+  );
+
+-- POLICIES: registros_encontro
+CREATE POLICY "Membros veem registros de encontros do grupo" ON public.registros_encontro 
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM public.grupos_membros gm 
+      WHERE gm.grupo_id = registros_encontro.grupo_id AND gm.usuario_id = auth.uid()
+    )
+    OR EXISTS (
+      SELECT 1 FROM public.grupos_estudo ge 
+      WHERE ge.id = registros_encontro.grupo_id AND ge.criador_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Monitores e criadores registram encontros" ON public.registros_encontro 
+  FOR INSERT WITH CHECK (
+    registrado_por = auth.uid() AND (
+      EXISTS (
+        SELECT 1 FROM public.grupos_estudo ge 
+        WHERE ge.id = registros_encontro.grupo_id AND ge.criador_id = auth.uid()
+      )
+      OR EXISTS (
+        SELECT 1 FROM public.grupos_membros gm 
+        WHERE gm.grupo_id = registros_encontro.grupo_id AND gm.usuario_id = auth.uid() AND gm.is_monitor = true
+      )
+    )
+  );
+
+CREATE POLICY "Registrante ou criador atualiza registro de encontro" ON public.registros_encontro 
+  FOR UPDATE USING (
+    registrado_por = auth.uid() 
+    OR EXISTS (
+      SELECT 1 FROM public.grupos_estudo ge 
+      WHERE ge.id = registros_encontro.grupo_id AND ge.criador_id = auth.uid()
+    )
+  );
