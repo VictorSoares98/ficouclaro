@@ -67,10 +67,13 @@ _Uma tarefa só é considerada concluída quando os critérios aplicáveis tiver
 
 _Esta seção é atualizada durante o ciclo de execução dos prompts._
 
-- **Sprint Ativa:** [A DEFINIR PELO FLUXO DA TAREFA]
-- **Tarefa Atual:** [A DEFINIR NO PROMPT 3]
-- **Critérios de Aceite:** [A DEFINIR NO PROMPT 3]
-- **Débitos Técnicos Mapeados:** [A DEFINIR PELO PROMPT 5, QUANDO APLICÁVEL]
+- **Sprint Ativa:** Sprint v2 - Refatoração Visual Global e Ergonomia
+- **Tarefa Atual:** Fundação Estrutural - Separação de Plataformas e Ergonomia (Mobile vs. Desktop)
+- **Critérios de Aceite:**
+  1. A navegação inferior (`MobileNavBottom.vue`) deve renderizar de forma fluida apenas em dispositivos móveis (`lt-md`), sem quebras no estado do Pinia.
+  2. O rodapé e drawers (`AppFooter.vue`) devem ser montados apenas em telas de desktop (`gt-sm`), isolando a experiência do professor.
+  3. Modais centrais substituídos por Bottom Sheets no mobile devem fechar corretamente ao evento de `swipe` e `route change`.
+  4. Nenhuma classe CSS utilitária do Quasar deve colidir com as classes Tailwind configuradas (`tw-`).
 
 ---
 
