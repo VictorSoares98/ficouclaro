@@ -36,58 +36,67 @@ const color = computed(() => {
 </script>
 
 <template>
-  <div class="tw-w-full tw-mt-2 tw-mb-4">
-    <q-linear-progress :value="progress" :color="color" class="tw-rounded-md tw-mb-3" size="4px" />
-    <div class="tw-grid tw-grid-cols-2 tw-gap-2 tw-text-xs tw-px-1">
+  <div class="tw-w-full tw-mt-1.5 tw-mb-2">
+    <q-linear-progress :value="progress" :color="color" class="tw-rounded-md tw-mb-2" size="4px" />
+    <div class="tw-grid tw-grid-cols-3 tw-gap-x-2 tw-gap-y-1 tw-text-[11px] sm:tw-text-xs tw-px-0.5">
+      <!-- Coluna 1, Linha 1 -->
       <div
         class="tw-flex tw-items-center tw-gap-1"
         :class="validations.length ? 'tw-text-positive' : 'text-hint'"
       >
         <q-icon
           :name="validations.length ? 'check_circle' : 'radio_button_unchecked'"
-          size="14px"
+          size="13px"
         />
         <span>12+ caracteres</span>
       </div>
+
+      <!-- Coluna 2, Linha 1 -->
       <div
         class="tw-flex tw-items-center tw-gap-1"
         :class="validations.uppercase ? 'tw-text-positive' : 'text-hint'"
       >
         <q-icon
           :name="validations.uppercase ? 'check_circle' : 'radio_button_unchecked'"
-          size="14px"
+          size="13px"
         />
         <span>Maiúscula</span>
       </div>
+
+      <!-- Coluna 3, Linha 1 e 2: Símbolo especial na 3ª coluna -->
+      <div
+        class="tw-flex tw-items-center tw-gap-1 tw-row-span-2"
+        :class="validations.symbol ? 'tw-text-positive' : 'text-hint'"
+      >
+        <q-icon
+          :name="validations.symbol ? 'check_circle' : 'radio_button_unchecked'"
+          size="13px"
+        />
+        <span>Símbolo especial (!@#$%)</span>
+      </div>
+
+      <!-- Coluna 1, Linha 2 -->
       <div
         class="tw-flex tw-items-center tw-gap-1"
         :class="validations.lowercase ? 'tw-text-positive' : 'text-hint'"
       >
         <q-icon
           :name="validations.lowercase ? 'check_circle' : 'radio_button_unchecked'"
-          size="14px"
+          size="13px"
         />
         <span>Minúscula</span>
       </div>
+
+      <!-- Coluna 2, Linha 2 -->
       <div
         class="tw-flex tw-items-center tw-gap-1"
         :class="validations.number ? 'tw-text-positive' : 'text-hint'"
       >
         <q-icon
           :name="validations.number ? 'check_circle' : 'radio_button_unchecked'"
-          size="14px"
+          size="13px"
         />
         <span>Número</span>
-      </div>
-      <div
-        class="tw-flex tw-items-center tw-gap-1 tw-col-span-2"
-        :class="validations.symbol ? 'tw-text-positive' : 'text-hint'"
-      >
-        <q-icon
-          :name="validations.symbol ? 'check_circle' : 'radio_button_unchecked'"
-          size="14px"
-        />
-        <span>Símbolo especial (!@#$%)</span>
       </div>
     </div>
   </div>

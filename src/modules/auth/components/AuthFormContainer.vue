@@ -16,11 +16,11 @@ const route = useRoute();
   <q-page class="tw-flex tw-min-h-screen tw-w-full">
     <!-- Lado Esquerdo: Formulários de Autenticação (Mobile: 100%, Desktop: 5/12) -->
     <div
-      class="tw-w-full lg:tw-w-5/12 tw-flex tw-flex-col tw-justify-center tw-items-center tw-py-4 sm:tw-py-6 tw-px-6 sm:tw-px-10 xl:tw-px-14 tw-relative tw-z-10 tw-border-r tw-border-gray-200 dark:tw-border-gray-800"
+      class="tw-w-full lg:tw-w-5/12 tw-flex tw-flex-col tw-justify-center tw-items-center tw-py-3 sm:tw-py-4 xl:tw-py-6 tw-px-6 sm:tw-px-10 xl:tw-px-14 tw-relative tw-z-10 tw-border-r tw-border-gray-200 dark:tw-border-gray-800"
     >
       <div class="tw-w-full tw-max-w-md tw-flex tw-flex-col tw-my-auto">
         <!-- Barra de Topo: Voltar ao Início e Menu de Acessibilidade -->
-        <div class="tw-flex tw-items-center tw-justify-between tw-mb-3 sm:tw-mb-4">
+        <div class="tw-flex tw-items-center tw-justify-between tw-mb-2 sm:tw-mb-3">
           <q-btn
             flat
             dense
@@ -36,7 +36,7 @@ const route = useRoute();
         </div>
 
         <!-- Título e Subtítulo -->
-        <div class="tw-mb-3 sm:tw-mb-4">
+        <div class="tw-mb-2 sm:tw-mb-3">
           <h1 class="tw-text-xl sm:tw-text-2xl tw-font-bold tw-mb-1 tw-tracking-tight">
             {{ title }}
           </h1>
@@ -46,7 +46,7 @@ const route = useRoute();
         </div>
 
         <!-- Abas Modernas (Entrar / Criar Conta) com Indicador Animado -->
-        <div class="tw-flex tw-mb-4 sm:tw-mb-5 tw-border-b tw-border-gray-200 dark:tw-border-gray-800">
+        <div class="tw-flex tw-mb-3 sm:tw-mb-4 tw-border-b tw-border-gray-200 dark:tw-border-gray-800">
           <router-link
             to="/login"
             :class="[
