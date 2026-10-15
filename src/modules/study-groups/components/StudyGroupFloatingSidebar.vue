@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount, nextTick, watch } from 'vue';
+import { ref, onMounted, onBeforeUnmount, nextTick, watch } from 'vue';
 import { gsap } from '@/boot/gsap';
 import { Draggable } from 'gsap/Draggable';
 import { useStudyGroupStore } from '../stores/study-group.store';
@@ -7,10 +7,18 @@ import StudyGroupCard from './StudyGroupCard.vue';
 import type { StudyGroupPublic } from '../types/study-group.types';
 
 const store = useStudyGroupStore();
+const currentSnapState = ref<'peek' | 'half' | 'expanded'>('peek');
 let gsapCtx: gsap.Context | null = null;
+let snapCycleFn: (() => void) | null = null;
 
 function handleSelectGroup(group: StudyGroupPublic) {
   store.selectGroup(group);
+}
+
+function cycleSheetState() {
+  if (snapCycleFn) {
+    snapCycleFn();
+  }
 }
 
 onMounted(() => {
@@ -21,16 +29,27 @@ onMounted(() => {
         const panel = document.querySelector('.floating-panel') as HTMLElement;
         if (!panel) return;
 
-        // Cálculos dinâmicos do Bottom Sheet móvel
+        // Cálculos dinâmicos e calibrados do Bottom Sheet móvel
         const panelHeight = panel.getBoundingClientRect().height;
-        const collapsedY = Math.max(0, panelHeight - 160); // Mantém ~160px visíveis (header, busca e filtros)
-        const halfY = panelHeight * 0.5; // Metade da tela
-        const expandedY = 0; // Totalmente expandido até o topo (bottom: 0, y: 0)
+        const collapsedY = Math.max(0, panelHeight - 145); // Peek: expõe ~145px (handle, título e barra de busca)
+        const halfY = Math.round(panelHeight * 0.52); // Half: ~48% da altura visível
+        const expandedY = 0; // Expanded: sobe respeitando o teto de 76px abaixo do header
 
         const snapPoints = [expandedY, halfY, collapsedY];
 
+        const updateStateFromY = (yVal: number) => {
+          if (Math.abs(yVal - expandedY) < 30) {
+            currentSnapState.value = 'expanded';
+          } else if (Math.abs(yVal - halfY) < 40) {
+            currentSnapState.value = 'half';
+          } else {
+            currentSnapState.value = 'peek';
+          }
+        };
+
         // Define o estado inicial recolhido no mobile
         gsap.set(panel, { y: collapsedY });
+        currentSnapState.value = 'peek';
 
         const dragInstance = Draggable.create(panel, {
           type: 'y',
@@ -55,6 +74,8 @@ onMounted(() => {
               else targetY = halfY;
             }
 
+            updateStateFromY(targetY);
+
             gsap.to(this.target, {
               y: targetY,
               duration: 0.3,
@@ -63,13 +84,33 @@ onMounted(() => {
           },
         })[0];
 
-        // Auto-expandir a gaveta para o topo se o usuário selecionar um grupo no mapa
+        // Função de alternância de estado para o botão do handle e atalhos de teclado
+        snapCycleFn = () => {
+          let nextY: number;
+          if (currentSnapState.value === 'peek') {
+            nextY = halfY;
+          } else if (currentSnapState.value === 'half') {
+            nextY = expandedY;
+          } else {
+            nextY = collapsedY;
+          }
+          updateStateFromY(nextY);
+          gsap.to(panel, {
+            y: nextY,
+            duration: 0.35,
+            ease: 'power2.out',
+            onUpdate: () => dragInstance?.update(),
+          });
+        };
+
+        // Auto-expandir a gaveta se o usuário selecionar um grupo no mapa
         const stopWatcher = watch(
           () => store.selectedGroup,
           (newGroup) => {
             if (newGroup) {
               const currentY = gsap.getProperty(panel, 'y') as number;
               if (currentY > expandedY) {
+                currentSnapState.value = 'expanded';
                 gsap.to(panel, {
                   y: expandedY,
                   duration: 0.4,
@@ -83,6 +124,7 @@ onMounted(() => {
 
         return () => {
           stopWatcher();
+          snapCycleFn = null;
         };
       });
     });
@@ -90,6 +132,7 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
+  snapCycleFn = null;
   if (gsapCtx) {
     gsapCtx.revert();
   }
@@ -106,16 +149,26 @@ onBeforeUnmount(() => {
   >
     <!-- Área combinada de Arraste (Handle + Título + Pesquisa) -->
     <div id="drag-zone" class="tw-w-full">
-      <!-- Handle Visual para Mobile (Gaveta Bottom Sheet) -->
-      <div class="tw-w-full tw-flex tw-justify-center tw-pt-3 md:tw-hidden cursor-grab">
-        <div
-          class="tw-w-12 tw-h-1.5 tw-rounded-full"
-          style="background-color: currentColor; opacity: 0.25"
-        ></div>
+      <!-- Handle Acessível para Mobile (Gaveta Bottom Sheet - WCAG 2.1 AA) -->
+      <div class="tw-w-full tw-flex tw-justify-center tw-pt-2 tw-pb-1 md:tw-hidden">
+        <button
+          type="button"
+          class="tw-w-full tw-h-11 tw-flex tw-items-center tw-justify-center tw-bg-transparent tw-border-none tw-cursor-grab active:tw-cursor-grabbing tw-touch-none focus:tw-outline-none focus-visible:tw-ring-2 focus-visible:tw-ring-primary tw-rounded-t-3xl"
+          :aria-expanded="currentSnapState === 'expanded'"
+          aria-label="Alternar altura do painel de grupos de estudo"
+          @click="cycleSheetState"
+          @keydown.enter.prevent="cycleSheetState"
+          @keydown.space.prevent="cycleSheetState"
+        >
+          <span
+            class="tw-w-12 tw-h-1.5 tw-rounded-full tw-transition-colors"
+            style="background-color: currentColor; opacity: 0.3"
+          ></span>
+        </button>
       </div>
 
       <!-- Cabeçalho do Painel com Título e Filtros -->
-      <q-card-section class="tw-p-5 sm:tw-p-6 tw-pt-3 sm:tw-pt-4 md:tw-pt-6 cursor-grab">
+      <q-card-section class="tw-p-4 sm:tw-p-6 tw-pt-1 sm:tw-pt-3 md:tw-pt-6 cursor-grab">
         <div class="tw-flex tw-items-center tw-gap-2.5 tw-mb-1">
           <div
             class="tw-w-8 tw-h-8 tw-rounded-xl tw-bg-primary/10 tw-text-primary tw-flex tw-items-center tw-justify-center"

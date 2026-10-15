@@ -98,23 +98,23 @@ function handleCreateGroupClick() {
 
     <!-- 2. Header Flutuante Translúcido (Espelho da arquitetura do Find My Pockets) -->
     <header
-      class="tw-absolute tw-top-0 tw-left-0 tw-w-full tw-z-[1000] tw-px-4 sm:tw-px-6 tw-pb-4 tw-flex tw-justify-between tw-items-center tw-pointer-events-none md:tw-px-8"
-      style="padding-top: calc(1rem + env(safe-area-inset-top, 0px))"
+      class="tw-absolute tw-top-0 tw-left-0 tw-w-full tw-z-[1000] tw-px-3 sm:tw-px-6 tw-pb-3 sm:tw-pb-4 tw-flex tw-justify-between tw-items-center tw-pointer-events-none md:tw-px-8"
+      style="padding-top: calc(0.75rem + env(safe-area-inset-top, 0px))"
     >
       <q-card
-        class="tw-pointer-events-auto tw-backdrop-blur-md tw-px-4 tw-py-2 tw-rounded-2xl tw-shadow-lg"
+        class="tw-pointer-events-auto tw-backdrop-blur-md tw-px-3 tw-py-1.5 sm:tw-px-4 sm:tw-py-2 tw-rounded-2xl tw-shadow-lg"
       >
-        <h1 class="text-h6 text-weight-bold tw-font-space-grotesk tw-m-0 tw-leading-none">
+        <h1 class="text-subtitle2 sm:text-h6 text-weight-bold tw-font-space-grotesk tw-m-0 tw-leading-none">
           FICOU <span class="text-primary">CLARO?</span>
         </h1>
       </q-card>
 
       <!-- Ações Rápidas na Direita -->
-      <div class="tw-pointer-events-auto tw-flex tw-items-center tw-gap-2">
+      <div class="tw-pointer-events-auto tw-flex tw-items-center tw-gap-1.5 sm:tw-gap-2">
         <q-card
           flat
           bordered
-          class="tw-p-1 tw-rounded-2xl tw-shadow-lg tw-flex tw-items-center tw-gap-1.5 tw-backdrop-blur-md"
+          class="tw-p-1 tw-rounded-2xl tw-shadow-lg tw-flex tw-items-center tw-gap-1 sm:tw-gap-1.5 tw-backdrop-blur-md"
         >
           <!-- Botão Voltar ao Início -->
           <q-btn
@@ -125,6 +125,7 @@ function handleCreateGroupClick() {
             color="primary"
             to="/"
             aria-label="Voltar à Página Inicial"
+            class="tw-w-8 tw-h-8 sm:tw-w-9 sm:tw-h-9"
           >
             <q-tooltip class="tw-text-xs">Voltar ao Início</q-tooltip>
           </q-btn>
@@ -133,14 +134,17 @@ function handleCreateGroupClick() {
           <AccessibilityMenu />
         </q-card>
 
-        <!-- Botão Criar Grupo (Destaque Principal) -->
+        <!-- Botão Criar Grupo (Destaque Principal com adaptação inteligente para mobile) -->
         <q-btn
           unelevated
           color="primary"
           icon="add"
-          label="Criar Grupo"
+          :label="$q.screen.gt.xs ? 'Criar Grupo' : undefined"
+          :round="!$q.screen.gt.xs"
+          :dense="!$q.screen.gt.xs"
+          aria-label="Criar Grupo de Estudo"
           no-caps
-          class="tw-rounded-2xl tw-font-bold tw-text-xs sm:tw-text-sm tw-shadow-xl tw-h-10 tw-px-3.5 sm:tw-px-4"
+          class="tw-rounded-2xl tw-font-bold tw-text-xs sm:tw-text-sm tw-shadow-xl tw-h-9 sm:tw-h-10 tw-w-9 sm:tw-w-auto sm:tw-px-4 tw-flex tw-items-center tw-justify-center"
           @click="handleCreateGroupClick"
         />
       </div>
@@ -148,7 +152,7 @@ function handleCreateGroupClick() {
 
     <!-- 3. Painel Lateral/Inferior Flutuante (Filtros e Resultados) -->
     <div
-      class="tw-absolute tw-z-[1000] tw-pointer-events-none floating-panel tw-bottom-0 tw-left-0 tw-w-full tw-h-[calc(100dvh-env(safe-area-inset-top,0px)-60px)] md:tw-top-24 md:tw-bottom-auto md:tw-left-6 md:tw-w-full md:tw-max-w-[492px] md:tw-h-[calc(100vh-8rem)] tw-flex tw-items-end md:tw-items-center"
+      class="tw-absolute tw-z-[1000] tw-pointer-events-none floating-panel tw-bottom-0 tw-left-0 tw-w-full tw-h-[calc(100dvh-env(safe-area-inset-top,0px)-76px)] md:tw-top-24 md:tw-bottom-auto md:tw-left-6 md:tw-w-full md:tw-max-w-[420px] md:tw-h-[calc(100vh-8rem)] tw-flex tw-items-end md:tw-items-center"
     >
       <StudyGroupFloatingSidebar class="tw-pointer-events-auto tw-w-full tw-h-full" />
 

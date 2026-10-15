@@ -40,10 +40,19 @@ onMounted(async () => {
     setTimeout(() => {
       invalidateSize();
     }, 250);
+
+    window.addEventListener('orientationchange', handleOrientationChange);
   }
 });
 
+function handleOrientationChange() {
+  setTimeout(() => {
+    invalidateSize();
+  }, 200);
+}
+
 onUnmounted(() => {
+  window.removeEventListener('orientationchange', handleOrientationChange);
   if (mapInstanceRef.value) {
     mapInstanceRef.value.remove();
   }
@@ -133,5 +142,14 @@ defineExpose({
 .custom-study-marker {
   background: transparent;
   border: none;
+}
+
+/* Posicionamento responsivo dos controles de zoom para não colidir com o Bottom Sheet */
+@media (max-width: 767px) {
+  .leaflet-bottom.leaflet-right {
+    margin-bottom: calc(155px + env(safe-area-inset-bottom, 0px)) !important;
+    margin-right: 14px !important;
+    transition: margin-bottom 0.3s ease;
+  }
 }
 </style>
