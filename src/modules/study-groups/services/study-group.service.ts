@@ -69,10 +69,7 @@ export class StudyGroupService {
   /**
    * Cria um novo grupo de estudo. O criador é automaticamente vinculado como monitor via trigger.
    */
-  async createStudyGroup(
-    criadorId: string,
-    dto: CreateStudyGroupDTO,
-  ): Promise<StudyGroupDetail> {
+  async createStudyGroup(criadorId: string, dto: CreateStudyGroupDTO): Promise<StudyGroupDetail> {
     const { data, error } = await supabase
       .from('grupos_estudo')
       .insert({

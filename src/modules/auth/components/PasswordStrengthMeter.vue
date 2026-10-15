@@ -38,7 +38,9 @@ const color = computed(() => {
 <template>
   <div class="tw-w-full tw-mt-1.5 tw-mb-2">
     <q-linear-progress :value="progress" :color="color" class="tw-rounded-md tw-mb-2" size="4px" />
-    <div class="tw-grid tw-grid-cols-3 tw-gap-x-2 tw-gap-y-1 tw-text-[11px] sm:tw-text-xs tw-px-0.5">
+    <div
+      class="tw-grid tw-grid-cols-3 tw-gap-x-2 tw-gap-y-1 tw-text-[11px] sm:tw-text-xs tw-px-0.5"
+    >
       <!-- Coluna 1, Linha 1 -->
       <div
         class="tw-flex tw-items-center tw-gap-1"

@@ -66,8 +66,8 @@
           </div>
         </div>
         <p class="tw-text-white/95 tw-text-xs sm:tw-text-sm tw-leading-relaxed tw-italic">
-          "Poder sinalizar dúvidas anonimamente sem vergonha de interromper a sala transformou
-          minha experiência em sala de aula."
+          "Poder sinalizar dúvidas anonimamente sem vergonha de interromper a sala transformou minha
+          experiência em sala de aula."
         </p>
       </div>
     </div>

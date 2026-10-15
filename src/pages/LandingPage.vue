@@ -20,7 +20,9 @@ import BaseSurfaceCard from '@/core/components/BaseSurfaceCard.vue';
         </h1>
 
         <!-- Subtitle -->
-        <p class="tw-text-base sm:tw-text-lg md:tw-text-xl text-muted tw-max-w-2xl tw-mx-auto tw-leading-relaxed">
+        <p
+          class="tw-text-base sm:tw-text-lg md:tw-text-xl text-muted tw-max-w-2xl tw-mx-auto tw-leading-relaxed"
+        >
           Acompanhe o ritmo da turma em tempo real. Uma plataforma conectando professores e alunos
           para garantir que todo o conteúdo realmente "ficou claro".
         </p>

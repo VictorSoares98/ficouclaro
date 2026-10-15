@@ -195,7 +195,9 @@ async function onSubmit() {
 
       <q-form @submit.prevent="onSubmit" class="tw-space-y-3">
         <div>
-          <label class="tw-text-muted tw-text-xs tw-font-bold tw-mb-1 tw-block">E-mail de Acesso</label>
+          <label class="tw-text-muted tw-text-xs tw-font-bold tw-mb-1 tw-block"
+            >E-mail de Acesso</label
+          >
           <q-input
             v-model="email"
             type="email"

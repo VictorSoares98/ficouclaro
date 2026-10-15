@@ -114,7 +114,11 @@ export function useStudyGroupsMap() {
 
       const isMonitoria = group.tipo === 'monitoria';
       const isProjeto = group.tipo === 'projeto';
-      const badgeColor = isMonitoria ? '#10b981' : isProjeto ? '#f59e0b' : 'var(--q-primary, #1976d2)';
+      const badgeColor = isMonitoria
+        ? '#10b981'
+        : isProjeto
+          ? '#f59e0b'
+          : 'var(--q-primary, #1976d2)';
       const iconName = isMonitoria ? 'school' : isProjeto ? 'architecture' : 'groups';
 
       // Ícone SVG moderno embutido como divIcon
@@ -153,7 +157,10 @@ export function useStudyGroupsMap() {
       // Popup informativo elegante no padrão Find My Pockets
       const schedulePopup = group.dia_reuniao || group.dia_semana || '';
       const timePopup = group.horario_reuniao || group.horario || '';
-      const localPopup = group.local_especifico || group.sala ? `Local: ${group.local_especifico || ('Sala ' + group.sala)}` : '';
+      const localPopup =
+        group.local_especifico || group.sala
+          ? `Local: ${group.local_especifico || 'Sala ' + group.sala}`
+          : '';
       const criadorPopup = group.criador_nome ? `Monitor: ${group.criador_nome}` : '';
 
       marker.bindPopup(`

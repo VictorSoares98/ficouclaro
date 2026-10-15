@@ -5,7 +5,9 @@
 <template>
   <q-page class="tw-p-4 tw-max-w-4xl tw-mx-auto">
     <div class="tw-mt-8 tw-mb-12">
-      <h1 class="tw-text-2xl sm:tw-text-3xl tw-font-bold tw-mb-6 tw-text-primary">Política de Privacidade</h1>
+      <h1 class="tw-text-2xl sm:tw-text-3xl tw-font-bold tw-mb-6 tw-text-primary">
+        Política de Privacidade
+      </h1>
 
       <div class="tw-text-base text-muted tw-space-y-6">
         <p>

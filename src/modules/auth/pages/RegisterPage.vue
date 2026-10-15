@@ -168,8 +168,13 @@ async function onGoogleLogin() {
       <!-- 3. Consentimento Legal Claro (Padrão Sign-in-wrap / LGPD) -->
       <p class="tw-text-[11px] tw-text-center text-muted tw-mt-0.5">
         Ao se cadastrar, você concorda com nossos
-        <router-link to="/termos" class="tw-text-primary hover:tw-underline">Termos de Uso</router-link> e a
-        <router-link to="/privacidade" class="tw-text-primary hover:tw-underline">Política de Privacidade</router-link>.
+        <router-link to="/termos" class="tw-text-primary hover:tw-underline"
+          >Termos de Uso</router-link
+        >
+        e a
+        <router-link to="/privacidade" class="tw-text-primary hover:tw-underline"
+          >Política de Privacidade</router-link
+        >.
       </p>
 
       <!-- 4. Divisor -->
@@ -182,7 +187,9 @@ async function onGoogleLogin() {
       <!-- 5. Formulário de Cadastro Tradicional Compacto -->
       <q-form @submit.prevent="onSubmit" class="tw-space-y-1.5 sm:tw-space-y-2">
         <div>
-          <label class="tw-text-muted tw-text-[11px] sm:tw-text-xs tw-font-bold tw-mb-0.5 tw-block">Nome Completo</label>
+          <label class="tw-text-muted tw-text-[11px] sm:tw-text-xs tw-font-bold tw-mb-0.5 tw-block"
+            >Nome Completo</label
+          >
           <q-input
             v-model="fullName"
             type="text"
@@ -200,7 +207,9 @@ async function onGoogleLogin() {
         </div>
 
         <div>
-          <label class="tw-text-muted tw-text-[11px] sm:tw-text-xs tw-font-bold tw-mb-0.5 tw-block">E-mail de Acesso</label>
+          <label class="tw-text-muted tw-text-[11px] sm:tw-text-xs tw-font-bold tw-mb-0.5 tw-block"
+            >E-mail de Acesso</label
+          >
           <q-input
             v-model="email"
             type="email"
@@ -221,7 +230,9 @@ async function onGoogleLogin() {
         </div>
 
         <div>
-          <label class="tw-text-muted tw-text-[11px] sm:tw-text-xs tw-font-bold tw-mb-0.5 tw-block">Criar Senha</label>
+          <label class="tw-text-muted tw-text-[11px] sm:tw-text-xs tw-font-bold tw-mb-0.5 tw-block"
+            >Criar Senha</label
+          >
           <q-input
             v-model="password"
             :type="isPasswordVisible ? 'text' : 'password'"
@@ -258,7 +269,9 @@ async function onGoogleLogin() {
         </div>
 
         <div>
-          <label class="tw-text-muted tw-text-[11px] sm:tw-text-xs tw-font-bold tw-mb-0.5 tw-block">Confirmar Senha</label>
+          <label class="tw-text-muted tw-text-[11px] sm:tw-text-xs tw-font-bold tw-mb-0.5 tw-block"
+            >Confirmar Senha</label
+          >
           <q-input
             v-model="confirmPassword"
             :type="isPasswordVisible ? 'text' : 'password'"

@@ -78,7 +78,9 @@ const locationDetails = computed(() => {
       <div
         class="tw-rounded-xl tw-p-2 tw-flex tw-items-center tw-gap-2.5 tw-border tw-border-primary/15 tw-bg-primary/5"
       >
-        <div class="tw-p-1.5 tw-rounded-lg tw-bg-primary/10 tw-text-primary tw-shrink-0 tw-flex tw-items-center tw-justify-center">
+        <div
+          class="tw-p-1.5 tw-rounded-lg tw-bg-primary/10 tw-text-primary tw-shrink-0 tw-flex tw-items-center tw-justify-center"
+        >
           <q-icon name="schedule" size="16px" />
         </div>
         <div class="tw-min-w-0 tw-flex-1">
@@ -93,7 +95,9 @@ const locationDetails = computed(() => {
         v-if="locationDetails"
         class="tw-rounded-xl tw-p-2 tw-flex tw-items-center tw-gap-2.5 tw-border tw-border-secondary/15 tw-bg-secondary/5"
       >
-        <div class="tw-p-1.5 tw-rounded-lg tw-bg-secondary/10 tw-text-secondary tw-shrink-0 tw-flex tw-items-center tw-justify-center">
+        <div
+          class="tw-p-1.5 tw-rounded-lg tw-bg-secondary/10 tw-text-secondary tw-shrink-0 tw-flex tw-items-center tw-justify-center"
+        >
           <q-icon name="place" size="16px" />
         </div>
         <div class="tw-min-w-0 tw-flex-1">
@@ -109,10 +113,7 @@ const locationDetails = computed(() => {
       class="tw-flex tw-items-center tw-justify-between tw-text-xs text-muted tw-pt-2 tw-border-t tw-border-gray-100 dark:tw-border-gray-800"
     >
       <div class="tw-flex tw-items-center tw-gap-1.5 tw-truncate tw-max-w-[55%]">
-        <q-avatar
-          v-if="group.criador_avatar"
-          size="18px"
-        >
+        <q-avatar v-if="group.criador_avatar" size="18px">
           <img :src="group.criador_avatar" alt="Avatar do criador" />
         </q-avatar>
         <q-avatar
@@ -135,12 +136,7 @@ const locationDetails = computed(() => {
           <span>{{ group.total_membros }}</span>
         </div>
 
-        <q-badge
-          v-if="group.vagas"
-          outline
-          color="grey-6"
-          class="tw-text-[10px] tw-rounded-md"
-        >
+        <q-badge v-if="group.vagas" outline color="grey-6" class="tw-text-[10px] tw-rounded-md">
           {{ group.vagas }} vagas
         </q-badge>
       </div>

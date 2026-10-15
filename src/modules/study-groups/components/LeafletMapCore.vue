@@ -10,14 +10,8 @@ import { useStudyGroupStore } from '../stores/study-group.store';
 const $q = useQuasar();
 const store = useStudyGroupStore();
 
-const {
-  initMap,
-  applyThemeLayer,
-  renderMarkers,
-  flyToGroup,
-  invalidateSize,
-  mapInstanceRef,
-} = useStudyGroupsMap();
+const { initMap, applyThemeLayer, renderMarkers, flyToGroup, invalidateSize, mapInstanceRef } =
+  useStudyGroupsMap();
 
 onMounted(async () => {
   try {

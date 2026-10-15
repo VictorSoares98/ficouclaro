@@ -46,7 +46,9 @@ const route = useRoute();
         </div>
 
         <!-- Abas Modernas (Entrar / Criar Conta) com Indicador Animado -->
-        <div class="tw-flex tw-mb-3 sm:tw-mb-4 tw-border-b tw-border-gray-200 dark:tw-border-gray-800">
+        <div
+          class="tw-flex tw-mb-3 sm:tw-mb-4 tw-border-b tw-border-gray-200 dark:tw-border-gray-800"
+        >
           <router-link
             to="/login"
             :class="[

@@ -36,9 +36,7 @@
           que viole o código de ética educacional resultará na exclusão da conta do infrator.
         </p>
 
-        <h2 class="tw-text-xl tw-font-semibold tw-mt-8 tw-mb-4">
-          4. Limitação de Disponibilidade
-        </h2>
+        <h2 class="tw-text-xl tw-font-semibold tw-mt-8 tw-mb-4">4. Limitação de Disponibilidade</h2>
         <p>
           Sendo um software em fase MVP (Minimum Viable Product), a plataforma é fornecida "no
           estado em que se encontra", sem garantias de disponibilidade ininterrupta (uptime de
