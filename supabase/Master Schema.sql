@@ -1,7 +1,7 @@
 -- ====================================================================
 -- ⚠️ AVISO: ARQUIVO AUTO-GERADO!
 -- NÃO EDITE ESTE ARQUIVO DIRETAMENTE. ALTERE OS SNIPPETS E RODE db:build
--- Gerado em: 2026-10-15T02:28:16.743Z
+-- Gerado em: 2026-10-15T02:31:25.545Z
 -- ====================================================================
 
 -- >>> INÍCIO DO SNIPPET: 00_Init_Extensions.sql <<<
@@ -228,7 +228,7 @@ CREATE TABLE public.registros_encontro (
 
 -- >>> INÍCIO DO SNIPPET: 03_Views.sql <<<
 -- ============================================================
--- 02_Views - VIEWS PUBLICAS E SEGURAS
+-- 03 - VIEWS PÚBLICAS E SEGURAS
 -- ============================================================
 
 -- ============================================================
@@ -276,7 +276,7 @@ GROUP BY g.id, u.nome_completo, u.url_avatar;
 
 -- >>> INÍCIO DO SNIPPET: 04_Funcoes.sql <<<
 -- ============================================================
--- 03 - FUNÇÕES GLOBAIS
+-- 04 - FUNÇÕES GLOBAIS
 -- ============================================================
 
 -- Retorna o papel do usuário autenticado
@@ -536,7 +536,7 @@ $$;
 
 -- >>> INÍCIO DO SNIPPET: 05_Triggers.sql <<<
 -- ============================================================
--- 04 - TRIGGERS
+-- 05 - TRIGGERS
 -- ============================================================
 
 -- Trigger: Auto-criar perfil após registro no Auth
@@ -720,7 +720,7 @@ CREATE TRIGGER ao_criar_grupo_estudo
 
 -- >>> INÍCIO DO SNIPPET: 06_RLS_e_Grants.sql <<<
 -- ============================================================
--- 05 - ROW LEVEL SECURITY (RLS) E POLÍTICAS
+-- 06 - ROW LEVEL SECURITY (RLS) E POLÍTICAS
 -- ============================================================
 -- Nota: A role 'anon' não possui grants no schema public (Zero-Trust).
 
@@ -917,7 +917,7 @@ GRANT EXECUTE ON FUNCTION public.link_member_to_study_group(UUID) TO authenticat
 
 -- >>> INÍCIO DO SNIPPET: 07_Indexes_Performance.sql <<<
 -- ============================================================
--- 06 - ÍNDICES E PERFORMANCE
+-- 07 - ÍNDICES E PERFORMANCE
 -- ============================================================
 
 CREATE INDEX IF NOT EXISTS idx_disciplinas_professor_id ON public.disciplinas(professor_id);
@@ -953,7 +953,7 @@ CREATE INDEX IF NOT EXISTS idx_registros_encontro_data ON public.registros_encon
 
 -- >>> INÍCIO DO SNIPPET: 08_Realtime.sql <<<
 -- ============================================================
--- 07 - REALTIME
+-- 08 - REALTIME
 -- ============================================================
 
 -- Adiciona as tabelas que precisam de reatividade ao vivo no Supabase Realtime

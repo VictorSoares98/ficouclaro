@@ -1,5 +1,5 @@
 -- ============================================================
--- 05 - ROW LEVEL SECURITY (RLS) E POLÍTICAS
+-- 06 - ROW LEVEL SECURITY (RLS) E POLÍTICAS
 -- ============================================================
 -- Nota: A role 'anon' não possui grants no schema public (Zero-Trust).
 

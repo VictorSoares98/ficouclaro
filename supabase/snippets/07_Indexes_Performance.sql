@@ -1,5 +1,5 @@
 -- ============================================================
--- 06 - ÍNDICES E PERFORMANCE
+-- 07 - ÍNDICES E PERFORMANCE
 -- ============================================================
 
 CREATE INDEX IF NOT EXISTS idx_disciplinas_professor_id ON public.disciplinas(professor_id);

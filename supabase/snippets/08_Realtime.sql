@@ -1,5 +1,5 @@
 -- ============================================================
--- 07 - REALTIME
+-- 08 - REALTIME
 -- ============================================================
 
 -- Adiciona as tabelas que precisam de reatividade ao vivo no Supabase Realtime
