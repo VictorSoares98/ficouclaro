@@ -40,30 +40,33 @@ function handleCreateGroupClick() {
 </script>
 
 <template>
-  <q-page class="tw-relative tw-w-full tw-h-screen tw-overflow-hidden tw-bg-gray-900">
+  <q-page class="tw-relative tw-w-full tw-h-screen tw-overflow-hidden">
     <!-- 1. Núcleo do Mapa Leaflet em Tela Cheia -->
     <LeafletMapCore ref="mapCoreRef" />
 
-    <!-- 2. Barra Superior Flutuante: Ações Rápidas à Direita -->
+    <!-- 2. Barra Superior Flutuante: Ações Rápidas à Direita em q-card nativo -->
     <div class="tw-absolute tw-top-4 tw-right-4 tw-z-20 tw-flex tw-items-center tw-gap-2">
-      <!-- Botão Voltar ao Início -->
-      <q-btn
+      <q-card
         flat
-        round
-        dense
-        icon="home"
-        color="white"
-        to="/"
-        class="tw-bg-gray-900/60 tw-backdrop-blur-md tw-border tw-border-white/10 tw-shadow-lg"
-        aria-label="Voltar à Página Inicial"
+        bordered
+        class="tw-p-1 tw-rounded-2xl tw-shadow-lg tw-flex tw-items-center tw-gap-1.5 tw-backdrop-blur-md"
       >
-        <q-tooltip class="tw-text-xs">Voltar ao Início</q-tooltip>
-      </q-btn>
+        <!-- Botão Voltar ao Início -->
+        <q-btn
+          flat
+          round
+          dense
+          icon="home"
+          color="primary"
+          to="/"
+          aria-label="Voltar à Página Inicial"
+        >
+          <q-tooltip class="tw-text-xs">Voltar ao Início</q-tooltip>
+        </q-btn>
 
-      <!-- Menu de Acessibilidade -->
-      <div class="tw-bg-gray-900/60 tw-backdrop-blur-md tw-border tw-border-white/10 tw-rounded-xl tw-shadow-lg tw-p-0.5">
-        <AccessibilityMenu color="white" />
-      </div>
+        <!-- Menu de Acessibilidade -->
+        <AccessibilityMenu />
+      </q-card>
 
       <!-- Botão Criar Grupo (Destaque Principal) -->
       <q-btn
@@ -72,7 +75,7 @@ function handleCreateGroupClick() {
         icon="add"
         label="Criar Grupo"
         no-caps
-        class="tw-rounded-xl tw-font-bold tw-text-xs sm:tw-text-sm tw-shadow-xl tw-h-9 sm:tw-h-10 tw-px-3 sm:tw-px-4"
+        class="tw-rounded-2xl tw-font-bold tw-text-xs sm:tw-text-sm tw-shadow-xl tw-h-10 tw-px-3.5 sm:tw-px-4"
         @click="handleCreateGroupClick"
       />
     </div>

@@ -150,13 +150,21 @@ export function useStudyGroupsMap() {
 
       marker.studyGroupId = group.id;
 
-      // Popup informativo sutil
+      // Popup informativo elegante no padrão Find My Pockets
+      const schedulePopup = group.dia_reuniao || group.dia_semana || '';
+      const timePopup = group.horario_reuniao || group.horario || '';
+      const localPopup = group.local_especifico || group.sala ? `Local: ${group.local_especifico || ('Sala ' + group.sala)}` : '';
+      const criadorPopup = group.criador_nome ? `Monitor: ${group.criador_nome}` : '';
+
       marker.bindPopup(`
-        <div style="font-family: 'Inter', sans-serif; padding: 4px; min-width: 180px;">
+        <div style="font-family: 'Inter', sans-serif; padding: 6px; min-width: 200px; line-height: 1.4;">
           <strong style="display: block; font-size: 14px; margin-bottom: 2px;">${group.nome}</strong>
-          <span style="font-size: 12px; color: #64748b;">${group.instituicao}${group.campus ? ' - ' + group.campus : ''}</span>
+          <span style="font-size: 12px; color: #64748b; display: block;">${group.instituicao}${group.campus ? ' · ' + group.campus : ''}</span>
+          ${localPopup ? `<span style="font-size: 11px; color: #475569; display: block; margin-top: 2px;">${localPopup}</span>` : ''}
+          ${schedulePopup || timePopup ? `<span style="font-size: 11px; color: #475569; display: block; margin-top: 2px;">📅 ${schedulePopup} ${timePopup ? 'às ' + timePopup : ''}</span>` : ''}
+          ${criadorPopup ? `<span style="font-size: 11px; color: #64748b; display: block; margin-top: 2px;">👤 ${criadorPopup}</span>` : ''}
           <div style="margin-top: 6px; font-size: 11px; font-weight: bold; color: ${badgeColor};">
-            ${isMonitoria ? 'Monitoria' : isProjeto ? 'Projeto' : 'Grupo de Estudos'}
+            ${isMonitoria ? 'Monitoria' : isProjeto ? 'Projeto' : group.tipo === 'reforco' ? 'Reforço' : 'Grupo de Estudos'}
           </div>
         </div>
       `);

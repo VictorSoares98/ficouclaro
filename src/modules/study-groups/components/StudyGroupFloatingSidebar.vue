@@ -38,9 +38,11 @@ function handleSelectGroup(group: StudyGroupPublic) {
       @click="toggleSidebar"
     />
 
-    <!-- Painel de Vidro / Superfície do Quasar -->
-    <div
-      class="tw-h-full tw-w-full tw-flex tw-flex-col tw-rounded-3xl tw-shadow-2xl tw-border tw-border-gray-200/80 dark:tw-border-gray-800/80 tw-bg-white/95 dark:tw-bg-dark-page/95 tw-backdrop-blur-md tw-overflow-hidden"
+    <!-- Painel de Superfície Nativa do Quasar (ADR-003 & ui-quasar-tailwind.md) -->
+    <q-card
+      flat
+      bordered
+      class="tw-h-full tw-w-full tw-flex tw-flex-col tw-rounded-3xl tw-shadow-2xl tw-backdrop-blur-md tw-overflow-hidden"
     >
       <!-- Cabeçalho do Painel -->
       <div class="tw-p-4 sm:tw-p-5 tw-border-b tw-border-gray-100 dark:tw-border-gray-800">
@@ -49,13 +51,13 @@ function handleSelectGroup(group: StudyGroupPublic) {
             <q-icon name="explore" size="20px" />
           </div>
           <div>
-            <h2 class="tw-text-base sm:tw-text-lg tw-font-bold tw-leading-tight tw-tracking-tight">
+            <h2 class="text-subtitle1 text-weight-bold tw-leading-tight tw-tracking-tight">
               Grupos de Estudo
             </h2>
           </div>
         </div>
 
-        <p class="tw-text-xs text-muted tw-mb-3">
+        <p class="text-caption text-muted tw-mb-3">
           Encontre monitorias e grupos de reforço na sua faculdade
         </p>
 
@@ -107,6 +109,19 @@ function handleSelectGroup(group: StudyGroupPublic) {
             dense
             rounded
             no-caps
+            :unelevated="store.filters.type === 'reforco'"
+            :flat="store.filters.type !== 'reforco'"
+            :color="store.filters.type === 'reforco' ? 'primary' : 'grey-7'"
+            class="tw-px-2.5 tw-text-xs"
+            label="Reforço"
+            @click="store.setTypeFilter('reforco')"
+          />
+
+          <q-btn
+            size="sm"
+            dense
+            rounded
+            no-caps
             :unelevated="store.filters.type === 'monitoria'"
             :flat="store.filters.type !== 'monitoria'"
             :color="store.filters.type === 'monitoria' ? 'primary' : 'grey-7'"
@@ -132,17 +147,15 @@ function handleSelectGroup(group: StudyGroupPublic) {
 
       <!-- Lista de Grupos com Scroll Suave -->
       <q-scroll-area class="tw-flex-1 tw-px-3 tw-py-3">
-        <!-- Skeleton Loading -->
-        <div v-if="store.isLoading" class="tw-space-y-3">
-          <div
+        <!-- Skeleton Loading Nativo do Quasar -->
+        <div v-if="store.isLoading" class="tw-space-y-2.5">
+          <q-skeleton
             v-for="i in 3"
             :key="i"
-            class="tw-p-4 tw-rounded-2xl tw-border tw-border-gray-200 dark:tw-border-gray-800 tw-animate-pulse"
-          >
-            <div class="tw-h-4 tw-bg-gray-200 dark:tw-bg-gray-700 tw-rounded tw-w-3/4 tw-mb-2"></div>
-            <div class="tw-h-3 tw-bg-gray-200 dark:tw-bg-gray-700 tw-rounded tw-w-1/2 tw-mb-3"></div>
-            <div class="tw-h-3 tw-bg-gray-200 dark:tw-bg-gray-700 tw-rounded tw-w-1/3"></div>
-          </div>
+            type="rect"
+            height="110px"
+            class="tw-rounded-2xl"
+          />
         </div>
 
         <!-- Lista Vazia -->
@@ -168,6 +181,6 @@ function handleSelectGroup(group: StudyGroupPublic) {
           />
         </div>
       </q-scroll-area>
-    </div>
+    </q-card>
   </aside>
 </template>
