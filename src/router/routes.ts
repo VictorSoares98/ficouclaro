@@ -14,6 +14,10 @@ const routes: RouteRecordRaw[] = [
         path: 'privacidade-seguranca',
         component: () => import('@/pages/PrivacidadeSegurancaPage.vue'),
       },
+      {
+        path: 'mapa',
+        component: () => import('@/modules/study-groups/pages/StudyGroupsMapPage.vue'),
+      },
     ],
   },
   {

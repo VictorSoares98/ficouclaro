@@ -1,0 +1,211 @@
+import { shallowRef } from 'vue';
+import L from 'leaflet';
+import 'leaflet.markercluster';
+import type { StudyGroupPublic, StudyGroupMarker } from '../types/study-group.types';
+
+// Asset imports explicitamente declarados com ?url para compatibilidade com Vite
+import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png?url';
+import iconUrl from 'leaflet/dist/images/marker-icon.png?url';
+import shadowUrl from 'leaflet/dist/images/marker-shadow.png?url';
+
+// Correção do bug de caminhos relativos do Leaflet no bundler Vite
+// @ts-expect-error - internal leaflet method missing from public types
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl,
+  iconUrl,
+  shadowUrl,
+});
+
+export function useStudyGroupsMap() {
+  // Instâncias blindadas com shallowRef para evitar reatividade intrusiva do Vue 3 Proxy
+  const mapInstanceRef = shallowRef<L.Map | null>(null);
+  const clusterGroupRef = shallowRef<L.MarkerClusterGroup | null>(null);
+  const currentTileLayer = shallowRef<L.TileLayer | null>(null);
+
+  /**
+   * Inicializa o mapa Leaflet no contêiner HTML indicado
+   */
+  function initMap(
+    containerId: string,
+    initialLat = -14.235,
+    initialLng = -51.9253,
+    initialZoom = 4,
+  ): L.Map {
+    if (mapInstanceRef.value) {
+      mapInstanceRef.value.remove();
+      mapInstanceRef.value = null;
+    }
+
+    const map = L.map(containerId, {
+      center: [initialLat, initialLng],
+      zoom: initialZoom,
+      zoomControl: false,
+    });
+
+    // Reposiciona o controle de zoom no canto inferior direito
+    L.control
+      .zoom({
+        position: 'bottomright',
+      })
+      .addTo(map);
+
+    // Cria o grupo de clusters nativo
+    const clusterGroup = L.markerClusterGroup({
+      showCoverageOnHover: false,
+      maxClusterRadius: 50,
+      spiderfyOnMaxZoom: true,
+      zoomToBoundsOnClick: true,
+    });
+
+    map.addLayer(clusterGroup);
+
+    mapInstanceRef.value = map;
+    clusterGroupRef.value = clusterGroup;
+
+    return map;
+  }
+
+  /**
+   * Alterna a camada de mapa (Tiles) de acordo com o modo de iluminação do Quasar
+   */
+  function applyThemeLayer(isDark: boolean) {
+    const map = mapInstanceRef.value;
+    if (!map) return;
+
+    if (currentTileLayer.value) {
+      map.removeLayer(currentTileLayer.value);
+    }
+
+    // Tiles da CartoDB: Dark Matter para dark mode, Positron para light mode
+    const tileUrl = isDark
+      ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+      : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+
+    const tileLayer = L.tileLayer(tileUrl, {
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      subdomains: 'abcd',
+      maxZoom: 20,
+    });
+
+    tileLayer.addTo(map);
+    currentTileLayer.value = tileLayer;
+  }
+
+  /**
+   * Limpa todos os marcadores existentes
+   */
+  function clearMarkers() {
+    if (clusterGroupRef.value) {
+      clusterGroupRef.value.clearLayers();
+    }
+  }
+
+  /**
+   * Renderiza os grupos de estudo no mapa com ícones semânticos customizados
+   */
+  function renderMarkers(
+    groups: StudyGroupPublic[],
+    onSelectGroup: (group: StudyGroupPublic) => void,
+  ) {
+    if (!clusterGroupRef.value || !mapInstanceRef.value) return;
+
+    clearMarkers();
+
+    const markers: L.Marker[] = [];
+
+    for (const group of groups) {
+      if (!group.lat || !group.lng) continue;
+
+      const isMonitoria = group.tipo === 'monitoria';
+      const isProjeto = group.tipo === 'projeto';
+      const badgeColor = isMonitoria ? '#10b981' : isProjeto ? '#f59e0b' : 'var(--q-primary, #1976d2)';
+      const iconName = isMonitoria ? 'school' : isProjeto ? 'architecture' : 'groups';
+
+      // Ícone SVG moderno embutido como divIcon
+      const customHtml = `
+        <div style="
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          background: ${badgeColor};
+          color: white;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+          border: 2px solid white;
+          cursor: pointer;
+          transition: transform 0.2s ease;
+        " class="hover:tw-scale-110">
+          <span class="material-icons" style="font-size: 18px;">${iconName}</span>
+        </div>
+      `;
+
+      const customIcon = L.divIcon({
+        html: customHtml,
+        className: 'custom-study-marker',
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+      });
+
+      const marker = L.marker([group.lat, group.lng], {
+        icon: customIcon,
+      }) as StudyGroupMarker;
+
+      marker.studyGroupId = group.id;
+
+      // Popup informativo sutil
+      marker.bindPopup(`
+        <div style="font-family: 'Inter', sans-serif; padding: 4px; min-width: 180px;">
+          <strong style="display: block; font-size: 14px; margin-bottom: 2px;">${group.nome}</strong>
+          <span style="font-size: 12px; color: #64748b;">${group.instituicao}${group.campus ? ' - ' + group.campus : ''}</span>
+          <div style="margin-top: 6px; font-size: 11px; font-weight: bold; color: ${badgeColor};">
+            ${isMonitoria ? 'Monitoria' : isProjeto ? 'Projeto' : 'Grupo de Estudos'}
+          </div>
+        </div>
+      `);
+
+      marker.on('click', () => {
+        onSelectGroup(group);
+      });
+
+      markers.push(marker);
+    }
+
+    clusterGroupRef.value.addLayers(markers);
+  }
+
+  /**
+   * Move suavemente a câmera para as coordenadas do grupo selecionado
+   */
+  function flyToGroup(group: StudyGroupPublic, zoom = 15) {
+    if (!mapInstanceRef.value || !group.lat || !group.lng) return;
+
+    mapInstanceRef.value.flyTo([group.lat, group.lng], zoom, {
+      duration: 1.2,
+      easeLinearity: 0.25,
+    });
+  }
+
+  /**
+   * Força o Leaflet a recalcular suas dimensões (prevenção do bug de tiles cinzas)
+   */
+  function invalidateSize() {
+    if (mapInstanceRef.value) {
+      mapInstanceRef.value.invalidateSize();
+    }
+  }
+
+  return {
+    mapInstanceRef,
+    clusterGroupRef,
+    initMap,
+    applyThemeLayer,
+    clearMarkers,
+    renderMarkers,
+    flyToGroup,
+    invalidateSize,
+  };
+}

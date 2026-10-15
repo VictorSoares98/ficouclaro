@@ -7,17 +7,19 @@ import AppFooter from './components/AppFooter.vue';
 
 const $q = useQuasar();
 const route = useRoute();
-const isAuthPage = computed(() => route.path === '/login' || route.path === '/register');
+const isImmersivePage = computed(
+  () => route.path === '/login' || route.path === '/register' || route.path === '/mapa',
+);
 </script>
 
 <template>
   <q-layout view="lHh Lpr lFf">
-    <AppHeader v-if="!isAuthPage" show-branding-menu />
+    <AppHeader v-if="!isImmersivePage" show-branding-menu />
 
-    <q-page-container :class="{ '!tw-p-0': isAuthPage }">
+    <q-page-container :class="{ '!tw-p-0': isImmersivePage }">
       <router-view />
     </q-page-container>
 
-    <AppFooter v-if="$q.screen.gt.sm && !isAuthPage" />
+    <AppFooter v-if="$q.screen.gt.sm && !isImmersivePage" />
   </q-layout>
 </template>

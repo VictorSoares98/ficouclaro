@@ -27,21 +27,32 @@ import BaseSurfaceCard from '@/core/components/BaseSurfaceCard.vue';
 
         <!-- CTA Buttons -->
         <div
-          class="tw-flex tw-flex-col sm:tw-flex-row tw-items-center tw-justify-center tw-gap-4 tw-pt-6"
+          class="tw-flex tw-flex-col sm:tw-flex-row tw-items-center tw-justify-center tw-gap-3 sm:tw-gap-4 tw-pt-6"
         >
           <q-btn
             color="primary"
             to="/register"
             label="Começar Agora"
+            no-caps
             unelevated
-            class="tw-w-full sm:tw-w-auto tw-px-8 tw-h-12 tw-rounded-full tw-text-base tw-font-bold tw-shadow-lg hover:tw-scale-105 tw-transition-transform"
+            class="tw-w-full sm:tw-w-auto tw-px-7 tw-h-12 tw-rounded-full tw-text-base tw-font-bold tw-shadow-lg hover:tw-scale-105 tw-transition-transform"
+          />
+          <q-btn
+            color="primary"
+            to="/mapa"
+            label="Explorar Grupos no Mapa"
+            icon="explore"
+            no-caps
+            outline
+            class="tw-w-full sm:tw-w-auto tw-px-6 tw-h-12 tw-rounded-full tw-text-base tw-font-bold hover:tw-bg-primary/10 tw-transition-colors"
           />
           <q-btn
             color="secondary"
             to="/login"
             label="Já tenho uma conta"
-            outline
-            class="tw-w-full sm:tw-w-auto tw-px-8 tw-h-12 tw-rounded-full tw-text-base tw-font-bold hover:tw-bg-secondary/10 tw-transition-colors"
+            no-caps
+            flat
+            class="tw-w-full sm:tw-w-auto tw-px-6 tw-h-12 tw-rounded-full tw-text-base tw-font-bold hover:tw-bg-secondary/10 tw-transition-colors"
           />
         </div>
       </div>

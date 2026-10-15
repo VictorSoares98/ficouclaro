@@ -34,6 +34,18 @@ async function handleLogout() {
         <span v-if="subtitle" class="tw-text-sm tw-font-normal text-muted">| {{ subtitle }}</span>
       </q-toolbar-title>
 
+      <!-- Botão Mapa de Grupos de Estudo -->
+      <q-btn
+        flat
+        dense
+        to="/mapa"
+        icon="map"
+        label="Mapa de Grupos"
+        color="white"
+        no-caps
+        class="tw-rounded-xl tw-px-2.5 tw-mr-1 tw-text-xs sm:tw-text-sm tw-font-semibold hover:tw-bg-white/10"
+      />
+
       <!-- Accessibility Menu Unificado (Substitui o ThemeSwitcher antigo e os botões individuais) -->
       <AccessibilityMenu color="white" />
 

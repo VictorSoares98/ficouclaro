@@ -452,6 +452,145 @@ export type Database = {
           },
         ];
       };
+      grupos_estudo: {
+        Row: {
+          ativo: boolean;
+          capacidade_maxima: number | null;
+          campus: string | null;
+          created_at: string;
+          criador_id: string | null;
+          descricao: string | null;
+          dia_semana: string | null;
+          disciplina_id: string | null;
+          horario: string | null;
+          horario_encontros: string | null;
+          id: string;
+          instituicao: string | null;
+          latitude: number;
+          local_nome: string;
+          longitude: number;
+          nome: string;
+          predio_bloco: string | null;
+          sala: string | null;
+          tipo: Database['public']['Enums']['tipo_grupo_estudo'];
+          updated_at: string;
+        };
+        Insert: {
+          ativo?: boolean;
+          capacidade_maxima?: number | null;
+          campus?: string | null;
+          created_at?: string;
+          criador_id?: string | null;
+          descricao?: string | null;
+          dia_semana?: string | null;
+          disciplina_id?: string | null;
+          horario?: string | null;
+          horario_encontros?: string | null;
+          id?: string;
+          instituicao?: string | null;
+          latitude: number;
+          local_nome: string;
+          longitude: number;
+          nome: string;
+          predio_bloco?: string | null;
+          sala?: string | null;
+          tipo?: Database['public']['Enums']['tipo_grupo_estudo'];
+          updated_at?: string;
+        };
+        Update: {
+          ativo?: boolean;
+          capacidade_maxima?: number | null;
+          campus?: string | null;
+          created_at?: string;
+          criador_id?: string | null;
+          descricao?: string | null;
+          dia_semana?: string | null;
+          disciplina_id?: string | null;
+          horario?: string | null;
+          horario_encontros?: string | null;
+          id?: string;
+          instituicao?: string | null;
+          latitude?: number;
+          local_nome?: string;
+          longitude?: number;
+          nome?: string;
+          predio_bloco?: string | null;
+          sala?: string | null;
+          tipo?: Database['public']['Enums']['tipo_grupo_estudo'];
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      grupos_membros: {
+        Row: {
+          grupo_id: string;
+          id: string;
+          joined_at: string;
+          papel: Database['public']['Enums']['papel_membro_grupo'];
+          usuario_id: string;
+        };
+        Insert: {
+          grupo_id: string;
+          id?: string;
+          joined_at?: string;
+          papel?: Database['public']['Enums']['papel_membro_grupo'];
+          usuario_id: string;
+        };
+        Update: {
+          grupo_id?: string;
+          id?: string;
+          joined_at?: string;
+          papel?: Database['public']['Enums']['papel_membro_grupo'];
+          usuario_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'grupos_membros_grupo_id_fkey';
+            columns: ['grupo_id'];
+            isOneToOne: false;
+            referencedRelation: 'grupos_estudo';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      registros_encontro: {
+        Row: {
+          created_at: string;
+          data_encontro: string;
+          grupo_id: string;
+          id: string;
+          notas: string | null;
+          presentes_contagem: number | null;
+          topico: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          data_encontro?: string;
+          grupo_id: string;
+          id?: string;
+          notas?: string | null;
+          presentes_contagem?: number | null;
+          topico?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          data_encontro?: string;
+          grupo_id?: string;
+          id?: string;
+          notas?: string | null;
+          presentes_contagem?: number | null;
+          topico?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'registros_encontro_grupo_id_fkey';
+            columns: ['grupo_id'];
+            isOneToOne: false;
+            referencedRelation: 'grupos_estudo';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
     };
     Views: {
       vw_course_insights: {
@@ -500,6 +639,69 @@ export type Database = {
             referencedColumns: ['id'];
           },
         ];
+      };
+      view_grupos_estudo_publicos: {
+        Row: {
+          capacidade_maxima: number | null;
+          campus: string | null;
+          created_at: string | null;
+          descricao: string | null;
+          dia_semana: string | null;
+          disciplina_id: string | null;
+          horario: string | null;
+          horario_encontros: string | null;
+          id: string | null;
+          instituicao: string | null;
+          latitude: number | null;
+          local_nome: string | null;
+          longitude: number | null;
+          nome: string | null;
+          predio_bloco: string | null;
+          sala: string | null;
+          tipo: Database['public']['Enums']['tipo_grupo_estudo'] | null;
+          total_membros: number | null;
+        };
+        Insert: {
+          capacidade_maxima?: number | null;
+          campus?: string | null;
+          created_at?: string | null;
+          descricao?: string | null;
+          dia_semana?: string | null;
+          disciplina_id?: string | null;
+          horario?: string | null;
+          horario_encontros?: string | null;
+          id?: string | null;
+          instituicao?: string | null;
+          latitude?: number | null;
+          local_nome?: string | null;
+          longitude?: number | null;
+          nome?: string | null;
+          predio_bloco?: string | null;
+          sala?: string | null;
+          tipo?: Database['public']['Enums']['tipo_grupo_estudo'] | null;
+          total_membros?: number | null;
+        };
+        Update: {
+          capacidade_maxima?: number | null;
+          campus?: string | null;
+          created_at?: string | null;
+          descricao?: string | null;
+          dia_semana?: string | null;
+          disciplina_id?: string | null;
+          horario?: string | null;
+          horario_encontros?: string | null;
+          id?: string | null;
+          instituicao?: string | null;
+          latitude?: number | null;
+          local_nome?: string | null;
+          longitude?: number | null;
+          nome?: string | null;
+          predio_bloco?: string | null;
+          sala?: string | null;
+          tipo?: Database['public']['Enums']['tipo_grupo_estudo'] | null;
+          total_membros?: number | null;
+        };
+        Relationships: [];
       };
     };
     Functions: {
@@ -562,11 +764,13 @@ export type Database = {
       };
     };
     Enums: {
+      papel_membro_grupo: 'lider' | 'membro' | 'interessado';
       papel_usuario: 'aluno' | 'professor';
       sinal_ritmo: 'muito_rapido' | 'boiando' | 'tudo_certo' | 'muito_devagar';
       status_enquete: 'rascunho' | 'ativa' | 'encerrada';
       status_sessao: 'aguardando' | 'ativa' | 'encerrada';
       tipo_enquete: 'multipla_escolha' | 'nuvem_palavras' | 'escala_clareza' | 'ranking';
+      tipo_grupo_estudo: 'grupo_estudos' | 'monitoria' | 'projeto' | 'outro';
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -691,11 +895,13 @@ export const Constants = {
   },
   public: {
     Enums: {
+      papel_membro_grupo: ['lider', 'membro', 'interessado'],
       papel_usuario: ['aluno', 'professor'],
       sinal_ritmo: ['muito_rapido', 'boiando', 'tudo_certo', 'muito_devagar'],
       status_enquete: ['rascunho', 'ativa', 'encerrada'],
       status_sessao: ['aguardando', 'ativa', 'encerrada'],
       tipo_enquete: ['multipla_escolha', 'nuvem_palavras', 'escala_clareza', 'ranking'],
+      tipo_grupo_estudo: ['grupo_estudos', 'monitoria', 'projeto', 'outro'],
     },
   },
 } as const;

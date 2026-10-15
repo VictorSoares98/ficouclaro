@@ -1,0 +1,113 @@
+<script setup lang="ts">
+import { onMounted, onUnmounted, watch } from 'vue';
+import { useQuasar } from 'quasar';
+import 'leaflet/dist/leaflet.css';
+import 'leaflet.markercluster/dist/MarkerCluster.css';
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
+import { useStudyGroupsMap } from '../composables/useStudyGroupsMap';
+import { useStudyGroupStore } from '../stores/study-group.store';
+
+const $q = useQuasar();
+const store = useStudyGroupStore();
+
+const {
+  initMap,
+  applyThemeLayer,
+  renderMarkers,
+  flyToGroup,
+  invalidateSize,
+  mapInstanceRef,
+} = useStudyGroupsMap();
+
+onMounted(async () => {
+  // Inicializa o mapa com centro no Brasil
+  initMap('study-map-container');
+
+  // Aplica o tema de tiles compatível com o Quasar Dark Mode
+  applyThemeLayer($q.dark.isActive);
+
+  // Carrega os dados se ainda não tiverem sido carregados
+  if (store.groups.length === 0) {
+    await store.loadPublicGroups();
+  }
+
+  // Renderiza marcadores iniciais
+  renderMarkers(store.filteredGroups, (group) => {
+    store.selectGroup(group);
+  });
+
+  // Garante que o Leaflet calcule as dimensões corretas após o mount
+  setTimeout(() => {
+    invalidateSize();
+  }, 250);
+});
+
+onUnmounted(() => {
+  if (mapInstanceRef.value) {
+    mapInstanceRef.value.remove();
+  }
+});
+
+// Reage a mudanças de tema do Quasar (Dark / Light)
+watch(
+  () => $q.dark.isActive,
+  (isDark) => {
+    applyThemeLayer(isDark);
+  },
+);
+
+// Re-renderiza marcadores quando o filtro ou a lista mudar
+watch(
+  () => store.filteredGroups,
+  (newGroups) => {
+    renderMarkers(newGroups, (group) => {
+      store.selectGroup(group);
+    });
+  },
+  { deep: true },
+);
+
+// Centraliza a câmera no grupo selecionado
+watch(
+  () => store.selectedGroup,
+  (group) => {
+    if (group) {
+      flyToGroup(group);
+    }
+  },
+);
+
+defineExpose({
+  invalidateSize,
+});
+</script>
+
+<template>
+  <div
+    id="study-map-container"
+    class="tw-w-full tw-h-full tw-absolute tw-top-0 tw-left-0 tw-z-0"
+  ></div>
+</template>
+
+<style>
+/* Customização para integrar os clusters ao Design System do Ficou Claro */
+.marker-cluster-small,
+.marker-cluster-medium,
+.marker-cluster-large {
+  background-color: rgba(25, 118, 210, 0.2) !important;
+}
+
+.marker-cluster-small div,
+.marker-cluster-medium div,
+.marker-cluster-large div {
+  background-color: var(--q-primary, #1976d2) !important;
+  color: #ffffff !important;
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 700 !important;
+}
+
+.custom-study-marker {
+  background: transparent;
+  border: none;
+}
+</style>
