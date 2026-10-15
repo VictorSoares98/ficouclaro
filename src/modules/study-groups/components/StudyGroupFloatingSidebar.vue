@@ -94,12 +94,12 @@ function handleSelectGroup(group: StudyGroupPublic) {
             dense
             rounded
             no-caps
-            :unelevated="store.filters.type === 'grupo_estudos'"
-            :flat="store.filters.type !== 'grupo_estudos'"
-            :color="store.filters.type === 'grupo_estudos' ? 'primary' : 'grey-7'"
+            :unelevated="store.filters.type === 'estudo'"
+            :flat="store.filters.type !== 'estudo'"
+            :color="store.filters.type === 'estudo' ? 'primary' : 'grey-7'"
             class="tw-px-2.5 tw-text-xs"
             label="Estudos"
-            @click="store.setTypeFilter('grupo_estudos')"
+            @click="store.setTypeFilter('estudo')"
           />
 
           <q-btn

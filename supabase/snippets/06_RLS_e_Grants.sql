@@ -185,4 +185,9 @@ CREATE POLICY "Registrante ou criador atualiza registro de encontro" ON public.r
       SELECT 1 FROM public.grupos_estudo ge 
       WHERE ge.id = registros_encontro.grupo_id AND ge.criador_id = auth.uid()
     )
-  );
+  );
+
+-- GRANTS: View pública e RPCs de grupos de estudo
+GRANT SELECT ON public.view_grupos_estudo_publicos TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.link_member_to_study_group(UUID) TO authenticated;
+

@@ -15,8 +15,15 @@ export interface CreateStudyGroupDTO {
   campus?: string;
   predio_bloco?: string;
   sala?: string;
+  local_especifico?: string;
+  cidade?: string;
+  estado?: string;
+  pais?: string;
+  place_id?: string;
   lat: number;
   lng: number;
+  dia_reuniao?: string;
+  horario_reuniao?: string;
   dia_semana?: string;
   horario?: string;
   vagas?: number;
@@ -66,10 +73,6 @@ export class StudyGroupService {
     criadorId: string,
     dto: CreateStudyGroupDTO,
   ): Promise<StudyGroupDetail> {
-    const localNome = dto.sala
-      ? `${dto.instituicao} - ${dto.sala}`
-      : dto.campus || dto.instituicao;
-
     const { data, error } = await supabase
       .from('grupos_estudo')
       .insert({
@@ -82,13 +85,16 @@ export class StudyGroupService {
         campus: dto.campus || null,
         predio_bloco: dto.predio_bloco || null,
         sala: dto.sala || null,
-        latitude: dto.lat,
-        longitude: dto.lng,
-        local_nome: localNome,
-        dia_semana: dto.dia_semana || null,
-        horario: dto.horario || null,
-        horario_encontros: dto.horario ? `${dto.dia_semana || ''} ${dto.horario}`.trim() : null,
-        capacidade_maxima: dto.vagas || 10,
+        local_especifico: dto.local_especifico || null,
+        cidade: dto.cidade || null,
+        estado: dto.estado || null,
+        pais: dto.pais || 'Brasil',
+        place_id: dto.place_id || null,
+        lat: dto.lat,
+        lng: dto.lng,
+        dia_reuniao: dto.dia_reuniao || dto.dia_semana || null,
+        horario_reuniao: dto.horario_reuniao || dto.horario || null,
+        vagas: dto.vagas || 10,
       })
       .select()
       .single();
@@ -109,7 +115,7 @@ export class StudyGroupService {
       .from('grupos_membros')
       .select('*, usuario:usuarios(nome_completo, url_avatar)')
       .eq('grupo_id', grupoId)
-      .order('joined_at', { ascending: false });
+      .order('created_at', { ascending: false });
 
     if (error) {
       console.error('[StudyGroupService] Erro ao buscar membros do grupo:', error);
@@ -120,16 +126,12 @@ export class StudyGroupService {
   }
 
   /**
-   * Permite que um aluno entre no grupo de estudo através do ID do grupo.
+   * Permite que um aluno entre no grupo de estudo através da RPC atômica (padrão link_member_to_pocket).
    */
-  async joinGroup(grupoId: string, usuarioId: string): Promise<void> {
-    const { error } = await supabase
-      .from('grupos_membros')
-      .insert({
-        grupo_id: grupoId,
-        usuario_id: usuarioId,
-        papel: 'membro',
-      });
+  async joinGroup(grupoId: string): Promise<void> {
+    const { error } = await supabase.rpc('link_member_to_study_group', {
+      p_grupo_id: grupoId,
+    });
 
     if (error) {
       console.error('[StudyGroupService] Erro ao entrar no grupo:', error);

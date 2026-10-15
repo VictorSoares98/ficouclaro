@@ -1,24 +1,39 @@
 import type L from 'leaflet';
 
-export type StudyGroupType = 'grupo_estudos' | 'monitoria' | 'projeto' | 'outro';
+export type StudyGroupType = 'estudo' | 'reforco' | 'monitoria' | 'projeto' | 'outro';
 export type StudyGroupStatus = 'ativo' | 'inativo';
 export type MeetingStatus = 'concluido' | 'pendente' | 'cancelado';
 
 export interface StudyGroupPublic {
   id: string;
   nome: string;
+  slug?: string | null;
   descricao: string | null;
   tipo: StudyGroupType;
   disciplina_id: string | null;
   instituicao: string;
   campus: string | null;
+  predio_bloco?: string | null;
+  sala?: string | null;
+  local_especifico?: string | null;
+  cidade?: string | null;
+  estado?: string | null;
+  pais?: string | null;
+  place_id?: string | null;
   lat: number;
   lng: number;
-  dia_semana: string | null;
-  horario: string | null;
+  dia_reuniao?: string | null;
+  horario_reuniao?: string | null;
+  dia_semana?: string | null;
+  horario?: string | null;
   vagas: number | null;
+  codigo_convite?: string;
+  categoria_universidade?: 'publica' | 'privada' | null;
+  status_academico?: 'letivo' | 'ferias' | 'greve' | null;
   status: StudyGroupStatus;
   created_at: string;
+  criador_nome?: string | null;
+  criador_avatar?: string | null;
   total_membros: number;
 }
 
@@ -26,6 +41,8 @@ export interface StudyGroupDetail extends StudyGroupPublic {
   criador_id: string;
   predio_bloco: string | null;
   sala: string | null;
+  local_especifico: string | null;
+  endereco_completo?: string | null;
   codigo_convite: string;
   updated_at: string;
 }

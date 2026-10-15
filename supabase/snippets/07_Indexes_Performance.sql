@@ -21,6 +21,8 @@ CREATE INDEX IF NOT EXISTS idx_avaliacoes_rapidas_sessao_id ON public.avaliacoes
 CREATE INDEX IF NOT EXISTS idx_grupos_estudo_geo ON public.grupos_estudo(lat, lng);
 CREATE INDEX IF NOT EXISTS idx_grupos_estudo_status ON public.grupos_estudo(status);
 CREATE INDEX IF NOT EXISTS idx_grupos_estudo_instituicao ON public.grupos_estudo(instituicao);
+CREATE INDEX IF NOT EXISTS idx_grupos_estudo_cidade_estado ON public.grupos_estudo(cidade, estado);
+CREATE INDEX IF NOT EXISTS idx_grupos_estudo_slug ON public.grupos_estudo(slug);
 CREATE INDEX IF NOT EXISTS idx_grupos_estudo_criador_id ON public.grupos_estudo(criador_id);
 CREATE INDEX IF NOT EXISTS idx_grupos_estudo_disciplina_id ON public.grupos_estudo(disciplina_id);
 CREATE INDEX IF NOT EXISTS idx_grupos_membros_grupo_id ON public.grupos_membros(grupo_id);

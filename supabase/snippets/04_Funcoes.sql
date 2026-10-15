@@ -226,3 +226,30 @@ BEGIN
   VALUES (p_sessao_id, v_aluno_id, p_nota, p_comentario, v_hash);
 END;
 $$;
+
+-- ============================================================
+-- 4. GRUPOS DE ESTUDO: VINCULAR MEMBRO (Atômico - Padrão FMP)
+-- ============================================================
+CREATE OR REPLACE FUNCTION public.link_member_to_study_group(p_grupo_id UUID)
+RETURNS boolean
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  IF auth.uid() IS NULL THEN
+    RAISE EXCEPTION 'Não autorizado';
+  END IF;
+
+  -- Insere o membro com papel de membro regular
+  INSERT INTO public.grupos_membros (grupo_id, usuario_id, is_monitor)
+  VALUES (p_grupo_id, auth.uid(), false)
+  ON CONFLICT (grupo_id, usuario_id) DO NOTHING;
+
+  RETURN true;
+EXCEPTION
+  WHEN OTHERS THEN
+    RAISE EXCEPTION 'Falha ao vincular membro ao grupo de estudos: %', SQLERRM;
+END;
+$$;
+
