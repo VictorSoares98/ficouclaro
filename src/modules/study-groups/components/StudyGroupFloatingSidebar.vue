@@ -1,15 +1,95 @@
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, nextTick, watch } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue';
 import { gsap } from '@/boot/gsap';
 import { Draggable } from 'gsap/Draggable';
 import { useStudyGroupStore } from '../stores/study-group.store';
 import StudyGroupCard from './StudyGroupCard.vue';
+import EmptyState from '@/components/EmptyState.vue';
 import type { StudyGroupPublic } from '../types/study-group.types';
+
+const emit = defineEmits<{
+  (e: 'create-group'): void;
+}>();
 
 const store = useStudyGroupStore();
 const currentSnapState = ref<'peek' | 'half' | 'expanded'>('peek');
 let gsapCtx: gsap.Context | null = null;
 let snapCycleFn: (() => void) | null = null;
+
+interface EmptyStateConfig {
+  icon: string;
+  title: string;
+  description: string;
+  state: 'no_data' | 'no_search_results' | 'no_category_results' | 'no_combined_results';
+  categoryLabel?: string;
+}
+
+const categoryLabels: Record<string, string> = {
+  estudo: 'Estudos',
+  reforco: 'Reforço',
+  monitoria: 'Monitoria',
+  projeto: 'Projetos',
+};
+
+const categoryIcons: Record<string, string> = {
+  estudo: 'menu_book',
+  reforco: 'school',
+  monitoria: 'record_voice_over',
+  projeto: 'rocket_launch',
+};
+
+const emptyStateConfig = computed<EmptyStateConfig>(() => {
+  const hasSearch = store.filters.search.trim().length > 0;
+  const hasType = store.filters.type !== 'all';
+  const searchTerm = store.filters.search.trim();
+
+  // Cenário 1: Banco inicial zerado / sem dados no campus (Zero Data)
+  if (store.groups.length === 0 && !hasSearch && !hasType) {
+    return {
+      state: 'no_data',
+      icon: 'groups',
+      title: 'Nenhum grupo cadastrado ainda',
+      description:
+        'Seja o pioneiro no seu campus! Crie o primeiro grupo de estudos ou monitoria e convide seus colegas de turma.',
+    };
+  }
+
+  // Cenário 2: Busca e Filtro de categoria combinados sem resultados
+  if (hasSearch && hasType) {
+    const catLabel = categoryLabels[store.filters.type] || 'Categoria';
+    return {
+      state: 'no_combined_results',
+      icon: 'filter_alt_off',
+      title: `Nenhum grupo de ${catLabel} para "${searchTerm}"`,
+      description:
+        'Tente buscar em todas as categorias ou utilizar termos mais amplos para encontrar grupos.',
+      categoryLabel: catLabel,
+    };
+  }
+
+  // Cenário 3: Busca textual sem resultados
+  if (hasSearch) {
+    return {
+      state: 'no_search_results',
+      icon: 'search_off',
+      title: `Nenhum resultado para "${searchTerm}"`,
+      description:
+        'Não encontramos grupos com esse nome, matéria ou campus. Verifique a ortografia ou use palavras-chave mais genéricas.',
+    };
+  }
+
+  // Cenário 4: Filtro de categoria selecionado sem ofertas disponíveis
+  const catLabel = categoryLabels[store.filters.type] || 'Categoria';
+  const catIcon = categoryIcons[store.filters.type] || 'filter_list_off';
+  return {
+    state: 'no_category_results',
+    icon: catIcon,
+    title: `Nenhum grupo de ${catLabel} no momento`,
+    description:
+      'Ainda não há grupos ou monitorias cadastrados nesta categoria. Que tal explorar outras modalidades ou iniciar um grupo?',
+    categoryLabel: catLabel,
+  };
+});
 
 function handleSelectGroup(group: StudyGroupPublic) {
   store.selectGroup(group);
@@ -274,34 +354,78 @@ onBeforeUnmount(() => {
       <q-scroll-area class="tw-flex-1 no-scrollbar tw-overscroll-contain">
         <!-- Skeleton Loading Nativo do Quasar -->
         <div v-if="store.isLoading" class="tw-space-y-3">
-          <q-skeleton
-            v-for="i in 3"
-            :key="i"
-            type="rect"
-            height="110px"
-            class="tw-rounded-2xl"
-          />
+          <q-skeleton v-for="i in 3" :key="i" type="rect" height="110px" class="tw-rounded-2xl" />
         </div>
 
-        <!-- Lista Vazia -->
-        <div
+        <!-- Lista Vazia Contextual (Padrão de Mercado) -->
+        <EmptyState
           v-else-if="store.filteredGroups.length === 0"
-          class="tw-h-full tw-flex tw-flex-col tw-items-center tw-justify-center tw-py-12 tw-text-center tw-px-4"
+          :icon="emptyStateConfig.icon"
+          :title="emptyStateConfig.title"
+          :description="emptyStateConfig.description"
         >
-          <q-icon name="location_off" size="3rem" class="text-hint tw-mb-2" />
-          <h4 class="tw-font-bold tw-text-sm tw-mb-1">Nenhum grupo encontrado</h4>
-          <p class="tw-text-xs text-muted">
-            Tente buscar por outro termo ou remova os filtros de busca.
-          </p>
-          <q-btn
-            v-if="store.filters.type !== 'all' || store.filters.search"
-            unelevated
-            color="primary"
-            class="tw-mt-3 tw-rounded-xl text-weight-bold tw-text-xs"
-            label="Limpar Filtros"
-            @click="store.clearFilters()"
-          />
-        </div>
+          <template #action>
+            <!-- Ações para Cenário 'no_data' (Banco zerado) -->
+            <q-btn
+              v-if="emptyStateConfig.state === 'no_data'"
+              unelevated
+              color="primary"
+              icon="add"
+              label="Criar Primeiro Grupo"
+              no-caps
+              class="tw-rounded-xl text-weight-bold tw-text-xs tw-shadow-md"
+              @click="emit('create-group')"
+            />
+
+            <!-- Ações para Cenário 'no_search_results' (Busca sem resultados) -->
+            <q-btn
+              v-else-if="emptyStateConfig.state === 'no_search_results'"
+              unelevated
+              color="primary"
+              icon="close"
+              label="Limpar Busca"
+              no-caps
+              class="tw-rounded-xl text-weight-bold tw-text-xs"
+              @click="store.setSearch('')"
+            />
+
+            <!-- Ações para Cenário 'no_category_results' (Filtro por categoria sem ofertas) -->
+            <div
+              v-else-if="emptyStateConfig.state === 'no_category_results'"
+              class="tw-flex tw-flex-wrap tw-items-center tw-justify-center tw-gap-2"
+            >
+              <q-btn
+                unelevated
+                color="primary"
+                label="Ver Todas as Categorias"
+                no-caps
+                class="tw-rounded-xl text-weight-bold tw-text-xs"
+                @click="store.setTypeFilter('all')"
+              />
+              <q-btn
+                flat
+                color="primary"
+                icon="add"
+                :label="`Criar de ${emptyStateConfig.categoryLabel || 'Grupo'}`"
+                no-caps
+                class="tw-rounded-xl text-weight-bold tw-text-xs"
+                @click="emit('create-group')"
+              />
+            </div>
+
+            <!-- Ações para Cenário 'no_combined_results' (Busca + Filtro combinados) -->
+            <q-btn
+              v-else-if="emptyStateConfig.state === 'no_combined_results'"
+              unelevated
+              color="primary"
+              icon="refresh"
+              label="Limpar Filtros e Busca"
+              no-caps
+              class="tw-rounded-xl text-weight-bold tw-text-xs"
+              @click="store.clearFilters()"
+            />
+          </template>
+        </EmptyState>
 
         <!-- Itens Encontrados -->
         <div v-else class="tw-space-y-3">

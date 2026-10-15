@@ -104,7 +104,9 @@ function handleCreateGroupClick() {
       <q-card
         class="tw-pointer-events-auto tw-backdrop-blur-md tw-px-3 tw-py-1.5 sm:tw-px-4 sm:tw-py-2 tw-rounded-2xl tw-shadow-lg"
       >
-        <h1 class="text-subtitle2 sm:text-h6 text-weight-bold tw-font-space-grotesk tw-m-0 tw-leading-none">
+        <h1
+          class="text-subtitle2 sm:text-h6 text-weight-bold tw-font-space-grotesk tw-m-0 tw-leading-none"
+        >
           FICOU <span class="text-primary">CLARO?</span>
         </h1>
       </q-card>
@@ -154,7 +156,10 @@ function handleCreateGroupClick() {
     <div
       class="tw-absolute tw-z-[1000] tw-pointer-events-none floating-panel tw-bottom-0 tw-left-0 tw-w-full tw-h-[calc(100dvh-env(safe-area-inset-top,0px)-76px)] md:tw-top-24 md:tw-bottom-auto md:tw-left-6 md:tw-w-full md:tw-max-w-[420px] md:tw-h-[calc(100vh-8rem)] tw-flex tw-items-end md:tw-items-center"
     >
-      <StudyGroupFloatingSidebar class="tw-pointer-events-auto tw-w-full tw-h-full" />
+      <StudyGroupFloatingSidebar
+        class="tw-pointer-events-auto tw-w-full tw-h-full"
+        @create-group="handleCreateGroupClick"
+      />
 
       <!-- Botão de Ocultar/Mostrar Aba (Tablet e Desktop) -->
       <q-btn
