@@ -20,26 +20,27 @@ const {
 } = useStudyGroupsMap();
 
 onMounted(async () => {
-  // Inicializa o mapa com centro no Brasil
-  initMap('study-map-container');
+  try {
+    // Inicializa o mapa com centro no Brasil e camada de tiles correspondente ao tema
+    initMap('study-map-container', $q.dark.isActive);
 
-  // Aplica o tema de tiles compatível com o Quasar Dark Mode
-  applyThemeLayer($q.dark.isActive);
+    // Carrega os dados se ainda não tiverem sido carregados
+    if (store.groups.length === 0) {
+      await store.loadPublicGroups();
+    }
 
-  // Carrega os dados se ainda não tiverem sido carregados
-  if (store.groups.length === 0) {
-    await store.loadPublicGroups();
+    // Renderiza marcadores iniciais
+    renderMarkers(store.filteredGroups, (group) => {
+      store.selectGroup(group);
+    });
+  } catch (err) {
+    console.error('[LeafletMapCore] Erro durante a montagem do mapa:', err);
+  } finally {
+    // Garante que o Leaflet calcule as dimensões corretas após o mount
+    setTimeout(() => {
+      invalidateSize();
+    }, 250);
   }
-
-  // Renderiza marcadores iniciais
-  renderMarkers(store.filteredGroups, (group) => {
-    store.selectGroup(group);
-  });
-
-  // Garante que o Leaflet calcule as dimensões corretas após o mount
-  setTimeout(() => {
-    invalidateSize();
-  }, 250);
 });
 
 onUnmounted(() => {
@@ -90,17 +91,27 @@ defineExpose({
 </template>
 
 <style>
+/* Fundo neutro enquanto os tiles do mapa carregam */
+#study-map-container {
+  background: var(--q-dark-page, #f8f9fa);
+}
+
+/* Inversão elegante e calibrada para Dark Mode nos tiles do OpenStreetMap */
+.map-tiles-dark {
+  filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+}
+
 /* Customização para integrar os clusters ao Design System do Ficou Claro */
 .marker-cluster-small,
 .marker-cluster-medium,
 .marker-cluster-large {
-  background-color: rgba(25, 118, 210, 0.2) !important;
+  background-color: rgba(2, 132, 199, 0.2) !important;
 }
 
 .marker-cluster-small div,
 .marker-cluster-medium div,
 .marker-cluster-large div {
-  background-color: var(--q-primary, #1976d2) !important;
+  background-color: var(--q-primary, #0284c7) !important;
   color: #ffffff !important;
   font-family: 'Inter', sans-serif !important;
   font-weight: 700 !important;

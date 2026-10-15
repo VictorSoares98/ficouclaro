@@ -3,68 +3,11 @@ import L from 'leaflet';
 import 'leaflet.markercluster';
 import type { StudyGroupPublic, StudyGroupMarker } from '../types/study-group.types';
 
-// Asset imports explicitamente declarados com ?url para compatibilidade com Vite
-import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png?url';
-import iconUrl from 'leaflet/dist/images/marker-icon.png?url';
-import shadowUrl from 'leaflet/dist/images/marker-shadow.png?url';
-
-// Correção do bug de caminhos relativos do Leaflet no bundler Vite
-// @ts-expect-error - internal leaflet method missing from public types
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl,
-  iconUrl,
-  shadowUrl,
-});
-
 export function useStudyGroupsMap() {
   // Instâncias blindadas com shallowRef para evitar reatividade intrusiva do Vue 3 Proxy
   const mapInstanceRef = shallowRef<L.Map | null>(null);
   const clusterGroupRef = shallowRef<L.MarkerClusterGroup | null>(null);
   const currentTileLayer = shallowRef<L.TileLayer | null>(null);
-
-  /**
-   * Inicializa o mapa Leaflet no contêiner HTML indicado
-   */
-  function initMap(
-    containerId: string,
-    initialLat = -14.235,
-    initialLng = -51.9253,
-    initialZoom = 4,
-  ): L.Map {
-    if (mapInstanceRef.value) {
-      mapInstanceRef.value.remove();
-      mapInstanceRef.value = null;
-    }
-
-    const map = L.map(containerId, {
-      center: [initialLat, initialLng],
-      zoom: initialZoom,
-      zoomControl: false,
-    });
-
-    // Reposiciona o controle de zoom no canto inferior direito
-    L.control
-      .zoom({
-        position: 'bottomright',
-      })
-      .addTo(map);
-
-    // Cria o grupo de clusters nativo
-    const clusterGroup = L.markerClusterGroup({
-      showCoverageOnHover: false,
-      maxClusterRadius: 50,
-      spiderfyOnMaxZoom: true,
-      zoomToBoundsOnClick: true,
-    });
-
-    map.addLayer(clusterGroup);
-
-    mapInstanceRef.value = map;
-    clusterGroupRef.value = clusterGroup;
-
-    return map;
-  }
 
   /**
    * Alterna a camada de mapa (Tiles) de acordo com o modo de iluminação do Quasar
@@ -77,20 +20,71 @@ export function useStudyGroupsMap() {
       map.removeLayer(currentTileLayer.value);
     }
 
-    // Tiles da CartoDB: Dark Matter para dark mode, Positron para light mode
-    const tileUrl = isDark
-      ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-      : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+    const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
     const tileLayer = L.tileLayer(tileUrl, {
-      attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-      subdomains: 'abcd',
-      maxZoom: 20,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      subdomains: 'abc',
+      minZoom: 3,
+      maxZoom: 19,
+      keepBuffer: 3,
+      updateWhenZooming: false,
+      updateWhenIdle: true,
+      className: isDark ? 'map-tiles-dark' : '',
     });
 
     tileLayer.addTo(map);
     currentTileLayer.value = tileLayer;
+  }
+
+  /**
+   * Inicializa o mapa Leaflet no contêiner HTML indicado com maxZoom obrigatório
+   */
+  function initMap(
+    containerId: string,
+    isDark = false,
+    initialLat = -14.235,
+    initialLng = -51.9253,
+    initialZoom = 4,
+  ): L.Map {
+    if (mapInstanceRef.value) {
+      mapInstanceRef.value.remove();
+      mapInstanceRef.value = null;
+    }
+
+    const map = L.map(containerId, {
+      center: [initialLat, initialLng],
+      zoom: initialZoom,
+      minZoom: 3,
+      maxZoom: 19,
+      zoomControl: false,
+    });
+
+    // Reposiciona o controle de zoom no canto inferior direito
+    L.control
+      .zoom({
+        position: 'bottomright',
+      })
+      .addTo(map);
+
+    mapInstanceRef.value = map;
+
+    // Aplica o tema de tiles antes de adicionar os clusters
+    applyThemeLayer(isDark);
+
+    // Cria o grupo de clusters nativo
+    const clusterGroup = L.markerClusterGroup({
+      showCoverageOnHover: false,
+      maxClusterRadius: 50,
+      spiderfyOnMaxZoom: true,
+      zoomToBoundsOnClick: true,
+      disableClusteringAtZoom: 18,
+    });
+
+    map.addLayer(clusterGroup);
+    clusterGroupRef.value = clusterGroup;
+
+    return map;
   }
 
   /**
