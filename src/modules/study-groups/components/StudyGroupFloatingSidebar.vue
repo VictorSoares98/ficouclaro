@@ -205,7 +205,17 @@ onMounted(() => {
         return () => {
           stopWatcher();
           snapCycleFn = null;
+          dragInstance?.kill();
+          gsap.set(panel, { clearProps: 'y' });
         };
+      });
+
+      // Garante que em telas desktop/tablet o painel sempre resete translações verticais do Bottom Sheet móvel
+      mm.add('(min-width: 768px)', () => {
+        const panel = document.querySelector('.floating-panel') as HTMLElement;
+        if (panel) {
+          gsap.set(panel, { clearProps: 'y' });
+        }
       });
     });
   });

@@ -47,13 +47,19 @@ watch(
   },
 );
 
-// Reseta o estado horizontal do GSAP caso o usuário redimensione para mobile
+// Reseta os estados de transição do GSAP ao alternar entre mobile e desktop
 watch(
   () => $q.screen.lt.md,
   (isMobile) => {
-    if (isMobile && isSidebarCollapsed.value) {
-      isSidebarCollapsed.value = false;
-      gsap.set('.floating-panel', { x: 0 });
+    if (isMobile) {
+      if (isSidebarCollapsed.value) {
+        isSidebarCollapsed.value = false;
+        gsap.set('.floating-panel', { x: 0 });
+      }
+    } else {
+      // Ao retornar para desktop/tablet: limpa qualquer translação vertical herdada do Bottom Sheet móvel
+      gsap.set('.floating-panel', { clearProps: 'y' });
+      mapCoreRef.value?.invalidateSize();
     }
   },
 );
