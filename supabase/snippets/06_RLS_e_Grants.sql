@@ -122,32 +122,19 @@ CREATE POLICY "Criador gerencia próprio grupo de estudo" ON public.grupos_estud
 CREATE POLICY "Criador deleta próprio grupo de estudo" ON public.grupos_estudo 
   FOR DELETE USING (criador_id = auth.uid());
 
--- POLICIES: grupos_membros
-CREATE POLICY "Membros veem integrantes do mesmo grupo" ON public.grupos_membros 
-  FOR SELECT USING (
-    EXISTS (
-      SELECT 1 FROM public.grupos_membros gm 
-      WHERE gm.grupo_id = grupos_membros.grupo_id AND gm.usuario_id = auth.uid()
-    )
-    OR EXISTS (
-      SELECT 1 FROM public.grupos_estudo ge 
-      WHERE ge.id = grupos_membros.grupo_id AND ge.criador_id = auth.uid()
-    )
-  );
+-- POLICIES: grupos_membros (Padrão FMP - Sem auto-joins recursivos)
+CREATE POLICY "Membros são públicos para leitura" ON public.grupos_membros 
+  FOR SELECT USING (true);
 
 CREATE POLICY "Usuário se inscreve em grupo de estudo" ON public.grupos_membros 
-  FOR INSERT WITH CHECK (usuario_id = auth.uid());
+  FOR INSERT TO authenticated WITH CHECK (usuario_id = auth.uid());
 
-CREATE POLICY "Usuário cancela inscrição ou monitor remove membro" ON public.grupos_membros 
-  FOR DELETE USING (
+CREATE POLICY "Usuário cancela inscrição ou criador remove membro" ON public.grupos_membros 
+  FOR DELETE TO authenticated USING (
     usuario_id = auth.uid() 
     OR EXISTS (
       SELECT 1 FROM public.grupos_estudo ge 
       WHERE ge.id = grupos_membros.grupo_id AND ge.criador_id = auth.uid()
-    )
-    OR EXISTS (
-      SELECT 1 FROM public.grupos_membros gm 
-      WHERE gm.grupo_id = grupos_membros.grupo_id AND gm.usuario_id = auth.uid() AND gm.is_monitor = true
     )
   );
 
