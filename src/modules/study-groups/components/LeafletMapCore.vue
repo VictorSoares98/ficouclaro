@@ -78,6 +78,14 @@ watch(
   },
 );
 
+// Mantém o mapa responsivo a rotação e redimensionamento de tela
+watch(
+  () => [$q.screen.width, $q.screen.height],
+  () => {
+    invalidateSize();
+  },
+);
+
 defineExpose({
   invalidateSize,
 });
@@ -99,6 +107,11 @@ defineExpose({
 /* Inversão elegante e calibrada para Dark Mode nos tiles do OpenStreetMap */
 .map-tiles-dark {
   filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+}
+
+/* Oculta completamente a barra de créditos de contribuidores do Leaflet */
+.leaflet-control-attribution {
+  display: none !important;
 }
 
 /* Customização para integrar os clusters ao Design System do Ficou Claro */

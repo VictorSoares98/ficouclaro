@@ -1,154 +1,226 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onMounted, onBeforeUnmount, nextTick, watch } from 'vue';
+import { gsap } from '@/boot/gsap';
+import { Draggable } from 'gsap/Draggable';
 import { useStudyGroupStore } from '../stores/study-group.store';
 import StudyGroupCard from './StudyGroupCard.vue';
 import type { StudyGroupPublic } from '../types/study-group.types';
 
 const store = useStudyGroupStore();
-const isCollapsed = ref(false);
-
-const emit = defineEmits<{
-  (e: 'toggle', collapsed: boolean): void;
-}>();
-
-function toggleSidebar() {
-  isCollapsed.value = !isCollapsed.value;
-  emit('toggle', isCollapsed.value);
-}
+let gsapCtx: gsap.Context | null = null;
 
 function handleSelectGroup(group: StudyGroupPublic) {
   store.selectGroup(group);
 }
+
+onMounted(() => {
+  void nextTick(() => {
+    gsapCtx = gsap.context(() => {
+      const mm = gsap.matchMedia();
+      mm.add('(max-width: 767px)', () => {
+        const panel = document.querySelector('.floating-panel') as HTMLElement;
+        if (!panel) return;
+
+        // Cálculos dinâmicos do Bottom Sheet móvel
+        const panelHeight = panel.getBoundingClientRect().height;
+        const collapsedY = Math.max(0, panelHeight - 160); // Mantém ~160px visíveis (header, busca e filtros)
+        const halfY = panelHeight * 0.5; // Metade da tela
+        const expandedY = 0; // Totalmente expandido até o topo (bottom: 0, y: 0)
+
+        const snapPoints = [expandedY, halfY, collapsedY];
+
+        // Define o estado inicial recolhido no mobile
+        gsap.set(panel, { y: collapsedY });
+
+        const dragInstance = Draggable.create(panel, {
+          type: 'y',
+          trigger: '#drag-zone',
+          bounds: { minY: expandedY, maxY: collapsedY },
+          edgeResistance: 1, // Trava absoluta sem vazamento de tela
+          dragClickables: true, // Permite clicar e focar em inputs sem bloquear
+          onRelease: function () {
+            const closest = snapPoints.reduce((prev, curr) =>
+              Math.abs(curr - this.y) < Math.abs(prev - this.y) ? curr : prev,
+            );
+
+            let targetY = closest;
+            const dir = this.getDirection('y');
+
+            // Força a intenção de movimento do usuário via swipe
+            if (dir === 'up') {
+              if (this.y < halfY) targetY = expandedY;
+              else targetY = halfY;
+            } else if (dir === 'down') {
+              if (this.y > halfY) targetY = collapsedY;
+              else targetY = halfY;
+            }
+
+            gsap.to(this.target, {
+              y: targetY,
+              duration: 0.3,
+              ease: 'power2.out',
+            });
+          },
+        })[0];
+
+        // Auto-expandir a gaveta para o topo se o usuário selecionar um grupo no mapa
+        const stopWatcher = watch(
+          () => store.selectedGroup,
+          (newGroup) => {
+            if (newGroup) {
+              const currentY = gsap.getProperty(panel, 'y') as number;
+              if (currentY > expandedY) {
+                gsap.to(panel, {
+                  y: expandedY,
+                  duration: 0.4,
+                  ease: 'power2.out',
+                  onUpdate: () => dragInstance?.update(),
+                });
+              }
+            }
+          },
+        );
+
+        return () => {
+          stopWatcher();
+        };
+      });
+    });
+  });
+});
+
+onBeforeUnmount(() => {
+  if (gsapCtx) {
+    gsapCtx.revert();
+  }
+});
 </script>
 
 <template>
-  <aside
-    class="tw-absolute tw-top-4 tw-bottom-4 tw-left-4 tw-z-10 tw-w-full tw-max-w-xs sm:tw-max-w-sm tw-transition-transform tw-duration-300 tw-ease-in-out"
-    :class="{ 'tw--translate-x-[calc(100%+1.5rem)]': isCollapsed }"
+  <q-card
+    @touchstart.stop
+    @touchmove.stop
+    @mousedown.stop
+    @wheel.stop
+    class="tw-backdrop-blur-xl tw-shadow-2xl tw-flex tw-flex-col tw-overflow-hidden tw-rounded-t-3xl tw-rounded-b-none md:tw-rounded-3xl tw-w-full tw-h-full"
   >
-    <!-- Botão Flutuante de Toggle (Abrir/Fechar Sidebar) -->
-    <q-btn
-      round
-      dense
-      unelevated
-      color="primary"
-      :icon="isCollapsed ? 'chevron_right' : 'chevron_left'"
-      class="tw-absolute tw-top-4 tw--right-10 tw-shadow-lg tw-z-20"
-      :aria-label="isCollapsed ? 'Abrir painel lateral' : 'Recolher painel lateral'"
-      @click="toggleSidebar"
-    />
+    <!-- Área combinada de Arraste (Handle + Título + Pesquisa) -->
+    <div id="drag-zone" class="tw-w-full">
+      <!-- Handle Visual para Mobile (Gaveta Bottom Sheet) -->
+      <div class="tw-w-full tw-flex tw-justify-center tw-pt-3 md:tw-hidden cursor-grab">
+        <div
+          class="tw-w-12 tw-h-1.5 tw-rounded-full"
+          style="background-color: currentColor; opacity: 0.25"
+        ></div>
+      </div>
 
-    <!-- Painel de Superfície Nativa do Quasar (ADR-003 & ui-quasar-tailwind.md) -->
-    <q-card
-      flat
-      bordered
-      class="tw-h-full tw-w-full tw-flex tw-flex-col tw-rounded-3xl tw-shadow-2xl tw-backdrop-blur-md tw-overflow-hidden"
-    >
-      <!-- Cabeçalho do Painel -->
-      <div class="tw-p-4 sm:tw-p-5 tw-border-b tw-border-gray-100 dark:tw-border-gray-800">
-        <div class="tw-flex tw-items-center tw-gap-2.5 tw-mb-1.5">
-          <div class="tw-w-8 tw-h-8 tw-rounded-xl tw-bg-primary/10 tw-text-primary tw-flex tw-items-center tw-justify-center">
+      <!-- Cabeçalho do Painel com Título e Filtros -->
+      <q-card-section class="tw-p-5 sm:tw-p-6 tw-pt-3 sm:tw-pt-4 md:tw-pt-6 cursor-grab">
+        <div class="tw-flex tw-items-center tw-gap-2.5 tw-mb-1">
+          <div
+            class="tw-w-8 tw-h-8 tw-rounded-xl tw-bg-primary/10 tw-text-primary tw-flex tw-items-center tw-justify-center"
+          >
             <q-icon name="explore" size="20px" />
           </div>
-          <div>
-            <h2 class="text-subtitle1 text-weight-bold tw-leading-tight tw-tracking-tight">
-              Grupos de Estudo
-            </h2>
-          </div>
+          <h2 class="text-h6 text-weight-bold tw-font-space-grotesk tw-m-0 tw-leading-tight">
+            Grupos de Estudo
+          </h2>
         </div>
 
-        <p class="text-caption text-muted tw-mb-3">
+        <p class="text-caption tw-opacity-70 tw-mb-3.5 tw-font-medium">
           Encontre monitorias e grupos de reforço na sua faculdade
         </p>
 
-        <!-- Campo de Busca -->
-        <q-input
-          v-model="store.filters.search"
-          placeholder="Buscar faculdade, matéria ou campus..."
-          dense
-          outlined
-          clearable
-          hide-bottom-space
-          class="tw-rounded-xl tw-text-xs"
-        >
-          <template v-slot:prepend>
-            <q-icon name="search" size="18px" class="text-muted" />
-          </template>
-        </q-input>
-
-        <!-- Filtros Rápidos por Categoria -->
-        <div class="tw-flex tw-items-center tw-gap-1.5 tw-mt-2.5 tw-flex-wrap">
-          <q-btn
-            size="sm"
+        <!-- data-drag-ignore impede o GSAP de interceptar cliques nesses componentes -->
+        <div data-drag-ignore="true">
+          <!-- Campo de Busca Estilizado -->
+          <q-input
+            v-model="store.filters.search"
+            placeholder="Buscar faculdade, matéria ou campus..."
             dense
+            outlined
             rounded
-            no-caps
-            :unelevated="store.filters.type === 'all'"
-            :flat="store.filters.type !== 'all'"
-            :color="store.filters.type === 'all' ? 'primary' : 'grey-7'"
-            class="tw-px-2.5 tw-text-xs"
-            label="Todos"
-            @click="store.setTypeFilter('all')"
-          />
+            clearable
+            hide-bottom-space
+            class="tw-mb-3"
+            style="height: 44px"
+          >
+            <template v-slot:prepend>
+              <q-icon name="search" />
+            </template>
+          </q-input>
 
-          <q-btn
-            size="sm"
-            dense
-            rounded
-            no-caps
-            :unelevated="store.filters.type === 'estudo'"
-            :flat="store.filters.type !== 'estudo'"
-            :color="store.filters.type === 'estudo' ? 'primary' : 'grey-7'"
-            class="tw-px-2.5 tw-text-xs"
-            label="Estudos"
-            @click="store.setTypeFilter('estudo')"
-          />
+          <!-- Filtros Rápidos por Categoria (Chips horizontais com rolagem invisível) -->
+          <div class="tw-flex tw-gap-2 tw-overflow-x-auto no-scrollbar tw-pb-1">
+            <q-chip
+              clickable
+              :color="store.filters.type === 'all' ? 'primary' : ''"
+              :text-color="store.filters.type === 'all' ? 'white' : 'primary'"
+              :outline="store.filters.type !== 'all'"
+              class="tw-m-0 tw-shrink-0 text-weight-bold tw-px-3"
+              @click="store.setTypeFilter('all')"
+            >
+              Todos
+            </q-chip>
 
-          <q-btn
-            size="sm"
-            dense
-            rounded
-            no-caps
-            :unelevated="store.filters.type === 'reforco'"
-            :flat="store.filters.type !== 'reforco'"
-            :color="store.filters.type === 'reforco' ? 'primary' : 'grey-7'"
-            class="tw-px-2.5 tw-text-xs"
-            label="Reforço"
-            @click="store.setTypeFilter('reforco')"
-          />
+            <q-chip
+              clickable
+              :color="store.filters.type === 'estudo' ? 'primary' : ''"
+              :text-color="store.filters.type === 'estudo' ? 'white' : 'primary'"
+              :outline="store.filters.type !== 'estudo'"
+              class="tw-m-0 tw-shrink-0 tw-px-3"
+              @click="store.setTypeFilter('estudo')"
+            >
+              Estudos
+            </q-chip>
 
-          <q-btn
-            size="sm"
-            dense
-            rounded
-            no-caps
-            :unelevated="store.filters.type === 'monitoria'"
-            :flat="store.filters.type !== 'monitoria'"
-            :color="store.filters.type === 'monitoria' ? 'primary' : 'grey-7'"
-            class="tw-px-2.5 tw-text-xs"
-            label="Monitoria"
-            @click="store.setTypeFilter('monitoria')"
-          />
+            <q-chip
+              clickable
+              :color="store.filters.type === 'reforco' ? 'primary' : ''"
+              :text-color="store.filters.type === 'reforco' ? 'white' : 'primary'"
+              :outline="store.filters.type !== 'reforco'"
+              class="tw-m-0 tw-shrink-0 tw-px-3"
+              @click="store.setTypeFilter('reforco')"
+            >
+              Reforço
+            </q-chip>
 
-          <q-btn
-            size="sm"
-            dense
-            rounded
-            no-caps
-            :unelevated="store.filters.type === 'projeto'"
-            :flat="store.filters.type !== 'projeto'"
-            :color="store.filters.type === 'projeto' ? 'primary' : 'grey-7'"
-            class="tw-px-2.5 tw-text-xs"
-            label="Projetos"
-            @click="store.setTypeFilter('projeto')"
-          />
+            <q-chip
+              clickable
+              :color="store.filters.type === 'monitoria' ? 'primary' : ''"
+              :text-color="store.filters.type === 'monitoria' ? 'white' : 'primary'"
+              :outline="store.filters.type !== 'monitoria'"
+              class="tw-m-0 tw-shrink-0 tw-px-3"
+              @click="store.setTypeFilter('monitoria')"
+            >
+              Monitoria
+            </q-chip>
+
+            <q-chip
+              clickable
+              :color="store.filters.type === 'projeto' ? 'primary' : ''"
+              :text-color="store.filters.type === 'projeto' ? 'white' : 'primary'"
+              :outline="store.filters.type !== 'projeto'"
+              class="tw-m-0 tw-shrink-0 tw-px-3"
+              @click="store.setTypeFilter('projeto')"
+            >
+              Projetos
+            </q-chip>
+          </div>
         </div>
-      </div>
+      </q-card-section>
+    </div>
 
-      <!-- Lista de Grupos com Scroll Suave -->
-      <q-scroll-area class="tw-flex-1 tw-px-3 tw-py-3">
+    <q-separator />
+
+    <!-- Lista de Grupos com Rolagem Suave -->
+    <div
+      class="tw-flex-1 tw-flex tw-flex-col tw-overflow-hidden tw-relative"
+      style="padding: 1rem; padding-bottom: calc(2rem + env(safe-area-inset-bottom, 0px))"
+    >
+      <q-scroll-area class="tw-flex-1 no-scrollbar tw-overscroll-contain">
         <!-- Skeleton Loading Nativo do Quasar -->
-        <div v-if="store.isLoading" class="tw-space-y-2.5">
+        <div v-if="store.isLoading" class="tw-space-y-3">
           <q-skeleton
             v-for="i in 3"
             :key="i"
@@ -161,17 +233,25 @@ function handleSelectGroup(group: StudyGroupPublic) {
         <!-- Lista Vazia -->
         <div
           v-else-if="store.filteredGroups.length === 0"
-          class="tw-flex tw-flex-col tw-items-center tw-justify-center tw-py-12 tw-text-center tw-px-4"
+          class="tw-h-full tw-flex tw-flex-col tw-items-center tw-justify-center tw-py-12 tw-text-center tw-px-4"
         >
           <q-icon name="location_off" size="3rem" class="text-hint tw-mb-2" />
           <h4 class="tw-font-bold tw-text-sm tw-mb-1">Nenhum grupo encontrado</h4>
           <p class="tw-text-xs text-muted">
             Tente buscar por outro termo ou remova os filtros de busca.
           </p>
+          <q-btn
+            v-if="store.filters.type !== 'all' || store.filters.search"
+            unelevated
+            color="primary"
+            class="tw-mt-3 tw-rounded-xl text-weight-bold tw-text-xs"
+            label="Limpar Filtros"
+            @click="store.clearFilters()"
+          />
         </div>
 
         <!-- Itens Encontrados -->
-        <div v-else class="tw-space-y-2.5">
+        <div v-else class="tw-space-y-3">
           <StudyGroupCard
             v-for="group in store.filteredGroups"
             :key="group.id"
@@ -181,6 +261,22 @@ function handleSelectGroup(group: StudyGroupPublic) {
           />
         </div>
       </q-scroll-area>
-    </q-card>
-  </aside>
+    </div>
+  </q-card>
 </template>
+
+<style scoped>
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.cursor-grab {
+  cursor: grab;
+}
+.cursor-grab:active {
+  cursor: grabbing;
+}
+</style>

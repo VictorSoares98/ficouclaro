@@ -76,6 +76,14 @@ export const useStudyGroupStore = defineStore('studyGroup', () => {
     filters.value.type = type;
   }
 
+  /**
+   * Limpa todos os filtros ativos
+   */
+  function clearFilters() {
+    filters.value.search = '';
+    filters.value.type = 'all';
+  }
+
   return {
     groups,
     selectedGroup,
@@ -87,5 +95,6 @@ export const useStudyGroupStore = defineStore('studyGroup', () => {
     selectGroup,
     setSearch,
     setTypeFilter,
+    clearFilters,
   };
 });

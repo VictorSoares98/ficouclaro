@@ -23,7 +23,6 @@ export function useStudyGroupsMap() {
     const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
     const tileLayer = L.tileLayer(tileUrl, {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       subdomains: 'abc',
       minZoom: 3,
       maxZoom: 19,
@@ -58,6 +57,7 @@ export function useStudyGroupsMap() {
       minZoom: 3,
       maxZoom: 19,
       zoomControl: false,
+      attributionControl: false,
     });
 
     // Reposiciona o controle de zoom no canto inferior direito
