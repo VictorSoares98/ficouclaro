@@ -3,14 +3,14 @@
   <h1>🎓 Ficou Claro? (Is it Clear?)</h1>
   <p><em>Living Documentation — Real-Time Classroom Engagement Platform & Academic Study Group Radar</em></p>
 
-  [![Version](https://img.shields.io/badge/version-0.0.1-blue.svg?style=flat-square)](package.json)
-  [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](LICENSE)
-  [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg?style=flat-square)](package.json)
-  [![Type-Coverage](https://img.shields.io/badge/TypeScript-Strict_100%25-blue.svg?style=flat-square&logo=typescript)](tsconfig.json)
-  [![Vue 3](https://img.shields.io/badge/Vue.js-3.5-4FC08D?style=flat-square&logo=vuedotjs)](https://vuejs.org/)
-  [![Quasar](https://img.shields.io/badge/Quasar-2.25-1976D2?style=flat-square&logo=quasar)](https://quasar.dev/)
-  [![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL_15-3ECF8E?style=flat-square&logo=supabase)](https://supabase.com/)
-  [![Tailwind CSS](https://img.shields.io/badge/Tailwind-Prefix_tw--38B2AC?style=flat-square&logo=tailwind-css)](https://tailwindcss.com/)
+[![Version](https://img.shields.io/badge/version-0.0.1-blue.svg?style=flat-square)](package.json)
+[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](LICENSE)
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg?style=flat-square)](package.json)
+[![Type-Coverage](https://img.shields.io/badge/TypeScript-Strict_100%25-blue.svg?style=flat-square&logo=typescript)](tsconfig.json)
+[![Vue 3](https://img.shields.io/badge/Vue.js-3.5-4FC08D?style=flat-square&logo=vuedotjs)](https://vuejs.org/)
+[![Quasar](https://img.shields.io/badge/Quasar-2.25-1976D2?style=flat-square&logo=quasar)](https://quasar.dev/)
+[![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL_15-3ECF8E?style=flat-square&logo=supabase)](https://supabase.com/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-Prefix_tw--38B2AC?style=flat-square&logo=tailwind-css)](https://tailwindcss.com/)
 </div>
 
 > _Read this in other languages: [🇺🇸 English](README.en.md) | [🇧🇷 Português](README.md)_
@@ -19,7 +19,7 @@
 
 ## 1. Title and Overview
 
-**Ficou Claro?** is a hybrid academic platform (Web, PWA, and Mobile) engineered to transform classroom dynamics and bridge the communication gap between educators and students. The platform replaces the traditional, awkward silence of *"Does anyone have any questions?"* with anonymous, instantaneous, and real-time validated channels powered by WebSockets, ensuring psychological safety for students throughout their learning journey.
+**Ficou Claro?** is a hybrid academic platform (Web, PWA, and Mobile) engineered to transform classroom dynamics and bridge the communication gap between educators and students. The platform replaces the traditional, awkward silence of _"Does anyone have any questions?"_ with anonymous, instantaneous, and real-time validated channels powered by WebSockets, ensuring psychological safety for students throughout their learning journey.
 
 Beyond live classroom engagement (continuous pacing thermometer, anonymous Q&A queue with peer upvotes, and real-time polls), the ecosystem integrates an **Interactive Campus Geospatial Radar**. This feature connects the academic community to physical tutoring sessions, peer review groups, and quiet study areas distributed across university campuses, democratizing access to collaborative learning.
 
@@ -30,6 +30,7 @@ Beyond live classroom engagement (continuous pacing thermometer, anonymous Q&A q
 The project is built on top of a modern, reactive, strictly typed architecture optimized for performance:
 
 ### Front-end
+
 - **[Vue 3](https://vuejs.org/)**: Modern reactive framework utilizing the Composition API and `<script setup>` with strict TypeScript.
 - **[Quasar Framework 2.25](https://quasar.dev/)**: UI Library and design system governing theme illumination (Dark/Light mode), mobile interaction components, and responsive app layouts.
 - **[Tailwind CSS 3.4](https://tailwindcss.com/)**: Utility styling engine strictly isolated with the `tw-` prefix for spacing, micro-layouts, and flex/grid alignment.
@@ -39,12 +40,14 @@ The project is built on top of a modern, reactive, strictly typed architecture o
 - **[Apache ECharts 6](https://echarts.apache.org/) & [vue-echarts](https://github.com/ecomfe/vue-echarts)**: Analytical charting and classroom telemetry visualization for the educator's dashboard.
 
 ### Back-end & BaaS
+
 - **[Supabase](https://supabase.com/) (PostgreSQL 15+)**: Relational database leveraging native types, triggers, security views, and RPC functions in PL/pgSQL.
 - **Supabase Auth**: Centralized identity management, JWT sessions, and Google OAuth social login.
 - **Supabase Realtime**: WebSocket pub/sub engine for sub-second synchronization of classroom votes, questions, and pacing metrics.
 - **Row Level Security (RLS)**: Deep database-level data isolation guaranteeing tenant privacy and role-based permissions.
 
 ### Infrastructure, Tooling & Mobile
+
 - **[Quasar CLI with Vite 3.6](https://quasar.dev/quasar-cli-vite/introduction)**: Blazing-fast development server with Hot Module Replacement (HMR) and optimized production bundler.
 - **[Capacitor 8](https://capacitorjs.com/)**: Cross-platform native runtime for Android (and iOS) packaging, with biometric authentication and haptic feedback bridges.
 - **[Docker](https://www.docker.com/) & Supabase CLI**: Complete local container orchestration (PostgreSQL, GoTrue, PostgREST, Realtime, and Studio).
@@ -63,7 +66,7 @@ The system adheres to rigorous engineering principles to guarantee scalability, 
   To eliminate CSS class collisions and specificity wars with Quasar components, Tailwind CSS is configured exclusively with the required `tw-` prefix (enforced in `tailwind.config.js`). Quasar Framework remains the supreme authority over component surfaces, tokens, and lighting modes, while `tw-*` utilities are restricted to flex layouts and spacing.
 
 - **Hardening & Zero-Direct-Access (Privacy by Design / LGPD):**  
-  Anonymous queries for public campus data (e.g., retrieving study groups on the map) have no direct `SELECT` permissions on primary relational tables (`grupos_estudo`, `usuarios`). Requests are mediated through a *Database Facade* consisting of secure Views defined `WITH (security_invoker = false)`, ensuring that Personally Identifiable Information (PII) is never exposed to unauthenticated actors.
+  Anonymous queries for public campus data (e.g., retrieving study groups on the map) have no direct `SELECT` permissions on primary relational tables (`grupos_estudo`, `usuarios`). Requests are mediated through a _Database Facade_ consisting of secure Views defined `WITH (security_invoker = false)`, ensuring that Personally Identifiable Information (PII) is never exposed to unauthenticated actors.
 
 - **Modular SQL Architecture (Schema Splitting):**  
   Instead of fragile timestamp-based migrations during MVP development, the database schema is divided into 9 idempotent, semantic snippets in `supabase/snippets/` (`00_Init_Extensions` through `08_Realtime`). The internal script `npm run db:build` deterministically compiles them into the consolidated `Master Schema.sql`.
@@ -87,7 +90,7 @@ Before setting up the local environment, make sure your machine has:
 - **NPM:** Version `>= 10.x`.
 - **Docker Desktop** or **Docker Engine** (with Docker Compose enabled): Required to run the local Supabase CLI stack.
 - **Git:** Version `>= 2.30` for repository cloning and branch management.
-- *(Optional for Android)*: Android Studio Flamingo+ and Android SDK configured for mobile emulation and native builds.
+- _(Optional for Android)_: Android Studio Flamingo+ and Android SDK configured for mobile emulation and native builds.
 
 ---
 
@@ -96,6 +99,7 @@ Before setting up the local environment, make sure your machine has:
 Follow the steps below to initialize the infrastructure and launch the development environment:
 
 ### 1. Clone the Repository
+
 ```bash
 git clone https://github.com/VictorSoares98/ficouclaro.git
 cd ficouclaro
@@ -103,12 +107,15 @@ npm install
 ```
 
 ### 2. Configure Environment Variables
+
 Copy the template environment file into the root folder:
+
 ```bash
 cp .env.example .env
 ```
 
 Open the generated `.env` file and configure your local parameters. For local Supabase development, set:
+
 ```env
 # Local Supabase Connection
 QCLI_SUPABASE_URL="http://127.0.0.1:54421"
@@ -122,14 +129,19 @@ SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET=""
 > 💡 **Note for Physical Mobile Testing:** When running on a physical Android device or emulator connected to your local Wi-Fi, replace `127.0.0.1` with your computer's local network IP address (e.g., `http://192.168.1.15:54421`).
 
 ### 3. Start Infrastructure (Supabase / Docker)
+
 Spin up the local Supabase container suite:
+
 ```bash
 npm run db:start
 ```
-> *(On first boot, Supabase CLI downloads required Docker images and prints API credentials, service keys, and the Supabase Studio dashboard URL at `http://127.0.0.1:54423`)*.
+
+> _(On first boot, Supabase CLI downloads required Docker images and prints API credentials, service keys, and the Supabase Studio dashboard URL at `http://127.0.0.1:54423`)_.
 
 ### 4. Run the Application
+
 With the backend running, start the Quasar Vite dev server with Hot Module Replacement:
+
 ```bash
 npm run dev
 ```
@@ -143,17 +155,17 @@ Open your browser at:
 
 The following standard operational commands are defined in `package.json`:
 
-| Script | Command Executed | Purpose / Description |
-| :--- | :--- | :--- |
-| `dev` | `npm run db:start && quasar dev` | Starts local Supabase and launches Vite dev server with HMR on port `9000`. |
-| `build` | `quasar build` | Compiles the production build and outputs optimized static assets to `dist/spa`. |
-| `typecheck` | `vue-tsc --noEmit` | Validates TypeScript types across `.vue` SFCs and `.ts` modules without emitting files. |
-| `lint` | `prettier --write ... && eslint --fix ...` | Automatically fixes code styling and ESLint violations across the codebase. |
-| `lint:check` | `prettier ... && eslint ...` | Runs linting and formatting verification in read-only mode (ideal for CI/CD). |
-| `db:start` | `npx supabase start` | Initializes local Supabase Docker containers. |
-| `db:stop` | `npx supabase stop` | Gracefully shuts down all local Supabase Docker containers. |
-| `db:build` | `node supabase/build-schema.js` | Concatenates the 9 snippets in `supabase/snippets/` into `Master Schema.sql`. |
-| `build:android`| `dotenv -e .env.production -- quasar build -m capacitor -T android` | Produces an Android production build with Capacitor injecting production environment variables. |
+| Script          | Command Executed                                                    | Purpose / Description                                                                           |
+| :-------------- | :------------------------------------------------------------------ | :---------------------------------------------------------------------------------------------- |
+| `dev`           | `npm run db:start && quasar dev`                                    | Starts local Supabase and launches Vite dev server with HMR on port `9000`.                     |
+| `build`         | `quasar build`                                                      | Compiles the production build and outputs optimized static assets to `dist/spa`.                |
+| `typecheck`     | `vue-tsc --noEmit`                                                  | Validates TypeScript types across `.vue` SFCs and `.ts` modules without emitting files.         |
+| `lint`          | `prettier --write ... && eslint --fix ...`                          | Automatically fixes code styling and ESLint violations across the codebase.                     |
+| `lint:check`    | `prettier ... && eslint ...`                                        | Runs linting and formatting verification in read-only mode (ideal for CI/CD).                   |
+| `db:start`      | `npx supabase start`                                                | Initializes local Supabase Docker containers.                                                   |
+| `db:stop`       | `npx supabase stop`                                                 | Gracefully shuts down all local Supabase Docker containers.                                     |
+| `db:build`      | `node supabase/build-schema.js`                                     | Concatenates the 9 snippets in `supabase/snippets/` into `Master Schema.sql`.                   |
+| `build:android` | `dotenv -e .env.production -- quasar build -m capacitor -T android` | Produces an Android production build with Capacitor injecting production environment variables. |
 
 ---
 
@@ -207,7 +219,8 @@ ficouclaro/
 
 ## 8. Privacy and Compliance (LGPD / GDPR)
 
-**Ficou Claro?** was architected from the ground up under *Privacy by Design* principles (ADR-009):
+**Ficou Claro?** was architected from the ground up under _Privacy by Design_ principles (ADR-009):
+
 - **Algorithmic Anonymity:** Student inquiries and pacing votes are decoupled from personal user identities, protecting academic psychological safety.
 - **Portability & Right to be Forgotten:** A dedicated Privacy Center (`/privacidade-seguranca`) allows users to export all account data and trigger irreversible account deletion with explicit keyphrase confirmation.
 - **Shielded Public APIs:** The campus study map projects sanitized organizer aliases through restricted Views (`WITH (security_invoker = false)`), never exposing user credentials or private records to unauthenticated visitors.

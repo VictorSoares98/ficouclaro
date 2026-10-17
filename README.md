@@ -3,14 +3,14 @@
   <h1>🎓 Ficou Claro?</h1>
   <p><em>Living Documentation — Plataforma de Engajamento Acadêmico em Tempo Real & Mapeamento de Monitorias</em></p>
 
-  [![Version](https://img.shields.io/badge/version-0.0.1-blue.svg?style=flat-square)](package.json)
-  [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](LICENSE)
-  [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg?style=flat-square)](package.json)
-  [![Type-Coverage](https://img.shields.io/badge/TypeScript-Strict_100%25-blue.svg?style=flat-square&logo=typescript)](tsconfig.json)
-  [![Vue 3](https://img.shields.io/badge/Vue.js-3.5-4FC08D?style=flat-square&logo=vuedotjs)](https://vuejs.org/)
-  [![Quasar](https://img.shields.io/badge/Quasar-2.25-1976D2?style=flat-square&logo=quasar)](https://quasar.dev/)
-  [![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL_15-3ECF8E?style=flat-square&logo=supabase)](https://supabase.com/)
-  [![Tailwind CSS](https://img.shields.io/badge/Tailwind-Prefix_tw--38B2AC?style=flat-square&logo=tailwind-css)](https://tailwindcss.com/)
+[![Version](https://img.shields.io/badge/version-0.0.1-blue.svg?style=flat-square)](package.json)
+[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](LICENSE)
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg?style=flat-square)](package.json)
+[![Type-Coverage](https://img.shields.io/badge/TypeScript-Strict_100%25-blue.svg?style=flat-square&logo=typescript)](tsconfig.json)
+[![Vue 3](https://img.shields.io/badge/Vue.js-3.5-4FC08D?style=flat-square&logo=vuedotjs)](https://vuejs.org/)
+[![Quasar](https://img.shields.io/badge/Quasar-2.25-1976D2?style=flat-square&logo=quasar)](https://quasar.dev/)
+[![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL_15-3ECF8E?style=flat-square&logo=supabase)](https://supabase.com/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-Prefix_tw--38B2AC?style=flat-square&logo=tailwind-css)](https://tailwindcss.com/)
 </div>
 
 > _Documento disponível em outros idiomas: [🇺🇸 English](README.en.md) | [🇧🇷 Português](README.md)_
@@ -19,7 +19,7 @@
 
 ## 1. Título e Visão Geral
 
-O **Ficou Claro?** é uma plataforma acadêmica híbrida (Web, PWA e Mobile) desenvolvida para transformar a dinâmica em sala de aula e mitigar o abismo de comunicação entre professores e estudantes. O sistema substitui o tradicional e desconfortável silêncio do *"Alguém tem alguma dúvida?"* por canais de interação anônimos, instantâneos e com validação em tempo real via WebSockets, garantindo a segurança psicológica do discente durante o processo pedagógico.
+O **Ficou Claro?** é uma plataforma acadêmica híbrida (Web, PWA e Mobile) desenvolvida para transformar a dinâmica em sala de aula e mitigar o abismo de comunicação entre professores e estudantes. O sistema substitui o tradicional e desconfortável silêncio do _"Alguém tem alguma dúvida?"_ por canais de interação anônimos, instantâneos e com validação em tempo real via WebSockets, garantindo a segurança psicológica do discente durante o processo pedagógico.
 
 Além da atuação em tempo real dentro da sala de aula (termômetro contínuo de ritmo, painel de dúvidas com upvotes da turma e enquetes instantâneas), o ecossistema integra um **Mapeador Geoespacial de Campus**. Esta funcionalidade conecta a comunidade a monitorias presenciais, grupos de reforço acadêmico e espaços de estudo físico espalhados pelas instituições de ensino, democratizando o acesso ao aprendizado colaborativo.
 
@@ -30,6 +30,7 @@ Além da atuação em tempo real dentro da sala de aula (termômetro contínuo d
 O projeto foi construído sobre uma arquitetura reativa, tipada e com alta performance de carregamento:
 
 ### Front-end
+
 - **[Vue 3](https://vuejs.org/)**: Framework reativo utilizando Composition API e script setup com TypeScript estrito.
 - **[Quasar Framework 2.25](https://quasar.dev/)**: UI Library e design system governante da iluminação (Dark/Light mode), componentes de interação nativa e layouts de alta performance.
 - **[Tailwind CSS 3.4](https://tailwindcss.com/)**: Motor de estilização utilitária com prefixo isolado `tw-` para espaçamentos, micro-layouts e alinhamentos rápidos.
@@ -39,12 +40,14 @@ O projeto foi construído sobre uma arquitetura reativa, tipada e com alta perfo
 - **[Apache ECharts 6](https://echarts.apache.org/) & [vue-echarts](https://github.com/ecomfe/vue-echarts)**: Geração de gráficos analíticos e telemetria de aulas para o painel docente.
 
 ### Back-end & BaaS
+
 - **[Supabase](https://supabase.com/) (PostgreSQL 15+)**: Banco de dados relacional com suporte a tipos nativos, triggers, views e funções RPC em PL/pgSQL.
 - **Supabase Auth**: Gerenciamento centralizado de identidades, sessões JWT e autenticação social OAuth (Google).
 - **Supabase Realtime**: Engine WebSocket pub/sub para sincronização em tempo real das interações em aula e termômetro didático.
 - **Row Level Security (RLS)**: Isolamento de dados direto na camada de banco de dados garantindo integridade de permissões.
 
 ### Infraestrutura, Ferramentas & Mobile
+
 - **[Quasar CLI com Vite 3.6](https://quasar.dev/quasar-cli-vite/introduction)**: Servidor de desenvolvimento ultrarrápido com Hot Module Replacement (HMR) e bundler otimizado para produção.
 - **[Capacitor 8](https://capacitorjs.com/)**: Runtime multiplataforma nativo para empacotamento Android (e iOS) com bridge de biometria e haptics.
 - **[Docker](https://www.docker.com/) & Supabase CLI**: Orquestração local completa da suíte Supabase (PostgreSQL, GoTrue, PostgREST, Realtime e Studio).
@@ -63,13 +66,13 @@ A engenharia do sistema adota princípios corporativos rígidos para assegurar e
   Para neutralizar colisões de classes e conflitos de especificidade com o ecossistema Quasar, a camada Tailwind CSS opera estritamente sob o prefixo obrigatório `tw-` (configurado em `tailwind.config.js`). O Quasar Framework atua como o soberano exclusivo de temas, tokens e superfícies, enquanto as classes utilitárias `tw-*` são restritas a layouts flexíveis e espaçamentos.
 
 - **Hardening & Zero-Direct-Access (LGPD by Design):**  
-  Consultas anônimas a dados públicos (ex: visualização de grupos de estudo e monitorias no mapa) não possuem permissão de leitura direta (`SELECT`) sobre as tabelas relacionais primárias (`grupos_estudo`, `usuarios`). A comunicação é intermediada por uma *Database Facade* composta por Views seguras com `security_invoker = false`, garantindo que informações pessoais identificáveis (PII) permaneçam completamente inacessíveis a agentes não autenticados.
+  Consultas anônimas a dados públicos (ex: visualização de grupos de estudo e monitorias no mapa) não possuem permissão de leitura direta (`SELECT`) sobre as tabelas relacionais primárias (`grupos_estudo`, `usuarios`). A comunicação é intermediada por uma _Database Facade_ composta por Views seguras com `security_invoker = false`, garantindo que informações pessoais identificáveis (PII) permaneçam completamente inacessíveis a agentes não autenticados.
 
 - **Arquitetura SQL Modular (Schema Splitting):**  
   Em substituição a migrações cronológicas fragmentadas, o schema do banco é mantido em 9 snippets semânticos idempotentes em `supabase/snippets/` (`00_Init_Extensions` até `08_Realtime`). O compilador interno `npm run db:build` concatena deterministicamente os módulos e gera o `Master Schema.sql` consolidado.
 
 - **Padrão Singleton para Realtime (ADR-006):**  
-  Inscrições de WebSockets são proibidas diretamente dentro de componentes visuais Vue. Toda telemetria em tempo real é centralizada pelo serviço `RealtimeManager`, prevenindo vazamentos de memória, conexões duplicadas e estados de corrida (*race conditions*).
+  Inscrições de WebSockets são proibidas diretamente dentro de componentes visuais Vue. Toda telemetria em tempo real é centralizada pelo serviço `RealtimeManager`, prevenindo vazamentos de memória, conexões duplicadas e estados de corrida (_race conditions_).
 
 - **Type-Safety Estrita (No `any` Policy - ADR-001):**  
   O uso da tipagem `any` é terminantemente vetado no repositório. Todos os retornos de API são mapeados a partir dos tipos gerados pelo banco para interfaces de domínio canônicas em `src/core/types`.
@@ -87,7 +90,7 @@ Antes de iniciar a configuração local, certifique-se de possuir em seu ambient
 - **NPM:** Versão `>= 10.x`.
 - **Docker Desktop** ou **Docker Engine** (com Docker Compose ativo): Necessário para a execução da infraestrutura local via Supabase CLI.
 - **Git:** Versão `>= 2.30` para clonagem e gestão de ramificações.
-- *(Opcional para Android)*: Android Studio Flamingo+ e Android SDK configurado para builds mobile.
+- _(Opcional para Android)_: Android Studio Flamingo+ e Android SDK configurado para builds mobile.
 
 ---
 
@@ -96,6 +99,7 @@ Antes de iniciar a configuração local, certifique-se de possuir em seu ambient
 Siga o passo a passo abaixo para inicializar a infraestrutura e executar a aplicação em ambiente de desenvolvimento:
 
 ### 1. Clonar o Repositório
+
 ```bash
 git clone https://github.com/VictorSoares98/ficouclaro.git
 cd ficouclaro
@@ -103,12 +107,15 @@ npm install
 ```
 
 ### 2. Configurar Variáveis de Ambiente
+
 Copie o modelo de variáveis de ambiente para a raiz do projeto:
+
 ```bash
 cp .env.example .env
 ```
 
 Abra o arquivo `.env` gerado e defina os parâmetros locais. Para desenvolvimento com Supabase Local, utilize:
+
 ```env
 # Conexão com Supabase Local
 QCLI_SUPABASE_URL="http://127.0.0.1:54421"
@@ -122,14 +129,19 @@ SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET=""
 > 💡 **Nota para Testes em Dispositivos Móveis:** Se for executar a aplicação em um smartphone físico ou emulador conectado à sua rede Wi-Fi, substitua `127.0.0.1` pelo IP local da sua máquina (ex: `http://192.168.1.15:54421`).
 
 ### 3. Subir a Infraestrutura (Supabase / Docker)
+
 Inicie a suíte local de containers do Supabase:
+
 ```bash
 npm run db:start
 ```
-> *(No primeiro boot, o Supabase CLI baixará as imagens Docker necessárias e imprimirá no terminal as credenciais locais, endpoints da API e a URL do Studio em `http://127.0.0.1:54423`)*.
+
+> _(No primeiro boot, o Supabase CLI baixará as imagens Docker necessárias e imprimirá no terminal as credenciais locais, endpoints da API e a URL do Studio em `http://127.0.0.1:54423`)_.
 
 ### 4. Executar a Aplicação Localmente
+
 Com os containers ativos, inicie o servidor de desenvolvimento do Quasar com Hot Module Replacement:
+
 ```bash
 npm run dev
 ```
@@ -143,17 +155,17 @@ A aplicação estará acessível no navegador pelo endereço:
 
 Abaixo estão listados os comandos operacionais padronizados no `package.json`:
 
-| Script | Comando Executado | Propósito / Descrição |
-| :--- | :--- | :--- |
-| `dev` | `npm run db:start && quasar dev` | Sobe o banco Supabase e inicia o servidor Vite local com HMR na porta `9000`. |
-| `build` | `quasar build` | Realiza a compilação de produção e gera o bundle estático otimizado em `dist/spa`. |
-| `typecheck` | `vue-tsc --noEmit` | Executa a checagem de tipos TypeScript em componentes `.vue` e módulos `.ts`. |
-| `lint` | `prettier --write ... && eslint --fix ...` | Corrige automaticamente desvios de formatação e linter em todo o código. |
-| `lint:check` | `prettier ... && eslint ...` | Valida formatação e qualidade de código em modo leitura (adequado para CI/CD). |
-| `db:start` | `npx supabase start` | Inicializa os containers Docker locais do ecossistema Supabase. |
-| `db:stop` | `npx supabase stop` | Encerra com segurança a execução de todos os containers locais do Supabase. |
-| `db:build` | `node supabase/build-schema.js` | Concatena os 9 snippets de `supabase/snippets/` no arquivo `Master Schema.sql`. |
-| `build:android`| `dotenv -e .env.production -- quasar build -m capacitor -T android` | Gera a compilação de produção nativa para Android via Capacitor. |
+| Script          | Comando Executado                                                   | Propósito / Descrição                                                              |
+| :-------------- | :------------------------------------------------------------------ | :--------------------------------------------------------------------------------- |
+| `dev`           | `npm run db:start && quasar dev`                                    | Sobe o banco Supabase e inicia o servidor Vite local com HMR na porta `9000`.      |
+| `build`         | `quasar build`                                                      | Realiza a compilação de produção e gera o bundle estático otimizado em `dist/spa`. |
+| `typecheck`     | `vue-tsc --noEmit`                                                  | Executa a checagem de tipos TypeScript em componentes `.vue` e módulos `.ts`.      |
+| `lint`          | `prettier --write ... && eslint --fix ...`                          | Corrige automaticamente desvios de formatação e linter em todo o código.           |
+| `lint:check`    | `prettier ... && eslint ...`                                        | Valida formatação e qualidade de código em modo leitura (adequado para CI/CD).     |
+| `db:start`      | `npx supabase start`                                                | Inicializa os containers Docker locais do ecossistema Supabase.                    |
+| `db:stop`       | `npx supabase stop`                                                 | Encerra com segurança a execução de todos os containers locais do Supabase.        |
+| `db:build`      | `node supabase/build-schema.js`                                     | Concatena os 9 snippets de `supabase/snippets/` no arquivo `Master Schema.sql`.    |
+| `build:android` | `dotenv -e .env.production -- quasar build -m capacitor -T android` | Gera a compilação de produção nativa para Android via Capacitor.                   |
 
 ---
 
@@ -207,7 +219,8 @@ ficouclaro/
 
 ## 8. Conformidade e Privacidade (LGPD)
 
-O **Ficou Claro?** foi projetado sob os preceitos de *Privacy by Design* (ADR-009):
+O **Ficou Claro?** foi projetado sob os preceitos de _Privacy by Design_ (ADR-009):
+
 - **Anonimato Algorítmico:** Dúvidas e votos de termômetro enviados por alunos são desacoplados de identificadores nominais, resguardando a integridade psicológica do discente.
 - **Direito à Portabilidade e Esquecimento:** Módulo de privacidade (`/privacidade-seguranca`) que viabiliza a exportação dos dados do usuário e o encerramento definitivo da conta com confirmação explícita de segurança.
 - **Proteção de Dados Públicos:** O mapeamento de campus expõe apenas pseudônimos de organizadores através de views com restrição de escopo (`WITH (security_invoker = false)`).
