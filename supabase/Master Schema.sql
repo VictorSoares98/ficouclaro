@@ -1,7 +1,7 @@
 -- ====================================================================
 -- ⚠️ AVISO: ARQUIVO AUTO-GERADO!
 -- NÃO EDITE ESTE ARQUIVO DIRETAMENTE. ALTERE OS SNIPPETS E RODE db:build
--- Gerado em: 2026-10-15T03:08:35.731Z
+-- Gerado em: 2026-10-17T15:06:57.412Z
 -- ====================================================================
 
 -- >>> INÍCIO DO SNIPPET: 00_Init_Extensions.sql <<<
@@ -235,7 +235,7 @@ CREATE TABLE public.registros_encontro (
 -- 1. VIEW MAPA DE GRUPOS DE ESTUDO (Baseado em vw_pockets_mapa)
 -- Evita vazamento de dados confidenciais e PII dos membros
 -- ============================================================
-CREATE OR REPLACE VIEW public.view_grupos_estudo_publicos WITH (security_invoker = true) AS
+CREATE OR REPLACE VIEW public.view_grupos_estudo_publicos WITH (security_invoker = false) AS
 SELECT 
   g.id,
   g.nome,
@@ -750,7 +750,7 @@ ALTER TABLE public.grupos_estudo ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.grupos_membros ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.registros_encontro ENABLE ROW LEVEL SECURITY;
 
--- Grants para visualização pública de grupos no mapa
+-- Grants para visualização pública de grupos no mapa (Fachada de Isolamento Zero-Direct-Access)
 GRANT SELECT ON public.view_grupos_estudo_publicos TO anon, authenticated;
 
 -- POLICIES: usuarios
@@ -895,7 +895,7 @@ CREATE POLICY "Registrante ou criador atualiza registro de encontro" ON public.r
     )
   );
 
--- GRANTS: View pública e RPCs de grupos de estudo
+-- GRANTS: View pública e RPCs de grupos de estudo (Zero-Direct-Access)
 GRANT SELECT ON public.view_grupos_estudo_publicos TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.link_member_to_study_group(UUID) TO authenticated;
 

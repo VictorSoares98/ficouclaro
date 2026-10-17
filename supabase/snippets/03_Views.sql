@@ -6,7 +6,7 @@
 -- 1. VIEW MAPA DE GRUPOS DE ESTUDO (Baseado em vw_pockets_mapa)
 -- Evita vazamento de dados confidenciais e PII dos membros
 -- ============================================================
-CREATE OR REPLACE VIEW public.view_grupos_estudo_publicos WITH (security_invoker = true) AS
+CREATE OR REPLACE VIEW public.view_grupos_estudo_publicos WITH (security_invoker = false) AS
 SELECT 
   g.id,
   g.nome,

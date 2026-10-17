@@ -29,7 +29,7 @@ ALTER TABLE public.grupos_estudo ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.grupos_membros ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.registros_encontro ENABLE ROW LEVEL SECURITY;
 
--- Grants para visualização pública de grupos no mapa
+-- Grants para visualização pública de grupos no mapa (Fachada de Isolamento Zero-Direct-Access)
 GRANT SELECT ON public.view_grupos_estudo_publicos TO anon, authenticated;
 
 -- POLICIES: usuarios
@@ -174,7 +174,7 @@ CREATE POLICY "Registrante ou criador atualiza registro de encontro" ON public.r
     )
   );
 
--- GRANTS: View pública e RPCs de grupos de estudo
+-- GRANTS: View pública e RPCs de grupos de estudo (Zero-Direct-Access)
 GRANT SELECT ON public.view_grupos_estudo_publicos TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.link_member_to_study_group(UUID) TO authenticated;
 
