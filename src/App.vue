@@ -32,6 +32,19 @@ themeStore.initTheme();
 accessibilityStore.initAccessibility();
 let authListener: Subscription | null = null;
 
+if (import.meta.env.DEV) {
+  window.lockSession = (force = true) => {
+    if (force) {
+      authStore.isLocked = true;
+    } else {
+      authStore.lockSession();
+    }
+  };
+  window.unlockSession = () => {
+    authStore.unlockSession();
+  };
+}
+
 const splashRef = ref<InstanceType<typeof AnimatedSplash> | null>(null);
 const showVueSplash = ref(true);
 

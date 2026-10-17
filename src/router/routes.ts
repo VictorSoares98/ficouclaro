@@ -18,6 +18,10 @@ const routes: RouteRecordRaw[] = [
         path: 'mapa',
         component: () => import('@/modules/study-groups/pages/StudyGroupsMapPage.vue'),
       },
+      {
+        path: 'lock',
+        component: () => import('@/components/LockScreen.vue'),
+      },
     ],
   },
   {

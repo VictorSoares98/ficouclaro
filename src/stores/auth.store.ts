@@ -21,6 +21,14 @@ export const useAuthStore = defineStore('auth', () => {
   const isProfessor = computed(() => user.value?.perfil.papel === 'professor');
   const isAluno = computed(() => user.value?.perfil.papel === 'aluno');
 
+  const isOAuthUser = computed(() => {
+    if (!user.value) return false;
+    const provider = user.value.auth.app_metadata?.provider;
+    if (provider && provider !== 'email') return true;
+    const providers = user.value.auth.app_metadata?.providers;
+    return Boolean(providers && providers.length > 0 && !providers.includes('email'));
+  });
+
   /**
    * Carrega a sessão pela primeira vez quando o app inicia.
    */
@@ -68,20 +76,31 @@ export const useAuthStore = defineStore('auth', () => {
     isLocked.value = false;
   }
 
-  async function unlockWithPassword(password: string) {
-    if (!user.value?.auth.email) return false;
+  async function unlockWithPassword(password: string): Promise<boolean> {
+    const userEmail = user.value?.auth.email;
+    if (!userEmail) return false;
 
-    return execute(async () => {
-      const data = await authService.signIn({
-        email: user.value!.auth.email!,
-        password,
-      });
-      if (data.user) {
+    try {
+      const data = await execute(async () => {
+        return await authService.signIn({
+          email: userEmail,
+          password,
+        });
+      }, 'Senha incorreta.');
+
+      if (data?.user) {
         unlockSession();
         return true;
       }
       return false;
-    }, 'Senha incorreta.');
+    } catch {
+      return false;
+    }
+  }
+
+  async function unlockWithGoogle() {
+    unlockSession();
+    await loginWithGoogle();
   }
 
   async function deleteAccount() {
@@ -124,6 +143,7 @@ export const useAuthStore = defineStore('auth', () => {
     isAuthenticated,
     isProfessor,
     isAluno,
+    isOAuthUser,
     loadInitialSession,
     reloadProfile,
     clearUser,
@@ -131,6 +151,7 @@ export const useAuthStore = defineStore('auth', () => {
     lockSession,
     unlockSession,
     unlockWithPassword,
+    unlockWithGoogle,
     login,
     loginWithGoogle,
     register,
