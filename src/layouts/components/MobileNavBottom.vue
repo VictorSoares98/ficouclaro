@@ -11,7 +11,7 @@ const isAluno = computed(() => authStore.isAluno);
 <template>
   <!-- MobileNavBottom: Barra inferior tátil ergonômica (Thumb Zone) para viewports lt-md -->
   <q-footer
-    class="tw-backdrop-blur-2xl tw-bg-surface/90 dark:tw-bg-dark-page/90 tw-text-gray-600 dark:tw-text-gray-300 tw-border-t tw-border-white/10 tw-shadow-2xl lt-md tw-z-[999]"
+    class="fc-glass-footer tw-shadow-2xl lt-md tw-z-[999]"
     style="padding-bottom: env(safe-area-inset-bottom, 0px)"
   >
     <q-tabs

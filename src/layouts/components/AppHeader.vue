@@ -20,10 +20,7 @@ const isAluno = computed(() => authStore.isAluno);
 </script>
 
 <template>
-  <q-header
-    class="tw-backdrop-blur-xl tw-bg-surface/80 dark:tw-bg-dark-page/80 tw-text-gray-900 dark:tw-text-white tw-border-b tw-border-white/10 tw-shadow-sm tw-transition-colors tw-duration-300"
-    style="padding-top: env(safe-area-inset-top, 0px)"
-  >
+  <q-header class="fc-glass-header tw-shadow-sm" style="padding-top: env(safe-area-inset-top, 0px)">
     <q-toolbar
       class="tw-h-16 tw-max-w-7xl tw-mx-auto tw-px-4 sm:tw-px-6 md:tw-px-8 tw-flex tw-items-center tw-justify-between"
     >
@@ -35,7 +32,7 @@ const isAluno = computed(() => authStore.isAluno);
           aria-label="Página Inicial do Ficou Claro"
         >
           <div
-            class="tw-w-9 tw-h-9 tw-rounded-xl tw-bg-primary/10 tw-text-primary tw-flex tw-items-center tw-justify-center tw-shadow-sm"
+            class="tw-w-9 tw-h-9 tw-rounded-xl bg-primary-soft text-primary tw-flex tw-items-center tw-justify-center tw-shadow-sm"
           >
             <q-icon name="lightbulb" size="20px" />
           </div>
@@ -61,13 +58,15 @@ const isAluno = computed(() => authStore.isAluno);
             no-caps
             to="/"
             label="Início"
-            class="tw-rounded-xl tw-px-3.5 tw-py-1.5 tw-text-xs sm:tw-text-sm tw-font-semibold hover:tw-bg-primary/10 hover:tw-text-primary tw-transition-all"
+            active-class="text-primary text-weight-bold"
+            class="tw-rounded-xl tw-px-3.5 tw-py-1.5 tw-text-xs sm:tw-text-sm tw-font-semibold tw-transition-colors"
           />
           <q-btn
             flat
             no-caps
             to="/mapa"
-            class="tw-rounded-xl tw-px-3.5 tw-py-1.5 tw-text-xs sm:tw-text-sm tw-font-semibold hover:tw-bg-primary/10 hover:tw-text-primary tw-transition-all"
+            active-class="text-primary text-weight-bold"
+            class="tw-rounded-xl tw-px-3.5 tw-py-1.5 tw-text-xs sm:tw-text-sm tw-font-semibold tw-transition-colors"
           >
             <div class="tw-flex tw-items-center tw-gap-1.5">
               <q-icon name="explore" size="16px" color="primary" />
@@ -81,7 +80,8 @@ const isAluno = computed(() => authStore.isAluno);
             to="/sala"
             label="Entrar em Aula"
             icon="meeting_room"
-            class="tw-rounded-xl tw-px-3.5 tw-py-1.5 tw-text-xs sm:tw-text-sm tw-font-semibold hover:tw-bg-primary/10 hover:tw-text-primary tw-transition-all"
+            active-class="text-primary text-weight-bold"
+            class="tw-rounded-xl tw-px-3.5 tw-py-1.5 tw-text-xs sm:tw-text-sm tw-font-semibold tw-transition-colors"
           />
         </template>
 
@@ -93,13 +93,15 @@ const isAluno = computed(() => authStore.isAluno);
             to="/hub"
             label="Meu Hub de Aulas"
             icon="school"
-            class="tw-rounded-xl tw-px-3.5 tw-py-1.5 tw-text-xs sm:tw-text-sm tw-font-semibold hover:tw-bg-primary/10 hover:tw-text-primary tw-transition-all"
+            active-class="text-primary text-weight-bold"
+            class="tw-rounded-xl tw-px-3.5 tw-py-1.5 tw-text-xs sm:tw-text-sm tw-font-semibold tw-transition-colors"
           />
           <q-btn
             flat
             no-caps
             to="/mapa"
-            class="tw-rounded-xl tw-px-3.5 tw-py-1.5 tw-text-xs sm:tw-text-sm tw-font-semibold hover:tw-bg-primary/10 hover:tw-text-primary tw-transition-all"
+            active-class="text-primary text-weight-bold"
+            class="tw-rounded-xl tw-px-3.5 tw-py-1.5 tw-text-xs sm:tw-text-sm tw-font-semibold tw-transition-colors"
           >
             <div class="tw-flex tw-items-center tw-gap-1.5">
               <q-icon name="explore" size="16px" color="primary" />
@@ -112,7 +114,8 @@ const isAluno = computed(() => authStore.isAluno);
             to="/sala"
             label="Entrar na Sala"
             icon="pin"
-            class="tw-rounded-xl tw-px-3.5 tw-py-1.5 tw-text-xs sm:tw-text-sm tw-font-semibold hover:tw-bg-primary/10 hover:tw-text-primary tw-transition-all"
+            active-class="text-primary text-weight-bold"
+            class="tw-rounded-xl tw-px-3.5 tw-py-1.5 tw-text-xs sm:tw-text-sm tw-font-semibold tw-transition-colors"
           />
         </template>
 
@@ -124,7 +127,8 @@ const isAluno = computed(() => authStore.isAluno);
             to="/dashboard"
             label="Dashboard Geral"
             icon="dashboard"
-            class="tw-rounded-xl tw-px-3.5 tw-py-1.5 tw-text-xs sm:tw-text-sm tw-font-semibold hover:tw-bg-secondary/10 hover:tw-text-secondary tw-transition-all"
+            active-class="text-secondary text-weight-bold"
+            class="tw-rounded-xl tw-px-3.5 tw-py-1.5 tw-text-xs sm:tw-text-sm tw-font-semibold tw-transition-colors"
           />
           <q-btn
             flat
@@ -132,7 +136,8 @@ const isAluno = computed(() => authStore.isAluno);
             to="/disciplinas"
             label="Minhas Turmas"
             icon="library_books"
-            class="tw-rounded-xl tw-px-3.5 tw-py-1.5 tw-text-xs sm:tw-text-sm tw-font-semibold hover:tw-bg-secondary/10 hover:tw-text-secondary tw-transition-all"
+            active-class="text-secondary text-weight-bold"
+            class="tw-rounded-xl tw-px-3.5 tw-py-1.5 tw-text-xs sm:tw-text-sm tw-font-semibold tw-transition-colors"
           />
           <q-btn
             flat
@@ -140,7 +145,8 @@ const isAluno = computed(() => authStore.isAluno);
             to="/sala"
             label="Iniciar Sessão"
             icon="cast_for_education"
-            class="tw-rounded-xl tw-px-3.5 tw-py-1.5 tw-text-xs sm:tw-text-sm tw-font-semibold hover:tw-bg-secondary/10 hover:tw-text-secondary tw-transition-all"
+            active-class="text-secondary text-weight-bold"
+            class="tw-rounded-xl tw-px-3.5 tw-py-1.5 tw-text-xs sm:tw-text-sm tw-font-semibold tw-transition-colors"
           />
           <q-btn
             flat
@@ -148,7 +154,8 @@ const isAluno = computed(() => authStore.isAluno);
             to="/mapa"
             label="Monitorias"
             icon="explore"
-            class="tw-rounded-xl tw-px-3.5 tw-py-1.5 tw-text-xs sm:tw-text-sm tw-font-semibold hover:tw-bg-secondary/10 hover:tw-text-secondary tw-transition-all"
+            active-class="text-secondary text-weight-bold"
+            class="tw-rounded-xl tw-px-3.5 tw-py-1.5 tw-text-xs sm:tw-text-sm tw-font-semibold tw-transition-colors"
           />
         </template>
       </nav>
@@ -168,7 +175,7 @@ const isAluno = computed(() => authStore.isAluno);
             no-caps
             to="/login"
             label="Entrar"
-            class="tw-rounded-xl tw-px-3.5 tw-h-9 tw-text-xs sm:tw-text-sm tw-font-bold hover:tw-bg-white/10 tw-transition-colors"
+            class="tw-rounded-xl tw-px-3.5 tw-h-9 tw-text-xs sm:tw-text-sm tw-font-bold tw-transition-colors"
           />
           <q-btn
             unelevated
@@ -186,7 +193,6 @@ const isAluno = computed(() => authStore.isAluno);
           round
           dense
           icon="menu"
-          color="inherit"
           class="md:tw-hidden tw-ml-1"
           aria-label="Abrir menu de navegação"
           @click="isDrawerOpen = true"

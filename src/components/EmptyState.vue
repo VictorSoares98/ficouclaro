@@ -22,7 +22,7 @@ withDefaults(
     :class="[
       flat
         ? 'tw-bg-transparent'
-        : 'tw-bg-surface tw-border tw-border-border tw-rounded-3xl tw-shadow-sm tw-p-6 sm:tw-p-8',
+        : 'tw-border tw-border-black/5 dark:tw-border-white/10 tw-rounded-3xl tw-shadow-sm tw-p-6 sm:tw-p-8',
       customClass,
     ]"
   >

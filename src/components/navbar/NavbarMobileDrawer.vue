@@ -38,30 +38,21 @@ function navigateTo(path: string) {
     overlay
     behavior="mobile"
     :width="300"
-    class="tw-backdrop-blur-2xl tw-border-l tw-border-white/10 tw-shadow-2xl"
-    style="background: rgba(var(--q-dark-page, 15, 23, 42), 0.95)"
+    class="fc-glass-drawer tw-shadow-2xl"
   >
     <div class="tw-flex tw-flex-col tw-h-full tw-p-5">
       <!-- Topo do Drawer com Título e Fechar -->
-      <div
-        class="tw-flex tw-items-center tw-justify-between tw-pb-4 tw-border-b tw-border-white/10"
-      >
+      <div class="tw-flex tw-items-center tw-justify-between tw-pb-4">
         <h2 class="text-subtitle1 text-weight-bold tw-font-space-grotesk tw-m-0">
           FICOU <span class="text-primary">CLARO?</span>
         </h2>
-        <q-btn
-          flat
-          round
-          dense
-          icon="close"
-          color="white"
-          aria-label="Fechar menu"
-          @click="isOpen = false"
-        />
+        <q-btn flat round dense icon="close" aria-label="Fechar menu" @click="isOpen = false" />
       </div>
 
+      <q-separator />
+
       <!-- Card do Usuário Autenticado -->
-      <div v-if="isAuthenticated && user" class="tw-py-4 tw-border-b tw-border-white/10">
+      <div v-if="isAuthenticated && user" class="tw-py-4">
         <div class="tw-flex tw-items-center tw-gap-3">
           <div
             class="tw-w-10 tw-h-10 tw-rounded-full tw-flex tw-items-center tw-justify-center tw-text-white tw-font-bold tw-text-xs tw-shadow-md tw-bg-gradient-to-tr"
@@ -92,7 +83,7 @@ function navigateTo(path: string) {
       </div>
 
       <!-- Ações para Visitante (Não Autenticado) -->
-      <div v-else class="tw-py-4 tw-border-b tw-border-white/10 tw-space-y-2">
+      <div v-else class="tw-py-4 tw-space-y-2">
         <q-btn
           unelevated
           color="primary"
@@ -110,6 +101,8 @@ function navigateTo(path: string) {
           @click="navigateTo('/login')"
         />
       </div>
+
+      <q-separator />
 
       <!-- Links de Navegação Suplementares -->
       <q-scroll-area class="tw-flex-1 tw-py-2">
@@ -131,7 +124,7 @@ function navigateTo(path: string) {
             <q-item-section class="tw-font-medium"> Entrar em Aula com Código </q-item-section>
           </q-item>
 
-          <q-separator class="tw-my-2 tw-opacity-20" />
+          <q-separator class="tw-my-2" />
 
           <q-item-label header class="tw-text-[10px] text-muted tw-font-bold tw-uppercase tw-p-2">
             Institucional & Segurança
@@ -160,10 +153,10 @@ function navigateTo(path: string) {
         </q-list>
       </q-scroll-area>
 
+      <q-separator />
+
       <!-- Rodapé do Drawer com Acessibilidade -->
-      <div
-        class="tw-pt-3 tw-border-t tw-border-white/10 tw-flex tw-items-center tw-justify-between"
-      >
+      <div class="tw-pt-3 tw-flex tw-items-center tw-justify-between">
         <span class="tw-text-xs text-muted tw-font-medium">Acessibilidade:</span>
         <AccessibilityMenu />
       </div>

@@ -70,11 +70,7 @@ function handleQuickJoin() {
 
           <!-- Widget de Entrada Rápida na Sala (Quick PIN) -->
           <div class="tw-pt-2 tw-max-w-md tw-mx-auto lg:tw-mx-0">
-            <q-card
-              flat
-              bordered
-              class="tw-p-2 tw-rounded-2xl tw-backdrop-blur-md tw-bg-surface/75 tw-shadow-lg tw-border tw-border-white/10"
-            >
+            <q-card flat bordered class="tw-p-2 tw-rounded-2xl tw-shadow-lg">
               <div class="tw-flex tw-items-center tw-gap-2">
                 <q-input
                   v-model="roomPin"

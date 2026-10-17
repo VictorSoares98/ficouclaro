@@ -14,7 +14,7 @@ function scrollToTop() {
 <template>
   <!-- Rodapé Institucional Semântico e Fluido (Não-Fixo / Scroll Natural) -->
   <footer
-    class="tw-w-full tw-relative tw-border-t tw-border-white/10 tw-backdrop-blur-xl tw-bg-surface/75 tw-pt-12 tw-pb-8 sm:tw-pt-16 sm:tw-pb-10 tw-z-10"
+    class="fc-glass-footer tw-w-full tw-relative tw-pt-12 tw-pb-8 sm:tw-pt-16 sm:tw-pb-10 tw-z-10"
     style="padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px))"
   >
     <div class="tw-max-w-7xl tw-mx-auto tw-px-4 sm:tw-px-6 md:tw-px-8">
