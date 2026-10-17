@@ -17,6 +17,7 @@ const password = ref('');
 const confirmPassword = ref('');
 const isPasswordVisible = ref(false);
 const role = ref<PapelUsuario>('aluno');
+const termsAccepted = ref(false);
 
 const googleButtonLabel = computed(() =>
   role.value === 'professor'
@@ -25,28 +26,32 @@ const googleButtonLabel = computed(() =>
 );
 
 onMounted(() => {
-  const saved = localStorage.getItem('ficouclaro_register_draft');
-  if (saved) {
-    try {
-      const data = JSON.parse(saved);
-      if (data.fullName) fullName.value = data.fullName;
-      if (data.email) email.value = data.email;
-      if (data.role) role.value = data.role;
-    } catch {
-      localStorage.removeItem('ficouclaro_register_draft');
+  if (typeof window !== 'undefined' && window.sessionStorage) {
+    const saved = sessionStorage.getItem('ficouclaro_register_draft');
+    if (saved) {
+      try {
+        const data = JSON.parse(saved);
+        if (data.fullName) fullName.value = data.fullName;
+        if (data.email) email.value = data.email;
+        if (data.role) role.value = data.role;
+      } catch {
+        sessionStorage.removeItem('ficouclaro_register_draft');
+      }
     }
   }
 });
 
 watch([fullName, email, role], () => {
-  localStorage.setItem(
-    'ficouclaro_register_draft',
-    JSON.stringify({
-      fullName: fullName.value,
-      email: email.value,
-      role: role.value,
-    }),
-  );
+  if (typeof window !== 'undefined' && window.sessionStorage) {
+    sessionStorage.setItem(
+      'ficouclaro_register_draft',
+      JSON.stringify({
+        fullName: fullName.value,
+        email: email.value,
+        role: role.value,
+      }),
+    );
+  }
 });
 
 const roleOptions: { label: string; value: PapelUsuario }[] = [
@@ -55,6 +60,16 @@ const roleOptions: { label: string; value: PapelUsuario }[] = [
 ];
 
 async function onSubmit() {
+  if (!termsAccepted.value) {
+    $q.notify({
+      type: 'warning',
+      message:
+        'É obrigatório aceitar os Termos de Uso e a Política de Privacidade para prosseguir.',
+      position: 'top',
+    });
+    return;
+  }
+
   if (password.value !== confirmPassword.value) {
     $q.notify({
       type: 'negative',
@@ -106,7 +121,9 @@ async function onSubmit() {
       position: 'top',
     });
 
-    localStorage.removeItem('ficouclaro_register_draft');
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      sessionStorage.removeItem('ficouclaro_register_draft');
+    }
 
     if (role.value === 'professor') {
       void router.push('/disciplinas');
@@ -120,6 +137,16 @@ async function onSubmit() {
 }
 
 async function onGoogleLogin() {
+  if (!termsAccepted.value) {
+    $q.notify({
+      type: 'warning',
+      message:
+        'Por favor, assinale o aceite dos Termos de Uso e da Política de Privacidade antes de autenticar com o Google.',
+      position: 'top',
+    });
+    return;
+  }
+
   await authStore.loginWithGoogle({
     papel: role.value,
     termos_aceitos_em: new Date().toISOString(),
@@ -165,17 +192,24 @@ async function onGoogleLogin() {
         />
       </div>
 
-      <!-- 3. Consentimento Legal Claro (Padrão Sign-in-wrap / LGPD) -->
-      <p class="tw-text-[11px] tw-text-center text-muted tw-mt-0.5">
-        Ao se cadastrar, você concorda com nossos
-        <router-link to="/termos" class="tw-text-primary hover:tw-underline"
-          >Termos de Uso</router-link
-        >
-        e a
-        <router-link to="/privacidade" class="tw-text-primary hover:tw-underline"
-          >Política de Privacidade</router-link
-        >.
-      </p>
+      <!-- 3. Consentimento Legal Ativo (Opt-in LGPD / Art. 7º e 8º) -->
+      <div class="tw-flex tw-items-center tw-justify-center tw-px-1 tw-py-0.5">
+        <q-checkbox v-model="termsAccepted" dense size="sm" color="primary">
+          <span class="tw-text-[11px] sm:tw-text-xs text-muted tw-leading-tight">
+            Li e aceito os
+            <router-link to="/termos" class="tw-text-primary hover:tw-underline" target="_blank"
+              >Termos de Uso</router-link
+            >
+            e a
+            <router-link
+              to="/privacidade"
+              class="tw-text-primary hover:tw-underline"
+              target="_blank"
+              >Política de Privacidade</router-link
+            >.
+          </span>
+        </q-checkbox>
+      </div>
 
       <!-- 4. Divisor -->
       <div class="tw-flex tw-items-center tw-my-1">

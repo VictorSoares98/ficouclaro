@@ -838,6 +838,10 @@ export type Database = {
         Args: { p_grupo_id: string };
         Returns: boolean;
       };
+      export_my_data: {
+        Args: Record<PropertyKey, never>;
+        Returns: Json;
+      };
     };
     Enums: {
       papel_usuario: 'aluno' | 'professor';

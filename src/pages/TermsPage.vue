@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// Página Estática: Termos de Uso
+// Página Estática: Termos de Uso (Versão 1.0.0)
 </script>
 
 <template>
@@ -9,44 +9,70 @@
 
       <div class="tw-text-base text-muted tw-space-y-6">
         <p>
-          Bem-vindo ao <strong>Ficou Claro?</strong>. Ao acessar e utilizar nossa plataforma, você
-          concorda com os termos e condições descritos abaixo. Leia-os atentamente antes de
-          prosseguir com o seu cadastro e uso da aplicação.
+          Bem-vindo ao <strong>Ficou Claro?</strong>. Ao criar uma conta ou utilizar nossa
+          plataforma em salas de aula e atividades acadêmicas, você concorda expressamente com os
+          termos e condições descritos abaixo. Leia-os atentamente antes de prosseguir.
         </p>
 
-        <h2 class="tw-text-xl tw-font-semibold tw-mt-8 tw-mb-4">1. Propósito da Plataforma</h2>
+        <h2 class="tw-text-xl tw-font-semibold tw-mt-8 tw-mb-4">
+          1. Propósito Educacional Exclusivo
+        </h2>
         <p>
-          O <strong>Ficou Claro?</strong> é um aplicativo de feedback educacional em tempo real,
-          projetado estritamente para o ambiente acadêmico. Seu objetivo é facilitar a comunicação
-          de ritmo de aprendizado entre alunos e professores, não devendo ser utilizado para
-          quaisquer outros fins corporativos, comerciais ou ilícitos.
+          O <strong>Ficou Claro?</strong> é uma ferramenta pedagógica criada para fomentar a
+          aprendizagem ativa, o feedback síncrono e o mapeamento de espaços de estudo no campus. É
+          estritamente vedada a utilização da plataforma para finalidades comerciais, políticas ou
+          qualquer prática que viole os regulamentos disciplinares das instituições de ensino.
         </p>
 
-        <h2 class="tw-text-xl tw-font-semibold tw-mt-8 tw-mb-4">2. Cadastro e Responsabilidade</h2>
+        <h2 class="tw-text-xl tw-font-semibold tw-mt-8 tw-mb-4">
+          2. Cadastro e Responsabilidade pelas Credenciais
+        </h2>
         <p>
-          Você é responsável por manter a confidencialidade das credenciais de sua conta e por todas
-          as atividades que ocorrem sob ela. O fornecimento de dados falsos durante o cadastro pode
-          resultar em suspensão ou exclusão imediata da conta.
+          Você é o único responsável pela guarda e confidencialidade de suas credenciais de acesso
+          (e-mail, senha e tokens de sessão). Toda e qualquer ação realizada a partir de sua conta
+          autenticada será de sua integral responsabilidade. O fornecimento deliberado de dados
+          falsos resultará na rescisão do acesso.
         </p>
 
-        <h2 class="tw-text-xl tw-font-semibold tw-mt-8 tw-mb-4">3. Conduta do Usuário</h2>
+        <h2 class="tw-text-xl tw-font-semibold tw-mt-8 tw-mb-4">
+          3. Código de Conduta e Moderação Automatizada
+        </h2>
         <p>
-          O sistema de dúvidas, ainda que anônimo perante a turma e o professor, é monitorado
-          sistemicamente por razões de segurança. O uso de linguagem ofensiva, discriminatória ou
-          que viole o código de ética educacional resultará na exclusão da conta do infrator.
+          Ainda que as dúvidas e os votos de ritmo sejam anônimos perante a turma e o professor para
+          assegurar a segurança psicológica, a plataforma implementa
+          <strong>regras estritas de moderação em tempo real</strong>. O envio de mensagens com teor
+          ofensivo, discriminatório, assédio, incitação à violência ou divulgação não autorizada de
+          dados pessoais de terceiros resultará no bloqueio automático da mensagem, aplicação de
+          <em>strikes</em> e eventual suspensão ou banimento da conta do infrator.
         </p>
 
-        <h2 class="tw-text-xl tw-font-semibold tw-mt-8 tw-mb-4">4. Limitação de Disponibilidade</h2>
+        <h2 class="tw-text-xl tw-font-semibold tw-mt-8 tw-mb-4">
+          4. Disponibilidade do Serviço (SLA)
+        </h2>
         <p>
-          Sendo um software em fase MVP (Minimum Viable Product), a plataforma é fornecida "no
-          estado em que se encontra", sem garantias de disponibilidade ininterrupta (uptime de
-          100%). O sistema pode passar por janelas de manutenção não programadas.
+          Na qualidade de aplicação em desenvolvimento contínuo (MVP), o serviço é disponibilizado
+          "no estado em que se encontra" (<em>as is</em>), podendo sofrer interrupções temporárias
+          para manutenção ou atualizações técnicas sem aviso prévio prolongado.
         </p>
 
-        <h2 class="tw-text-xl tw-font-semibold tw-mt-8 tw-mb-4">5. Modificações dos Termos</h2>
+        <h2 class="tw-text-xl tw-font-semibold tw-mt-8 tw-mb-4">
+          5. Propriedade Intelectual e Dados
+        </h2>
         <p>
-          Reservamo-nos o direito de modificar estes Termos a qualquer momento. Modificações
-          substanciais serão comunicadas ativamente através de um aviso na própria plataforma.
+          O código-fonte, arquitetura, marcas e identidade visual do <strong>Ficou Claro?</strong>
+          pertencem aos seus respectivos desenvolvedores. Os conteúdos pedagógicos gerados pelos
+          professores (enquetes, perguntas e disciplinas) permanecem sob a titularidade de seus
+          autores, sendo concedida à plataforma apenas a licença necessária para viabilizar as
+          aulas.
+        </p>
+
+        <h2 class="tw-text-xl tw-font-semibold tw-mt-8 tw-mb-4">
+          6. Alterações nos Termos e Notificação
+        </h2>
+        <p>
+          Estes Termos podem ser revisados periodicamente para refletir evoluções da legislação ou
+          novas funcionalidades. Quando ocorrerem alterações materiais, a plataforma solicitará um
+          novo consentimento formal (<em>re-consent</em>) no próximo acesso do usuário.
         </p>
       </div>
 

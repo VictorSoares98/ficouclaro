@@ -4,12 +4,10 @@
 
 <template>
   <div class="tw-hidden lg:tw-flex lg:tw-w-7/12 tw-relative tw-overflow-hidden tw-min-h-screen">
-    <!-- Imagem de Fundo (Universidade / Aprendizado Ativo) -->
+    <!-- Imagem de Fundo (Universidade / Sala de Aula) - Auto-hospedada / Zero Terceiros -->
     <div
       class="tw-absolute tw-inset-0 tw-bg-cover tw-bg-center tw-transform tw-scale-105 tw-transition-transform tw-duration-1000"
-      style="
-        background-image: url('https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=2070&auto=format&fit=crop');
-      "
+      style="background-image: url('/images/auth-bg.jpg')"
     >
       <!-- Overlay com as cores corporativas do Ficou Claro? (Primary / Secondary) -->
       <div
