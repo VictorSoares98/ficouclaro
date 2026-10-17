@@ -1,7 +1,7 @@
 -- ====================================================================
 -- ⚠️ AVISO: ARQUIVO AUTO-GERADO!
 -- NÃO EDITE ESTE ARQUIVO DIRETAMENTE. ALTERE OS SNIPPETS E RODE db:build
--- Gerado em: 2026-10-17T15:06:57.412Z
+-- Gerado em: 2026-10-17T20:26:29.265Z
 -- ====================================================================
 
 -- >>> INÍCIO DO SNIPPET: 00_Init_Extensions.sql <<<
@@ -50,7 +50,7 @@ CREATE TABLE public.usuarios (
 -- disciplinas (Disciplinas do professor)
 CREATE TABLE public.disciplinas (
   id             UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  professor_id   UUID NOT NULL REFERENCES public.usuarios(id) ON DELETE CASCADE,
+  professor_id   UUID REFERENCES public.usuarios(id) ON DELETE SET NULL,
   nome           TEXT NOT NULL,
   descricao      TEXT,
   curso          TEXT,
@@ -79,7 +79,7 @@ CREATE TABLE public.matriculas (
 CREATE TABLE public.sessoes (
   id            UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   disciplina_id UUID NOT NULL REFERENCES public.disciplinas(id) ON DELETE CASCADE,
-  professor_id  UUID NOT NULL REFERENCES public.usuarios(id),
+  professor_id  UUID REFERENCES public.usuarios(id) ON DELETE SET NULL,
   topico        TEXT,
   status        status_sessao NOT NULL DEFAULT 'aguardando',
   iniciada_em   TIMESTAMPTZ,
@@ -109,12 +109,11 @@ CREATE TABLE public.enquetes (
   updated_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- respostas_enquete (Respostas dos alunos às enquetes)
+-- respostas_enquete (Respostas dos alunos às enquetes — Anônimo via hash)
 CREATE TABLE public.respostas_enquete (
   id           UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   enquete_id   UUID NOT NULL REFERENCES public.enquetes(id) ON DELETE CASCADE,
   sessao_id    UUID NOT NULL REFERENCES public.sessoes(id) ON DELETE CASCADE,
-  aluno_id     UUID REFERENCES public.usuarios(id) ON DELETE SET NULL,
   resposta     JSONB NOT NULL,
   hash_eleitor TEXT NOT NULL,
   created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -530,6 +529,136 @@ EXCEPTION
 END;
 $$;
 
+-- ============================================================
+-- 5. PORTABILIDADE DE DADOS (DSAR - Art. 18 LGPD)
+-- ============================================================
+CREATE OR REPLACE FUNCTION public.export_my_data()
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_uid UUID;
+  v_result JSONB;
+BEGIN
+  v_uid := auth.uid();
+  IF v_uid IS NULL THEN
+    RAISE EXCEPTION 'Usuário não autenticado.';
+  END IF;
+
+  SELECT jsonb_build_object(
+    'titular', (
+      SELECT jsonb_build_object(
+        'id', u.id,
+        'papel', u.papel,
+        'nome_completo', u.nome_completo,
+        'url_avatar', u.url_avatar,
+        'termos_aceitos_em', u.termos_aceitos_em,
+        'versao_termos', u.versao_termos,
+        'created_at', u.created_at,
+        'updated_at', u.updated_at
+      )
+      FROM public.usuarios u
+      WHERE u.id = v_uid
+    ),
+    'disciplinas_lecionadas', COALESCE((
+      SELECT jsonb_agg(jsonb_build_object(
+        'id', d.id,
+        'nome', d.nome,
+        'descricao', d.descricao,
+        'curso', d.curso,
+        'semestre', d.semestre,
+        'turma', d.turma,
+        'horario', d.horario,
+        'codigo_convite', d.codigo_convite,
+        'created_at', d.created_at
+      ))
+      FROM public.disciplinas d
+      WHERE d.professor_id = v_uid
+    ), '[]'::jsonb),
+    'matriculas', COALESCE((
+      SELECT jsonb_agg(jsonb_build_object(
+        'matricula_id', m.id,
+        'matriculado_em', m.created_at,
+        'disciplina_id', d.id,
+        'disciplina_nome', d.nome,
+        'curso', d.curso,
+        'semestre', d.semestre
+      ))
+      FROM public.matriculas m
+      JOIN public.disciplinas d ON d.id = m.disciplina_id
+      WHERE m.aluno_id = v_uid
+    ), '[]'::jsonb),
+    'duvidas_submetidas', COALESCE((
+      SELECT jsonb_agg(jsonb_build_object(
+        'id', dv.id,
+        'sessao_id', dv.sessao_id,
+        'texto', dv.texto,
+        'votos', dv.votos,
+        'foi_respondida', dv.foi_respondida,
+        'created_at', dv.created_at
+      ))
+      FROM public.duvidas dv
+      WHERE dv.autor_id = v_uid
+    ), '[]'::jsonb),
+    'avaliacoes_realizadas', COALESCE((
+      SELECT jsonb_agg(jsonb_build_object(
+        'id', ar.id,
+        'sessao_id', ar.sessao_id,
+        'nota', ar.nota,
+        'comentario', ar.comentario,
+        'created_at', ar.created_at
+      ))
+      FROM public.avaliacoes_rapidas ar
+      WHERE ar.aluno_id = v_uid
+    ), '[]'::jsonb),
+    'grupos_estudo_criados', COALESCE((
+      SELECT jsonb_agg(jsonb_build_object(
+        'id', ge.id,
+        'nome', ge.nome,
+        'descricao', ge.descricao,
+        'tipo', ge.tipo,
+        'instituicao', ge.instituicao,
+        'campus', ge.campus,
+        'cidade', ge.cidade,
+        'created_at', ge.created_at
+      ))
+      FROM public.grupos_estudo ge
+      WHERE ge.criador_id = v_uid
+    ), '[]'::jsonb),
+    'grupos_membro', COALESCE((
+      SELECT jsonb_agg(jsonb_build_object(
+        'grupo_id', gm.grupo_id,
+        'grupo_nome', ge.nome,
+        'is_monitor', gm.is_monitor,
+        'inscrito_em', gm.created_at
+      ))
+      FROM public.grupos_membros gm
+      JOIN public.grupos_estudo ge ON ge.id = gm.grupo_id
+      WHERE gm.usuario_id = v_uid
+    ), '[]'::jsonb),
+    'registros_encontro', COALESCE((
+      SELECT jsonb_agg(jsonb_build_object(
+        'id', re.id,
+        'grupo_id', re.grupo_id,
+        'data_referencia', re.data_referencia,
+        'topico', re.topico,
+        'participantes', re.participantes,
+        'duracao_minutos', re.duracao_minutos,
+        'duvidas_resolvidas', re.duvidas_resolvidas,
+        'created_at', re.created_at
+      ))
+      FROM public.registros_encontro re
+      WHERE re.registrado_por = v_uid
+    ), '[]'::jsonb),
+    'exportado_em', NOW()
+  ) INTO v_result;
+
+  RETURN v_result;
+END;
+$$;
+
 
 -- >>> FIM DO SNIPPET: 04_Funcoes.sql <<<
 
@@ -898,6 +1027,7 @@ CREATE POLICY "Registrante ou criador atualiza registro de encontro" ON public.r
 -- GRANTS: View pública e RPCs de grupos de estudo (Zero-Direct-Access)
 GRANT SELECT ON public.view_grupos_estudo_publicos TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.link_member_to_study_group(UUID) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.export_my_data() TO authenticated;
 
 -- >>> FIM DO SNIPPET: 06_RLS_e_Grants.sql <<<
 

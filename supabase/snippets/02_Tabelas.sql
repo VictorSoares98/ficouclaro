@@ -17,7 +17,7 @@ CREATE TABLE public.usuarios (
 -- disciplinas (Disciplinas do professor)
 CREATE TABLE public.disciplinas (
   id             UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  professor_id   UUID NOT NULL REFERENCES public.usuarios(id) ON DELETE CASCADE,
+  professor_id   UUID REFERENCES public.usuarios(id) ON DELETE SET NULL,
   nome           TEXT NOT NULL,
   descricao      TEXT,
   curso          TEXT,
@@ -46,7 +46,7 @@ CREATE TABLE public.matriculas (
 CREATE TABLE public.sessoes (
   id            UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   disciplina_id UUID NOT NULL REFERENCES public.disciplinas(id) ON DELETE CASCADE,
-  professor_id  UUID NOT NULL REFERENCES public.usuarios(id),
+  professor_id  UUID REFERENCES public.usuarios(id) ON DELETE SET NULL,
   topico        TEXT,
   status        status_sessao NOT NULL DEFAULT 'aguardando',
   iniciada_em   TIMESTAMPTZ,
@@ -76,12 +76,11 @@ CREATE TABLE public.enquetes (
   updated_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- respostas_enquete (Respostas dos alunos às enquetes)
+-- respostas_enquete (Respostas dos alunos às enquetes — Anônimo via hash)
 CREATE TABLE public.respostas_enquete (
   id           UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   enquete_id   UUID NOT NULL REFERENCES public.enquetes(id) ON DELETE CASCADE,
   sessao_id    UUID NOT NULL REFERENCES public.sessoes(id) ON DELETE CASCADE,
-  aluno_id     UUID REFERENCES public.usuarios(id) ON DELETE SET NULL,
   resposta     JSONB NOT NULL,
   hash_eleitor TEXT NOT NULL,
   created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),

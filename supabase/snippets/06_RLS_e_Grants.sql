@@ -177,4 +177,5 @@ CREATE POLICY "Registrante ou criador atualiza registro de encontro" ON public.r
 -- GRANTS: View pública e RPCs de grupos de estudo (Zero-Direct-Access)
 GRANT SELECT ON public.view_grupos_estudo_publicos TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.link_member_to_study_group(UUID) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.export_my_data() TO authenticated;
 
