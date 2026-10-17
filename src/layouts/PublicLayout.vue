@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import AppHeader from './components/AppHeader.vue';
 import AppFooter from './components/AppFooter.vue';
+import MobileNavBottom from './components/MobileNavBottom.vue';
 
 const route = useRoute();
 const isImmersivePage = computed(
@@ -18,5 +19,7 @@ const isImmersivePage = computed(
       <router-view />
       <AppFooter v-if="!isImmersivePage" />
     </q-page-container>
+
+    <MobileNavBottom v-if="!isImmersivePage" />
   </q-layout>
 </template>
