@@ -170,7 +170,7 @@ async function onSubmit() {
         <q-btn
           class="tw-w-full tw-min-h-10 sm:tw-min-h-11 tw-py-1.5 tw-px-3 tw-rounded-xl tw-text-xs sm:tw-text-sm tw-font-bold tw-shadow-sm tw-bg-white hover:tw-bg-gray-50 dark:tw-bg-dark-page dark:hover:tw-bg-dark tw-border tw-border-gray-200 dark:tw-border-gray-800"
           text-color="grey-9"
-          icon="img:https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
+          icon="img:/icons/google.svg"
           label="Entrar com Google"
           unelevated
           no-caps
