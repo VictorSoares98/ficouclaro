@@ -62,8 +62,16 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function signOut() {
-    await authService.signOut();
-    clearUser();
+    try {
+      await authService.signOut();
+    } catch (error) {
+      console.warn(
+        '[AuthStore] Erro ao encerrar sessão remotamente, limpando estado local:',
+        error,
+      );
+    } finally {
+      clearUser();
+    }
   }
 
   function lockSession() {

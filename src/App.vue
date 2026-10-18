@@ -15,6 +15,7 @@ import { useNetworkStatus } from '@/core/composables/useNetworkStatus';
 import LibrasWidget from '@/components/LibrasWidget.vue';
 import LockScreen from '@/components/LockScreen.vue';
 import { useSessionTimeout } from '@/core/composables/useSessionTimeout';
+import { ROUTE_ROLES } from '@/router/route-meta';
 
 const authStore = useAuthStore();
 const themeStore = useThemeStore();
@@ -110,6 +111,11 @@ onMounted(async () => {
     async (event: AuthChangeEvent, session: Session | null) => {
       if (event === 'SIGNED_OUT' || !session) {
         authStore.clearUser();
+        const currentPath = router.currentRoute.value.path;
+        const rootPath = `/${currentPath.split('/')[1]}`;
+        if (ROUTE_ROLES[rootPath]) {
+          void router.replace('/login');
+        }
       } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
         await authStore.reloadProfile(session.user);
       }

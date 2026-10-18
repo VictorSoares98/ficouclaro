@@ -143,9 +143,10 @@ async function unlockWithGoogle() {
 }
 
 async function logout() {
-  await authStore.signOut();
-  if (route.path === '/lock') {
-    void router.push('/login');
+  try {
+    await authStore.signOut();
+  } finally {
+    void router.replace('/login');
   }
 }
 
