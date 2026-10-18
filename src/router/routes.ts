@@ -26,6 +26,14 @@ const routes: RouteRecordRaw[] = [
         path: 'recursos/:slug',
         component: () => import('@/pages/FeatureDetailPage.vue'),
       },
+      {
+        path: 'join/:code',
+        component: () => import('@/pages/JoinClassroomPage.vue'),
+      },
+      {
+        path: 'join',
+        component: () => import('@/pages/JoinClassroomPage.vue'),
+      },
     ],
   },
   {

@@ -34,6 +34,14 @@ export default defineBoot(({ router, store }) => {
 
     // Rota Protegida, mas sem login
     if (!authStore.isAuthenticated) {
+      if (
+        rootPath === '/sala' &&
+        typeof window !== 'undefined' &&
+        window.sessionStorage &&
+        sessionStorage.getItem('ficouclaro_guest_session')
+      ) {
+        return true;
+      }
       return { path: '/login', query: { redirect: to.fullPath } };
     }
 
