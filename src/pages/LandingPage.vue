@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import LandingHeroVisual from '@/components/landing/LandingHeroVisual.vue';
 import LandingFeatureBento from '@/components/landing/LandingFeatureBento.vue';
@@ -20,14 +20,29 @@ function handleQuickJoin() {
   void router.push(`/sala/${pin}`);
 }
 
+function focusPinInput() {
+  setTimeout(() => {
+    const pinEl = document.getElementById('pin');
+    pinEl?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const inputEl = document.querySelector<HTMLInputElement>('#pin input');
+    inputEl?.focus();
+  }, 250);
+}
+
 onMounted(() => {
-  if (route.hash === '#pin') {
-    setTimeout(() => {
-      const inputEl = document.querySelector<HTMLInputElement>('#pin input');
-      inputEl?.focus();
-    }, 450);
+  if (route.hash === '#pin' || route.query.focus === 'pin') {
+    focusPinInput();
   }
 });
+
+watch(
+  () => [route.hash, route.query.focus] as const,
+  ([hash, focus]) => {
+    if (hash === '#pin' || focus === 'pin') {
+      focusPinInput();
+    }
+  },
+);
 </script>
 
 <template>

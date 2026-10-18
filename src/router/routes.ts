@@ -22,6 +22,10 @@ const routes: RouteRecordRaw[] = [
         path: 'lock',
         component: () => import('@/components/LockScreen.vue'),
       },
+      {
+        path: 'recursos/:slug',
+        component: () => import('@/pages/FeatureDetailPage.vue'),
+      },
     ],
   },
   {
