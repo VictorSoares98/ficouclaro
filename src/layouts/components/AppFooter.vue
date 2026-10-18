@@ -106,7 +106,7 @@ async function handleLibrasAction() {
           <ul class="tw-space-y-2.5 tw-list-none tw-p-0 tw-m-0 tw-text-xs sm:tw-text-sm">
             <li>
               <router-link
-                to="/#simulador"
+                to="/recursos/termometro"
                 class="tw-flex tw-items-center tw-gap-1.5 hover:tw-text-primary hover:tw-translate-x-1 tw-transition-all"
               >
                 <q-icon name="speed" size="14px" />
@@ -115,11 +115,29 @@ async function handleLibrasAction() {
             </li>
             <li>
               <router-link
-                to="/#recursos"
+                to="/recursos/qa"
                 class="tw-flex tw-items-center tw-gap-1.5 hover:tw-text-primary hover:tw-translate-x-1 tw-transition-all"
               >
                 <q-icon name="question_answer" size="14px" />
                 <span>Q&A com Votação Anônima</span>
+              </router-link>
+            </li>
+            <li>
+              <router-link
+                to="/recursos/enquetes"
+                class="tw-flex tw-items-center tw-gap-1.5 hover:tw-text-primary hover:tw-translate-x-1 tw-transition-all"
+              >
+                <q-icon name="poll" size="14px" />
+                <span>Enquetes & Quizzes Relâmpago</span>
+              </router-link>
+            </li>
+            <li>
+              <router-link
+                to="/recursos/analytics"
+                class="tw-flex tw-items-center tw-gap-1.5 hover:tw-text-primary hover:tw-translate-x-1 tw-transition-all"
+              >
+                <q-icon name="insights" size="14px" />
+                <span>Analytics Pedagógico $0 AI</span>
               </router-link>
             </li>
             <li>
@@ -130,24 +148,6 @@ async function handleLibrasAction() {
                 <q-icon name="explore" size="14px" color="primary" />
                 <span class="text-weight-bold text-primary">Mapa de Monitorias</span>
                 <q-badge color="primary" rounded class="tw-text-[9px] tw-ml-1">Novo</q-badge>
-              </router-link>
-            </li>
-            <li>
-              <router-link
-                to="/#recursos"
-                class="tw-flex tw-items-center tw-gap-1.5 hover:tw-text-primary hover:tw-translate-x-1 tw-transition-all"
-              >
-                <q-icon name="poll" size="14px" />
-                <span>Enquetes & Quizzes Relâmpago</span>
-              </router-link>
-            </li>
-            <li>
-              <router-link
-                to="/disciplinas"
-                class="tw-flex tw-items-center tw-gap-1.5 hover:tw-text-primary hover:tw-translate-x-1 tw-transition-all"
-              >
-                <q-icon name="insights" size="14px" />
-                <span>Analytics Pedagógico $0 AI</span>
               </router-link>
             </li>
           </ul>
@@ -161,7 +161,7 @@ async function handleLibrasAction() {
           <ul class="tw-space-y-2.5 tw-list-none tw-p-0 tw-m-0 tw-text-xs sm:tw-text-sm">
             <li>
               <router-link
-                to="/#pin"
+                to="/?focus=pin"
                 class="tw-flex tw-items-center tw-gap-1.5 hover:tw-text-primary hover:tw-translate-x-1 tw-transition-all"
               >
                 <q-icon name="pin" size="14px" />
