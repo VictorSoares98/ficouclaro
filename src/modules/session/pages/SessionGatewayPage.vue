@@ -11,14 +11,18 @@ const $q = useQuasar();
 const router = useRouter();
 
 const role = computed(() => authStore.user?.perfil.papel);
+const isGuest = computed(() => {
+  if (typeof window === 'undefined' || !window.sessionStorage) return false;
+  return Boolean(sessionStorage.getItem('ficouclaro_guest_session'));
+});
 
-if (!role.value) {
-  $q.notify({ type: 'negative', message: 'Sessão inválida.' });
+if (!role.value && !isGuest.value) {
+  $q.notify({ type: 'negative', message: 'Sessão inválida ou não autorizada.' });
   void router.replace('/');
 }
 </script>
 
 <template>
   <ProfessorSessionPage v-if="role === 'professor'" />
-  <StudentSessionPage v-else-if="role === 'aluno'" />
+  <StudentSessionPage v-else-if="role === 'aluno' || isGuest" />
 </template>

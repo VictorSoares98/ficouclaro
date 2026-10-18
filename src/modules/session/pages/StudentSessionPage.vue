@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted } from 'vue';
+import { computed, onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useSessionStore } from '@/modules/session/stores/session.store';
 import { usePollStore } from '@/modules/poll/stores/poll.store';
@@ -19,6 +19,25 @@ const $q = useQuasar();
 
 const sessionId = String((route.params as Record<string, unknown>).id);
 
+const guestSession = computed(() => {
+  if (typeof window === 'undefined' || !window.sessionStorage) return null;
+  const raw = sessionStorage.getItem('ficouclaro_guest_session');
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw) as {
+      isGuest: boolean;
+      guestName: string;
+      courseName?: string;
+      professorName?: string;
+      inviteCode?: string;
+    };
+  } catch {
+    return null;
+  }
+});
+
+const isGuest = computed(() => Boolean(guestSession.value?.isGuest));
+
 onMounted(async () => {
   try {
     await sessionStore.joinSession(sessionId);
@@ -26,7 +45,7 @@ onMounted(async () => {
     pollStore.subscribeToSessionPolls(sessionId, false);
   } catch (err: unknown) {
     $q.notify({ color: 'negative', message: err instanceof Error ? err.message : 'Erro' });
-    void router.replace('/hub'); // Voltar em caso de erro
+    void router.replace(isGuest.value ? '/' : '/hub');
   }
 });
 
@@ -38,6 +57,32 @@ onUnmounted(() => {
 
 <template>
   <q-page class="tw-p-4 tw-flex tw-flex-col tw-items-center tw-max-w-xl tw-mx-auto">
+    <!-- Banner de Modo Visitante Convidado -->
+    <div
+      v-if="isGuest"
+      class="tw-w-full tw-mb-4 tw-p-3 sm:tw-p-3.5 tw-rounded-2xl tw-bg-amber-500/10 tw-border tw-border-amber-500/30 tw-flex tw-items-center tw-justify-between tw-gap-3 tw-shadow-sm"
+    >
+      <div class="tw-flex tw-items-center tw-gap-2.5 tw-min-w-0">
+        <q-icon name="visibility" color="warning" size="22px" />
+        <div class="tw-text-xs tw-text-left tw-leading-tight">
+          <span class="tw-font-bold tw-text-amber-800 dark:tw-text-amber-300">
+            Modo Convidado ({{ guestSession?.guestName }}):
+          </span>
+          <span class="text-muted tw-block sm:tw-inline sm:tw-ml-1">
+            Você está assistindo à aula. Crie sua conta para salvar seu histórico e interagir!
+          </span>
+        </div>
+      </div>
+      <q-btn
+        unelevated
+        no-caps
+        color="primary"
+        label="Criar Conta"
+        class="tw-rounded-xl tw-text-xs tw-font-bold tw-px-3.5 tw-h-8 tw-shrink-0 tw-shadow-sm hover:tw-scale-105 tw-transition-transform"
+        :to="{ path: '/register', query: { join: guestSession?.inviteCode } }"
+      />
+    </div>
+
     <ActivePollPanel />
 
     <!-- Esqueleto de loading -->
@@ -110,7 +155,14 @@ onUnmounted(() => {
         <q-icon name="task_alt" size="4rem" color="warning" />
         <h2 class="tw-text-2xl tw-font-bold tw-text-warning">Aula Encerrada</h2>
         <p class="text-muted">Obrigado por participar.</p>
-        <q-btn color="primary" label="Voltar" to="/hub" class="tw-mt-4" />
+        <q-btn
+          color="primary"
+          unelevated
+          no-caps
+          :label="isGuest ? 'Criar Minha Conta de Aluno' : 'Voltar ao Meu Hub'"
+          :to="isGuest ? { path: '/register', query: { join: guestSession?.inviteCode } } : '/hub'"
+          class="tw-mt-4 tw-rounded-xl tw-font-bold tw-px-6 tw-h-11"
+        />
       </div>
     </div>
     <ReviewModal />

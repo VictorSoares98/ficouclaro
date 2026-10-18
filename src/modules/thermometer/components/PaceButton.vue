@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onUnmounted } from 'vue';
+import { computed, onUnmounted } from 'vue';
 import { useThermometerStore } from '@/modules/thermometer/stores/thermometer.store';
 import type { SinalRitmo } from '@/modules/thermometer/services/thermometer.service';
 import { useSessionStore } from '@/modules/session/stores/session.store';
@@ -9,6 +9,12 @@ import { Haptics, ImpactStyle } from '@capacitor/haptics';
 const thermometerStore = useThermometerStore();
 const sessionStore = useSessionStore();
 const $q = useQuasar();
+
+const isGuest = computed(() => {
+  return (
+    typeof window !== 'undefined' && Boolean(sessionStorage.getItem('ficouclaro_guest_session'))
+  );
+});
 
 // Garante que o timer de cooldown seja cancelado e o estado seja limpo ao sair da tela
 onUnmounted(() => {
@@ -23,6 +29,17 @@ const options: { value: SinalRitmo; label: string; icon: string; color: string }
 ];
 
 async function handleSignal(sinal: SinalRitmo) {
+  if (isGuest.value) {
+    $q.notify({
+      type: 'warning',
+      icon: 'school',
+      message:
+        'Você está no modo visitante! Crie sua conta gratuita de aluno para registrar seus sinais no termômetro.',
+      position: 'top',
+    });
+    return;
+  }
+
   if (sessionStore.currentSession) {
     if ($q.platform.is.capacitor) {
       try {
