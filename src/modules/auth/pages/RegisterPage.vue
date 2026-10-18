@@ -1,15 +1,29 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
 import { useAuthStore } from '@/stores/auth.store';
+import { useCourseStore } from '@/modules/courses/stores/course.store';
+import {
+  courseService,
+  type ClassroomInviteDetails,
+} from '@/modules/courses/services/course.service';
 import type { PapelUsuario } from '@/core/types/auth.types';
 import AuthFormContainer from '@/modules/auth/components/AuthFormContainer.vue';
 import PasswordStrengthMeter from '@/modules/auth/components/PasswordStrengthMeter.vue';
 
+const route = useRoute();
 const router = useRouter();
 const $q = useQuasar();
 const authStore = useAuthStore();
+const courseStore = useCourseStore();
+
+const joinCode = computed(() => {
+  const code = route.query.join;
+  return typeof code === 'string' ? code.trim().toLowerCase() : '';
+});
+
+const joinedCourseDetails = ref<ClassroomInviteDetails | null>(null);
 
 const fullName = ref('');
 const email = ref('');
@@ -26,9 +40,19 @@ const googleButtonLabel = computed(() =>
 );
 
 onMounted(() => {
+  if (joinCode.value) {
+    role.value = 'aluno';
+    void (async () => {
+      const details = await courseService.getCourseDetailsByInviteCode(joinCode.value);
+      if (details) {
+        joinedCourseDetails.value = details;
+      }
+    })();
+  }
+
   if (typeof window !== 'undefined' && window.sessionStorage) {
     const saved = sessionStorage.getItem('ficouclaro_register_draft');
-    if (saved) {
+    if (saved && !joinCode.value) {
       try {
         const data = JSON.parse(saved);
         if (data.fullName) fullName.value = data.fullName;
@@ -125,6 +149,26 @@ async function onSubmit() {
       sessionStorage.removeItem('ficouclaro_register_draft');
     }
 
+    // Auto-matrícula se veio de um convite de turma
+    if (joinCode.value) {
+      try {
+        await courseStore.enroll(joinCode.value);
+        $q.notify({
+          type: 'positive',
+          icon: 'school',
+          message: `Vinculado(a) com sucesso à matéria "${joinedCourseDetails.value?.nome || joinCode.value}"!`,
+          position: 'top',
+        });
+      } catch (errEnroll) {
+        console.warn('Auto-matrícula pós cadastro:', errEnroll);
+      }
+
+      if (joinedCourseDetails.value?.sessao_ativa_id) {
+        void router.push(`/sala/${joinedCourseDetails.value.sessao_ativa_id}`);
+        return;
+      }
+    }
+
     if (role.value === 'professor') {
       void router.push('/disciplinas');
     } else {
@@ -162,8 +206,35 @@ async function onGoogleLogin() {
     :isLoading="authStore.isLoading"
   >
     <div class="tw-space-y-2 sm:tw-space-y-2.5">
+      <!-- Notificação de Vinculação à Matéria do Professor -->
+      <div
+        v-if="joinedCourseDetails"
+        class="tw-p-4 tw-rounded-2xl tw-bg-primary-soft tw-border tw-border-primary/20 tw-shadow-sm tw-mb-3"
+      >
+        <div class="tw-flex tw-items-center tw-gap-3">
+          <div
+            class="tw-w-10 tw-h-10 tw-rounded-xl bg-primary text-white tw-flex tw-items-center tw-justify-center tw-shrink-0 tw-shadow-sm"
+          >
+            <q-icon :name="joinedCourseDetails.icone || 'school'" size="22px" />
+          </div>
+          <div class="tw-flex-1 tw-min-w-0">
+            <div class="tw-text-[10px] tw-font-bold tw-text-primary tw-uppercase tw-tracking-wider">
+              Vínculo de Turma Automático
+            </div>
+            <div class="tw-text-sm tw-font-bold tw-font-space-grotesk tw-truncate">
+              {{ joinedCourseDetails.nome }}
+            </div>
+            <div class="tw-text-xs text-muted tw-leading-tight tw-mt-0.5">
+              Ao criar sua conta, você será vinculado(a) à matéria do professor
+              <strong>{{ joinedCourseDetails.professor_nome }}</strong
+              >.
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- 1. Seleção de Papel no Topo (Role-First Compacto) -->
-      <div class="tw-flex tw-justify-center">
+      <div v-if="!joinedCourseDetails" class="tw-flex tw-justify-center">
         <q-btn-toggle
           v-model="role"
           spread
@@ -176,6 +247,13 @@ async function onGoogleLogin() {
           text-color="grey-8"
           :options="roleOptions"
         />
+      </div>
+      <div
+        v-else
+        class="tw-flex tw-items-center tw-justify-center tw-gap-1.5 tw-py-1 tw-text-xs tw-text-primary tw-font-bold"
+      >
+        <q-icon name="school" size="16px" />
+        <span>Cadastro de Aluno Universitário</span>
       </div>
 
       <!-- 2. Botão de Cadastro Social com Papel Contextualizado -->

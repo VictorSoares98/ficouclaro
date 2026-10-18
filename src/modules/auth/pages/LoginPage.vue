@@ -128,9 +128,12 @@ async function onSubmit() {
     });
 
     const redirect = router.currentRoute.value.query.redirect as string;
+    const joinCode = router.currentRoute.value.query.join as string;
 
     if (redirect) {
       void router.push(redirect);
+    } else if (joinCode) {
+      void router.push(`/join/${joinCode.toLowerCase()}`);
     } else if (papel === 'professor') {
       void router.push('/disciplinas');
     } else if (papel === 'aluno') {
