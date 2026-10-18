@@ -60,8 +60,12 @@ async function handleEnroll() {
   }
 }
 
+function getSessionStatus(courseId: string): 'aguardando' | 'ativa' | 'encerrada' | 'nenhuma' {
+  return sessionStore.coursesSessions?.[courseId]?.status || 'nenhuma';
+}
+
 async function handleJoinActiveSession(courseId: string) {
-  const session = sessionStore.coursesSessions[courseId];
+  const session = sessionStore.coursesSessions?.[courseId];
   if (session && (session.status === 'aguardando' || session.status === 'ativa')) {
     void router.push(`/sala/${session.id}`);
     return;
@@ -130,7 +134,7 @@ async function handleJoinActiveSession(courseId: string) {
         v-for="course in courseStore.courses"
         :key="course.id"
         :course="course"
-        :sessionStatus="sessionStore.coursesSessions[course.id]?.status || 'nenhuma'"
+        :sessionStatus="getSessionStatus(course.id)"
         actionLabel="Entrar na Aula"
         actionIcon="login"
         actionColor="positive"

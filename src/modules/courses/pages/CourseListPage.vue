@@ -179,7 +179,7 @@ function openStartSessionDialog(courseId: string) {
 }
 
 function handleCourseAction(courseId: string) {
-  const activeSession = sessionStore.coursesSessions[courseId];
+  const activeSession = sessionStore.coursesSessions?.[courseId];
   if (
     activeSession &&
     (activeSession.status === 'aguardando' || activeSession.status === 'ativa')
@@ -191,11 +191,11 @@ function handleCourseAction(courseId: string) {
 }
 
 function getSessionStatus(courseId: string): 'aguardando' | 'ativa' | 'encerrada' | 'nenhuma' {
-  return sessionStore.coursesSessions[courseId]?.status || 'nenhuma';
+  return sessionStore.coursesSessions?.[courseId]?.status || 'nenhuma';
 }
 
 function getActionLabel(courseId: string): string {
-  const status = sessionStore.coursesSessions[courseId]?.status;
+  const status = sessionStore.coursesSessions?.[courseId]?.status;
   if (status === 'ativa' || status === 'aguardando') {
     return 'Continuar Aula';
   }
@@ -203,7 +203,7 @@ function getActionLabel(courseId: string): string {
 }
 
 function getActionIcon(courseId: string): string {
-  const status = sessionStore.coursesSessions[courseId]?.status;
+  const status = sessionStore.coursesSessions?.[courseId]?.status;
   if (status === 'ativa' || status === 'aguardando') {
     return 'login';
   }
@@ -211,7 +211,7 @@ function getActionIcon(courseId: string): string {
 }
 
 function getActionColor(courseId: string): string {
-  const status = sessionStore.coursesSessions[courseId]?.status;
+  const status = sessionStore.coursesSessions?.[courseId]?.status;
   if (status === 'ativa') return 'positive';
   if (status === 'aguardando') return 'warning';
   return 'primary';

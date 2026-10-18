@@ -19,6 +19,13 @@ export const useSessionStore = defineStore('session', () => {
   const hasSubscribed = ref(false);
   const isCoursesSubscribed = ref(false);
 
+  function getCoursesMap(): Record<string, CourseSessionInfo | null> {
+    if (!coursesSessions.value) {
+      coursesSessions.value = {};
+    }
+    return coursesSessions.value;
+  }
+
   /**
    * Carrega a sessão e assina o canal Realtime para escutar mudanças (ex: professor inicia ou encerra)
    */
@@ -71,7 +78,7 @@ export const useSessionStore = defineStore('session', () => {
   async function createSession(professorId: string, disciplinaId: string, topico?: string) {
     return execute(async () => {
       const sessao = await sessionService.createSession(professorId, disciplinaId, topico);
-      coursesSessions.value[disciplinaId] = {
+      getCoursesMap()[disciplinaId] = {
         id: sessao.id,
         status: sessao.status,
         topico: sessao.topico,
@@ -90,7 +97,7 @@ export const useSessionStore = defineStore('session', () => {
         currentSession.value = updated;
       }
       if (updated.disciplina_id) {
-        coursesSessions.value[updated.disciplina_id] = {
+        getCoursesMap()[updated.disciplina_id] = {
           id: updated.id,
           status: updated.status,
           topico: updated.topico,
@@ -109,7 +116,7 @@ export const useSessionStore = defineStore('session', () => {
         currentSession.value = updated;
       }
       if (updated.disciplina_id) {
-        coursesSessions.value[updated.disciplina_id] = null;
+        getCoursesMap()[updated.disciplina_id] = null;
       }
     }, 'Erro ao encerrar sessão.');
   }
@@ -127,8 +134,9 @@ export const useSessionStore = defineStore('session', () => {
     if (courseIds.length === 0) return;
     try {
       const activeMap = await sessionService.getActiveSessionsForCourses(courseIds);
+      const map = getCoursesMap();
       courseIds.forEach((id) => {
-        coursesSessions.value[id] = activeMap[id] || null;
+        map[id] = activeMap[id] || null;
       });
     } catch (err: unknown) {
       console.warn('Erro ao carregar status das turmas:', err);
@@ -159,7 +167,7 @@ export const useSessionStore = defineStore('session', () => {
               newSessao?.disciplina_id &&
               (newSessao.status === 'aguardando' || newSessao.status === 'ativa')
             ) {
-              coursesSessions.value[newSessao.disciplina_id] = {
+              getCoursesMap()[newSessao.disciplina_id] = {
                 id: newSessao.id,
                 status: newSessao.status,
                 topico: newSessao.topico,
@@ -177,12 +185,13 @@ export const useSessionStore = defineStore('session', () => {
           (payload: RealtimePostgresUpdatePayload<Sessao>) => {
             const updated = payload.new;
             if (updated?.disciplina_id) {
+              const map = getCoursesMap();
               if (updated.status === 'encerrada') {
-                if (coursesSessions.value[updated.disciplina_id]?.id === updated.id) {
-                  coursesSessions.value[updated.disciplina_id] = null;
+                if (map[updated.disciplina_id]?.id === updated.id) {
+                  map[updated.disciplina_id] = null;
                 }
               } else {
-                coursesSessions.value[updated.disciplina_id] = {
+                map[updated.disciplina_id] = {
                   id: updated.id,
                   status: updated.status,
                   topico: updated.topico,
