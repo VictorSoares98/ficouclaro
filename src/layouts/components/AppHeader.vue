@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { computed } from 'vue';
 import { useAuthStore } from '@/stores/auth.store';
 import AccessibilityMenu from '@/components/AccessibilityMenu.vue';
 import NavbarUserBadge from '@/components/navbar/NavbarUserBadge.vue';
-import NavbarMobileDrawer from '@/components/navbar/NavbarMobileDrawer.vue';
 
 defineProps<{
   subtitle?: string;
@@ -12,7 +11,6 @@ defineProps<{
 }>();
 
 const authStore = useAuthStore();
-const isDrawerOpen = ref(false);
 
 const isAuthenticated = computed(() => authStore.isAuthenticated);
 const isProfessor = computed(() => authStore.isProfessor);
@@ -169,38 +167,26 @@ const isAluno = computed(() => authStore.isAluno);
         <NavbarUserBadge v-if="isAuthenticated" />
 
         <!-- Usuário Visitante (Não Autenticado) -->
-        <div v-else class="tw-hidden sm:tw-flex tw-items-center tw-gap-2">
+        <div v-else class="tw-flex tw-items-center tw-gap-1.5 sm:tw-gap-2">
           <q-btn
             flat
             no-caps
             to="/login"
             label="Entrar"
-            class="tw-rounded-xl tw-px-3.5 tw-h-9 tw-text-xs sm:tw-text-sm tw-font-bold tw-transition-colors"
+            class="tw-rounded-xl tw-px-3 tw-h-8 sm:tw-h-9 tw-text-xs sm:tw-text-sm tw-font-bold tw-transition-colors"
           />
           <q-btn
             unelevated
             no-caps
             color="primary"
             to="/register"
-            label="Começar Grátis"
-            class="tw-rounded-xl tw-px-4 tw-h-9 tw-text-xs sm:tw-text-sm tw-font-bold tw-shadow-md hover:tw-scale-105 tw-transition-transform"
-          />
+            label="Começar"
+            class="tw-rounded-xl tw-px-3 sm:tw-px-4 tw-h-8 sm:tw-h-9 tw-text-xs sm:tw-text-sm tw-font-bold tw-shadow-md hover:tw-scale-105 tw-transition-transform"
+          >
+            <span class="tw-hidden sm:tw-inline tw-ml-1">Grátis</span>
+          </q-btn>
         </div>
-
-        <!-- Botão Menu Hambúrguer para Telas Móveis e Tablets (lt-md) -->
-        <q-btn
-          flat
-          round
-          dense
-          icon="menu"
-          class="md:tw-hidden tw-ml-1"
-          aria-label="Abrir menu de navegação"
-          @click="isDrawerOpen = true"
-        />
       </div>
     </q-toolbar>
-
-    <!-- Gaveta Off-Canvas para Navegação Móvel e Suplementar -->
-    <NavbarMobileDrawer v-model="isDrawerOpen" />
   </q-header>
 </template>

@@ -230,6 +230,13 @@ function handleLogout() {
               <q-item-section class="tw-font-medium">Privacidade e Segurança</q-item-section>
             </q-item>
 
+            <q-item clickable v-close-popup to="/termos" class="tw-rounded-xl tw-transition-colors">
+              <q-item-section avatar class="tw-min-w-[32px]">
+                <q-icon name="description" size="18px" />
+              </q-item-section>
+              <q-item-section class="tw-font-medium">Termos de Uso</q-item-section>
+            </q-item>
+
             <q-separator class="tw-my-1" />
 
             <!-- Ação de Logout -->
