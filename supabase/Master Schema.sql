@@ -1,7 +1,7 @@
 -- ====================================================================
 -- ⚠️ AVISO: ARQUIVO AUTO-GERADO!
 -- NÃO EDITE ESTE ARQUIVO DIRETAMENTE. ALTERE OS SNIPPETS E RODE db:build
--- Gerado em: 2026-10-18T01:26:31.179Z
+-- Gerado em: 2026-10-18T06:12:50.168Z
 -- ====================================================================
 
 -- >>> INÍCIO DO SNIPPET: 00_Init_Extensions.sql <<<
@@ -659,6 +659,53 @@ BEGIN
 END;
 $$;
 
+-- Busca dados públicos da disciplina por código de convite para a página de ingresso e QR Code
+CREATE OR REPLACE FUNCTION public.obter_detalhes_convite(p_codigo TEXT)
+RETURNS TABLE (
+  disciplina_id UUID,
+  nome TEXT,
+  descricao TEXT,
+  curso TEXT,
+  semestre TEXT,
+  turma TEXT,
+  sala TEXT,
+  bloco TEXT,
+  icone TEXT,
+  codigo_convite TEXT,
+  professor_nome TEXT,
+  professor_avatar TEXT,
+  sessao_ativa_id UUID
+) LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path = public AS $$
+BEGIN
+  RETURN QUERY
+  SELECT 
+    d.id AS disciplina_id,
+    d.nome,
+    d.descricao,
+    d.curso,
+    d.semestre,
+    d.turma,
+    d.sala,
+    d.bloco,
+    d.icone,
+    d.codigo_convite,
+    COALESCE(u.nome_completo, 'Professor Docente') AS professor_nome,
+    u.url_avatar AS professor_avatar,
+    (
+      SELECT s.id 
+      FROM public.sessoes s 
+      WHERE s.disciplina_id = d.id 
+        AND s.status IN ('aguardando', 'ativa') 
+      ORDER BY s.created_at DESC 
+      LIMIT 1
+    ) AS sessao_ativa_id
+  FROM public.disciplinas d
+  LEFT JOIN public.usuarios u ON d.professor_id = u.id
+  WHERE LOWER(d.codigo_convite) = LOWER(p_codigo)
+  LIMIT 1;
+END;
+$$;
+
 
 -- >>> FIM DO SNIPPET: 04_Funcoes.sql <<<
 
@@ -947,21 +994,36 @@ ALTER TABLE public.registros_encontro ENABLE ROW LEVEL SECURITY;
 
 -- Grants para visualização pública de grupos no mapa (Fachada de Isolamento Zero-Direct-Access)
 GRANT SELECT ON public.view_grupos_estudo_publicos TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.obter_detalhes_convite(TEXT) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.esta_matriculado(UUID) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.get_thermometer_stats(UUID) TO anon, authenticated;
+GRANT SELECT ON public.sessoes TO anon;
+GRANT SELECT ON public.enquetes TO anon;
+GRANT SELECT ON public.duvidas TO anon;
+GRANT SELECT ON public.usuarios TO anon;
+GRANT SELECT ON public.disciplinas TO anon;
 
 -- POLICIES: usuarios
-CREATE POLICY "Usuário lê o próprio perfil" ON public.usuarios FOR SELECT USING (id = auth.uid());
-CREATE POLICY "Usuário atualiza o próprio perfil" ON public.usuarios FOR UPDATE USING (id = auth.uid());
-CREATE POLICY "Professor vê perfis de alunos matriculados" ON public.usuarios FOR SELECT USING (
+CREATE POLICY "Usuário lê o próprio perfil" ON public.usuarios FOR SELECT TO authenticated USING (id = auth.uid());
+CREATE POLICY "Usuário atualiza o próprio perfil" ON public.usuarios FOR UPDATE TO authenticated USING (id = auth.uid());
+CREATE POLICY "Professor vê perfis de alunos matriculados" ON public.usuarios FOR SELECT TO authenticated USING (
   private.obter_meu_papel() = 'professor' AND EXISTS (
     SELECT 1 FROM public.matriculas m
     JOIN public.disciplinas d ON m.disciplina_id = d.id
     WHERE m.aluno_id = usuarios.id AND d.professor_id = auth.uid()
   )
 );
+CREATE POLICY "Visitantes e alunos veem autores de duvidas" ON public.usuarios FOR SELECT TO anon, authenticated USING (
+  EXISTS (
+    SELECT 1 FROM public.duvidas d
+    WHERE d.autor_id = usuarios.id
+  )
+);
 
 -- POLICIES: disciplinas
 CREATE POLICY "Professor gerencia próprias disciplinas" ON public.disciplinas FOR ALL USING (professor_id = auth.uid());
-CREATE POLICY "Usuários autenticados podem ver disciplinas" ON public.disciplinas FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "Usuários autenticados podem ver disciplinas" ON public.disciplinas FOR SELECT TO authenticated USING (auth.role() = 'authenticated');
+CREATE POLICY "Visitantes podem ver dados de disciplinas" ON public.disciplinas FOR SELECT TO anon USING (true);
 
 -- POLICIES: matriculas
 CREATE POLICY "Aluno se matricula" ON public.matriculas FOR INSERT WITH CHECK (aluno_id = auth.uid());
@@ -973,6 +1035,9 @@ CREATE POLICY "Professor vê matrículas das próprias disciplinas" ON public.ma
 -- POLICIES: sessoes
 CREATE POLICY "Professor gerencia próprias sessões" ON public.sessoes FOR ALL USING (professor_id = auth.uid());
 CREATE POLICY "Aluno vê sessões das disciplinas matriculadas" ON public.sessoes FOR SELECT USING (esta_matriculado(disciplina_id));
+CREATE POLICY "Visitantes podem ver sessões de aula" ON public.sessoes FOR SELECT TO anon USING (
+  status IN ('aguardando', 'ativa', 'encerrada')
+);
 
 -- POLICIES: sinais_ritmo
 CREATE POLICY "Aluno envia sinal de ritmo" ON public.sinais_ritmo FOR INSERT WITH CHECK (
@@ -989,6 +1054,9 @@ CREATE POLICY "Professor gerencia enquetes" ON public.enquetes FOR ALL USING (
 CREATE POLICY "Aluno vê enquetes ativas" ON public.enquetes FOR SELECT USING (
   status = 'ativa' AND EXISTS (SELECT 1 FROM public.sessoes s WHERE s.id = enquetes.sessao_id AND esta_matriculado(s.disciplina_id))
 );
+CREATE POLICY "Visitantes podem ver enquetes ativas" ON public.enquetes FOR SELECT TO anon USING (
+  status = 'ativa'
+);
 
 -- POLICIES: respostas_enquete
 CREATE POLICY "Aluno responde enquetes" ON public.respostas_enquete FOR INSERT WITH CHECK (
@@ -1004,6 +1072,9 @@ CREATE POLICY "Aluno envia dúvida" ON public.duvidas FOR INSERT WITH CHECK (
 );
 CREATE POLICY "Todos veem dúvidas da sessão" ON public.duvidas FOR SELECT USING (
   EXISTS (SELECT 1 FROM public.sessoes s WHERE s.id = duvidas.sessao_id AND (s.professor_id = auth.uid() OR esta_matriculado(s.disciplina_id)))
+);
+CREATE POLICY "Visitantes podem ver dúvidas da sessão" ON public.duvidas FOR SELECT TO anon USING (
+  EXISTS (SELECT 1 FROM public.sessoes s WHERE s.id = duvidas.sessao_id)
 );
 CREATE POLICY "Professor responde dúvidas" ON public.duvidas FOR UPDATE USING (
   EXISTS (SELECT 1 FROM public.sessoes s WHERE s.id = duvidas.sessao_id AND s.professor_id = auth.uid())

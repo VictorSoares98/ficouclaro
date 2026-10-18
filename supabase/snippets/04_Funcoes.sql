@@ -383,3 +383,50 @@ BEGIN
 END;
 $$;
 
+-- Busca dados públicos da disciplina por código de convite para a página de ingresso e QR Code
+CREATE OR REPLACE FUNCTION public.obter_detalhes_convite(p_codigo TEXT)
+RETURNS TABLE (
+  disciplina_id UUID,
+  nome TEXT,
+  descricao TEXT,
+  curso TEXT,
+  semestre TEXT,
+  turma TEXT,
+  sala TEXT,
+  bloco TEXT,
+  icone TEXT,
+  codigo_convite TEXT,
+  professor_nome TEXT,
+  professor_avatar TEXT,
+  sessao_ativa_id UUID
+) LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path = public AS $$
+BEGIN
+  RETURN QUERY
+  SELECT 
+    d.id AS disciplina_id,
+    d.nome,
+    d.descricao,
+    d.curso,
+    d.semestre,
+    d.turma,
+    d.sala,
+    d.bloco,
+    d.icone,
+    d.codigo_convite,
+    COALESCE(u.nome_completo, 'Professor Docente') AS professor_nome,
+    u.url_avatar AS professor_avatar,
+    (
+      SELECT s.id 
+      FROM public.sessoes s 
+      WHERE s.disciplina_id = d.id 
+        AND s.status IN ('aguardando', 'ativa') 
+      ORDER BY s.created_at DESC 
+      LIMIT 1
+    ) AS sessao_ativa_id
+  FROM public.disciplinas d
+  LEFT JOIN public.usuarios u ON d.professor_id = u.id
+  WHERE LOWER(d.codigo_convite) = LOWER(p_codigo)
+  LIMIT 1;
+END;
+$$;
+
