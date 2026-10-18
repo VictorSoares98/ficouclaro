@@ -67,6 +67,9 @@ async function loadInviteDetails() {
 
 async function handleAuthenticatedEnroll(details: ClassroomInviteDetails) {
   isEnrolling.value = true;
+  if (typeof window !== 'undefined' && window.sessionStorage) {
+    sessionStorage.removeItem('ficouclaro_guest_session');
+  }
   try {
     await courseStore.enroll(details.codigo_convite);
     $q.notify({

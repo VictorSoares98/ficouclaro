@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { useAuthStore } from '@/stores/auth.store';
 import { useSessionStore } from '@/modules/session/stores/session.store';
 import { usePollStore } from '@/modules/poll/stores/poll.store';
 import { useQuasar } from 'quasar';
@@ -13,6 +14,7 @@ import WaitingRoomWidget from '@/modules/session/components/WaitingRoomWidget.vu
 
 const route = useRoute();
 const router = useRouter();
+const authStore = useAuthStore();
 const sessionStore = useSessionStore();
 const pollStore = usePollStore();
 const $q = useQuasar();
@@ -20,6 +22,13 @@ const $q = useQuasar();
 const sessionId = String((route.params as Record<string, unknown>).id);
 
 const guestSession = computed(() => {
+  // Se o usuário estiver autenticado, qualquer resíduo anterior de visitante é limpo
+  if (authStore.isAuthenticated) {
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      sessionStorage.removeItem('ficouclaro_guest_session');
+    }
+    return null;
+  }
   if (typeof window === 'undefined' || !window.sessionStorage) return null;
   const raw = sessionStorage.getItem('ficouclaro_guest_session');
   if (!raw) return null;
@@ -36,9 +45,12 @@ const guestSession = computed(() => {
   }
 });
 
-const isGuest = computed(() => Boolean(guestSession.value?.isGuest));
+const isGuest = computed(() => !authStore.isAuthenticated && Boolean(guestSession.value?.isGuest));
 
 onMounted(async () => {
+  if (authStore.isAuthenticated && typeof window !== 'undefined' && window.sessionStorage) {
+    sessionStorage.removeItem('ficouclaro_guest_session');
+  }
   try {
     await sessionStore.joinSession(sessionId);
     await pollStore.loadActivePolls(sessionId);

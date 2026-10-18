@@ -12,6 +12,12 @@ const router = useRouter();
 
 const role = computed(() => authStore.user?.perfil.papel);
 const isGuest = computed(() => {
+  if (authStore.isAuthenticated) {
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      sessionStorage.removeItem('ficouclaro_guest_session');
+    }
+    return false;
+  }
   if (typeof window === 'undefined' || !window.sessionStorage) return false;
   return Boolean(sessionStorage.getItem('ficouclaro_guest_session'));
 });

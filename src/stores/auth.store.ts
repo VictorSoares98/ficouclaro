@@ -35,6 +35,9 @@ export const useAuthStore = defineStore('auth', () => {
   async function loadInitialSession() {
     await execute(async () => {
       user.value = await authService.getSessionUser();
+      if (user.value && typeof window !== 'undefined' && window.sessionStorage) {
+        sessionStorage.removeItem('ficouclaro_guest_session');
+      }
     }, 'Erro ao carregar sessão.');
     isReady.value = true;
   }
@@ -47,6 +50,9 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       const perfil = await authService.getProfile(authUser.id);
       user.value = { auth: authUser, perfil };
+      if (typeof window !== 'undefined' && window.sessionStorage) {
+        sessionStorage.removeItem('ficouclaro_guest_session');
+      }
     } catch (e) {
       console.error('Falha ao recarregar perfil no listener:', e);
       user.value = null;
@@ -59,6 +65,9 @@ export const useAuthStore = defineStore('auth', () => {
   function clearUser() {
     user.value = null;
     isLocked.value = false;
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      sessionStorage.removeItem('ficouclaro_guest_session');
+    }
   }
 
   async function signOut() {
