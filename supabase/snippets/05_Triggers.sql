@@ -64,15 +64,19 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Trigger: Moderação Automática de Conteúdo
-CREATE OR REPLACE FUNCTION private.trigger_moderacao_texto()
+-- ============================================================
+-- Moderação Automática de Conteúdo (Triggers Específicos por Tabela)
+-- ============================================================
+
+-- 1. Moderação de Dúvidas (Painel Q&A)
+CREATE OR REPLACE FUNCTION private.trigger_moderacao_duvida()
 RETURNS TRIGGER AS $$
 DECLARE
   v_mod JSONB;
   v_strikes INT;
 BEGIN
   -- Prevenção de Falsidade Ideológica (Impersonation)
-  IF TG_TABLE_NAME = 'duvidas' AND NEW.autor_id IS NOT NULL AND NEW.autor_id != auth.uid() THEN
+  IF NEW.autor_id IS NOT NULL AND NEW.autor_id != auth.uid() THEN
     RAISE EXCEPTION 'IMPERSONATION_BLOCKED: Não é permitido assinar uma dúvida em nome de outro usuário.';
   END IF;
 
@@ -83,16 +87,7 @@ BEGIN
     END IF;
   END IF;
 
-  v_mod := private.verificar_moderacao(
-    COALESCE(
-      CASE 
-        WHEN TG_TABLE_NAME = 'duvidas' THEN NEW.texto 
-        WHEN TG_TABLE_NAME = 'avaliacoes_rapidas' THEN NEW.comentario 
-        WHEN TG_TABLE_NAME = 'respostas_enquete' THEN (NEW.resposta->>'texto')
-        ELSE ''
-      END, ''
-    )
-  );
+  v_mod := private.verificar_moderacao(COALESCE(NEW.texto, ''));
 
   IF (v_mod->>'sensitive')::boolean THEN
     RAISE EXCEPTION 'MODERATION_BLOCKED: Dados sensíveis não são permitidos por questões de privacidade.';
@@ -100,11 +95,7 @@ BEGIN
 
   IF (v_mod->>'offensive')::boolean THEN
     IF auth.uid() IS NOT NULL THEN
-      IF TG_TABLE_NAME = 'duvidas' THEN
-        NEW.autor_id := auth.uid();
-      ELSIF TG_TABLE_NAME = 'avaliacoes_rapidas' OR TG_TABLE_NAME = 'respostas_enquete' THEN
-        NEW.aluno_id := auth.uid();
-      END IF;
+      NEW.autor_id := auth.uid();
       
       INSERT INTO private.strikes_moderacao (aluno_id, quantidade)
       VALUES (auth.uid(), 1)
@@ -116,20 +107,95 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+-- 2. Moderação de Avaliações Rápidas (Pós-Aula)
+CREATE OR REPLACE FUNCTION private.trigger_moderacao_avaliacao()
+RETURNS TRIGGER AS $$
+DECLARE
+  v_mod JSONB;
+  v_strikes INT;
+BEGIN
+  IF auth.uid() IS NOT NULL THEN
+    SELECT quantidade INTO v_strikes FROM private.strikes_moderacao WHERE aluno_id = auth.uid();
+    IF v_strikes >= 3 THEN
+      RAISE EXCEPTION 'MODERATION_SUSPENDED: Usuário suspenso por múltiplas violações das regras.';
+    END IF;
+  END IF;
+
+  IF NEW.comentario IS NOT NULL AND NEW.comentario <> '' THEN
+    v_mod := private.verificar_moderacao(NEW.comentario);
+
+    IF (v_mod->>'sensitive')::boolean THEN
+      RAISE EXCEPTION 'MODERATION_BLOCKED: Dados sensíveis não são permitidos por questões de privacidade.';
+    END IF;
+
+    IF (v_mod->>'offensive')::boolean THEN
+      IF auth.uid() IS NOT NULL THEN
+        NEW.aluno_id := auth.uid();
+        
+        INSERT INTO private.strikes_moderacao (aluno_id, quantidade)
+        VALUES (auth.uid(), 1)
+        ON CONFLICT (aluno_id) DO UPDATE SET quantidade = private.strikes_moderacao.quantidade + 1, ultima_ocorrencia = NOW();
+      END IF;
+    END IF;
+  END IF;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- 3. Moderação de Respostas de Enquete
+CREATE OR REPLACE FUNCTION private.trigger_moderacao_enquete()
+RETURNS TRIGGER AS $$
+DECLARE
+  v_mod JSONB;
+  v_strikes INT;
+  v_texto TEXT;
+BEGIN
+  IF auth.uid() IS NOT NULL THEN
+    SELECT quantidade INTO v_strikes FROM private.strikes_moderacao WHERE aluno_id = auth.uid();
+    IF v_strikes >= 3 THEN
+      RAISE EXCEPTION 'MODERATION_SUSPENDED: Usuário suspenso por múltiplas violações das regras.';
+    END IF;
+  END IF;
+
+  v_texto := COALESCE(NEW.resposta->>'texto', '');
+  IF v_texto <> '' THEN
+    v_mod := private.verificar_moderacao(v_texto);
+
+    IF (v_mod->>'sensitive')::boolean THEN
+      RAISE EXCEPTION 'MODERATION_BLOCKED: Dados sensíveis não são permitidos por questões de privacidade.';
+    END IF;
+
+    IF (v_mod->>'offensive')::boolean THEN
+      IF auth.uid() IS NOT NULL THEN
+        INSERT INTO private.strikes_moderacao (aluno_id, quantidade)
+        VALUES (auth.uid(), 1)
+        ON CONFLICT (aluno_id) DO UPDATE SET quantidade = private.strikes_moderacao.quantidade + 1, ultima_ocorrencia = NOW();
+      END IF;
+    END IF;
+  END IF;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
 DROP TRIGGER IF EXISTS ao_inserir_duvida_mod ON public.duvidas;
 CREATE TRIGGER ao_inserir_duvida_mod
   BEFORE INSERT ON public.duvidas
-  FOR EACH ROW EXECUTE FUNCTION private.trigger_moderacao_texto();
+  FOR EACH ROW EXECUTE FUNCTION private.trigger_moderacao_duvida();
 
 DROP TRIGGER IF EXISTS ao_inserir_avaliacao_mod ON public.avaliacoes_rapidas;
 CREATE TRIGGER ao_inserir_avaliacao_mod
   BEFORE INSERT ON public.avaliacoes_rapidas
-  FOR EACH ROW EXECUTE FUNCTION private.trigger_moderacao_texto();
+  FOR EACH ROW EXECUTE FUNCTION private.trigger_moderacao_avaliacao();
 
 DROP TRIGGER IF EXISTS ao_inserir_enquete_mod ON public.respostas_enquete;
 CREATE TRIGGER ao_inserir_enquete_mod
   BEFORE INSERT ON public.respostas_enquete
-  FOR EACH ROW EXECUTE FUNCTION private.trigger_moderacao_texto();
+  FOR EACH ROW EXECUTE FUNCTION private.trigger_moderacao_enquete();
+
+-- Remoção da função genérica depreciada se existente
+DROP FUNCTION IF EXISTS private.trigger_moderacao_texto();
 
 DROP TRIGGER IF EXISTS ao_atualizar_usuario ON public.usuarios;
 CREATE TRIGGER ao_atualizar_usuario

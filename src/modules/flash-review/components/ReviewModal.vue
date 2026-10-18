@@ -44,21 +44,25 @@ async function submit() {
     return;
   }
 
-  await flashReviewStore.submitReview(
-    {
-      sessao_id: sessionStore.currentSession.id,
-      nota: rating.value,
-      comentario: comentario.value.trim() || null,
-    },
-    isAnonymous.value,
-  );
+  try {
+    await flashReviewStore.submitReview(
+      {
+        sessao_id: sessionStore.currentSession.id,
+        nota: rating.value,
+        comentario: comentario.value.trim() || null,
+      },
+      isAnonymous.value,
+    );
 
-  if (!flashReviewStore.error) {
-    $q.notify({
-      type: 'positive',
-      message: 'Avaliação enviada! Obrigado pelo feedback.',
-    });
-    isOpen.value = false;
+    if (!flashReviewStore.error) {
+      $q.notify({
+        type: 'positive',
+        message: 'Avaliação enviada! Obrigado pelo feedback.',
+      });
+      isOpen.value = false;
+    }
+  } catch {
+    // Erros de rede ou moderação já são tratados e exibidos pelo useAsyncOperation
   }
 }
 
