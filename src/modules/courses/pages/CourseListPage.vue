@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useCourseStore } from '@/modules/courses/stores/course.store';
 import { useSessionStore } from '@/modules/session/stores/session.store';
@@ -59,6 +59,13 @@ const isConfirmDialogOpen = computed({
 
 onMounted(async () => {
   await courseStore.fetchMyCourses();
+  const courseIds = courseStore.courses.map((c) => c.id);
+  await sessionStore.fetchCoursesSessions(courseIds);
+  sessionStore.subscribeToCoursesSessions();
+});
+
+onUnmounted(() => {
+  sessionStore.unsubscribeCoursesSessions();
 });
 
 function resetForm() {
@@ -171,6 +178,45 @@ function openStartSessionDialog(courseId: string) {
   }
 }
 
+function handleCourseAction(courseId: string) {
+  const activeSession = sessionStore.coursesSessions[courseId];
+  if (
+    activeSession &&
+    (activeSession.status === 'aguardando' || activeSession.status === 'ativa')
+  ) {
+    void router.push(`/sala/${activeSession.id}`);
+  } else {
+    openStartSessionDialog(courseId);
+  }
+}
+
+function getSessionStatus(courseId: string): 'aguardando' | 'ativa' | 'encerrada' | 'nenhuma' {
+  return sessionStore.coursesSessions[courseId]?.status || 'nenhuma';
+}
+
+function getActionLabel(courseId: string): string {
+  const status = sessionStore.coursesSessions[courseId]?.status;
+  if (status === 'ativa' || status === 'aguardando') {
+    return 'Continuar Aula';
+  }
+  return 'Iniciar Aula';
+}
+
+function getActionIcon(courseId: string): string {
+  const status = sessionStore.coursesSessions[courseId]?.status;
+  if (status === 'ativa' || status === 'aguardando') {
+    return 'login';
+  }
+  return 'play_arrow';
+}
+
+function getActionColor(courseId: string): string {
+  const status = sessionStore.coursesSessions[courseId]?.status;
+  if (status === 'ativa') return 'positive';
+  if (status === 'aguardando') return 'warning';
+  return 'primary';
+}
+
 async function handleConfirmStartSession(topic: string) {
   if (!selectedCourseForSession.value) return;
 
@@ -264,13 +310,14 @@ function handleOpenInsights(courseId: string) {
         v-for="course in courseStore.courses"
         :key="course.id"
         :course="course"
-        actionLabel="Iniciar Aula"
-        actionIcon="play_arrow"
-        actionColor="primary"
+        :sessionStatus="getSessionStatus(course.id)"
+        :actionLabel="getActionLabel(course.id)"
+        :actionIcon="getActionIcon(course.id)"
+        :actionColor="getActionColor(course.id)"
         :showInviteCode="true"
         :showInsightsBtn="authStore.user?.perfil.papel === 'professor'"
         :showOptionsBtn="authStore.user?.perfil.papel === 'professor'"
-        @action="openStartSessionDialog"
+        @action="handleCourseAction"
         @insights="handleOpenInsights"
         @edit="openEditModal"
         @delete="handleDeleteCourse"

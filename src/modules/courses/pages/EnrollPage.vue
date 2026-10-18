@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useCourseStore } from '@/modules/courses/stores/course.store';
 import { useSessionStore } from '@/modules/session/stores/session.store';
 import { useQuasar } from 'quasar';
-import { sessionService, type StatusSessao } from '@/modules/session/services/session.service';
 import CourseCard from '@/modules/courses/components/CourseCard.vue';
 import CourseCardSkeleton from '@/modules/courses/components/CourseCardSkeleton.vue';
 
@@ -16,28 +15,18 @@ const $q = useQuasar();
 const isEnrolling = ref(false);
 const inviteCode = ref('');
 const isRefreshing = ref(false);
-const activeSessions = ref<Record<string, StatusSessao | 'nenhuma'>>({});
-
-async function loadSessionStatuses() {
-  if (courseStore.courses.length === 0) return;
-  const courseIds = courseStore.courses.map((c) => c.id);
-  const statuses = await sessionService.getActiveSessionsForCourses(courseIds);
-
-  // Mapeia garantindo que mesmo sem aula tenha a marcação 'nenhuma'
-  courseIds.forEach((id) => {
-    activeSessions.value[id] = statuses[id] || 'nenhuma';
-  });
-}
 
 async function handleRefresh() {
   isRefreshing.value = true;
   await courseStore.fetchMyCourses();
-  await loadSessionStatuses();
+  const courseIds = courseStore.courses.map((c) => c.id);
+  await sessionStore.fetchCoursesSessions(courseIds);
   isRefreshing.value = false;
 }
 
 onMounted(async () => {
   await handleRefresh();
+  sessionStore.subscribeToCoursesSessions();
 
   // Abordagem Premium (Universal/Deep Links):
   // Se o aluno escanear um QR code web, a URL trará ?join=CODIGO
@@ -50,6 +39,10 @@ onMounted(async () => {
     // Limpa a URL para não matricular de novo caso ele atualize a página
     void router.replace({ query: { ...router.currentRoute.value.query, join: undefined } });
   }
+});
+
+onUnmounted(() => {
+  sessionStore.unsubscribeCoursesSessions();
 });
 
 async function handleEnroll() {
@@ -68,19 +61,23 @@ async function handleEnroll() {
 }
 
 async function handleJoinActiveSession(courseId: string) {
+  const session = sessionStore.coursesSessions[courseId];
+  if (session && (session.status === 'aguardando' || session.status === 'ativa')) {
+    void router.push(`/sala/${session.id}`);
+    return;
+  }
+
   try {
     $q.loading.show({ message: 'Buscando aula ativa...' });
-
-    // Busca a sessão mais recente deste curso que não esteja encerrada via store
     const sessionId = await sessionStore.getActiveSession(courseId);
-
     $q.loading.hide();
     void router.push(`/sala/${sessionId}`);
   } catch (err: unknown) {
     $q.loading.hide();
     $q.notify({
       color: 'warning',
-      message: err instanceof Error ? err.message : 'Erro ao entrar na aula',
+      message:
+        err instanceof Error ? err.message : 'Não há aula aberta nesta disciplina no momento.',
     });
   }
 }
@@ -133,7 +130,7 @@ async function handleJoinActiveSession(courseId: string) {
         v-for="course in courseStore.courses"
         :key="course.id"
         :course="course"
-        :sessionStatus="activeSessions[course.id] || 'nenhuma'"
+        :sessionStatus="sessionStore.coursesSessions[course.id]?.status || 'nenhuma'"
         actionLabel="Entrar na Aula"
         actionIcon="login"
         actionColor="positive"

@@ -171,10 +171,20 @@ defineEmits<{
         class="tw-flex-1"
         flat
         no-wrap
-        :color="sessionStatus === 'nenhuma' || sessionStatus === 'encerrada' ? 'grey' : actionColor"
+        :color="
+          !showOptionsBtn && (sessionStatus === 'nenhuma' || sessionStatus === 'encerrada')
+            ? 'grey'
+            : actionColor
+        "
         :icon="actionIcon"
-        :label="sessionStatus === 'aguardando' ? 'Entrar na Sala' : actionLabel"
-        :disable="sessionStatus === 'nenhuma' || sessionStatus === 'encerrada'"
+        :label="
+          !showOptionsBtn && (sessionStatus === 'nenhuma' || sessionStatus === 'encerrada')
+            ? 'Sem Aula'
+            : sessionStatus === 'aguardando' && !showOptionsBtn
+              ? 'Entrar na Sala'
+              : actionLabel
+        "
+        :disable="!showOptionsBtn && (sessionStatus === 'nenhuma' || sessionStatus === 'encerrada')"
         @click="$emit('action', course.id)"
       />
     </q-card-actions>

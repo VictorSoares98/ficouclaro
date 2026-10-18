@@ -1,7 +1,7 @@
 -- ====================================================================
 -- ⚠️ AVISO: ARQUIVO AUTO-GERADO!
 -- NÃO EDITE ESTE ARQUIVO DIRETAMENTE. ALTERE OS SNIPPETS E RODE db:build
--- Gerado em: 2026-10-18T01:11:15.318Z
+-- Gerado em: 2026-10-18T01:26:31.179Z
 -- ====================================================================
 
 -- >>> INÍCIO DO SNIPPET: 00_Init_Extensions.sql <<<
@@ -1109,6 +1109,7 @@ CREATE INDEX IF NOT EXISTS idx_matriculas_aluno_id ON public.matriculas(aluno_id
 CREATE INDEX IF NOT EXISTS idx_sessoes_disciplina_id ON public.sessoes(disciplina_id);
 CREATE INDEX IF NOT EXISTS idx_sessoes_professor_id ON public.sessoes(professor_id);
 CREATE INDEX IF NOT EXISTS idx_sessoes_status ON public.sessoes(status);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_sessoes_ativas_por_disciplina ON public.sessoes(disciplina_id) WHERE status IN ('aguardando', 'ativa');
 CREATE INDEX IF NOT EXISTS idx_sinais_ritmo_sessao_created ON public.sinais_ritmo(sessao_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_enquetes_sessao_id ON public.enquetes(sessao_id);
 CREATE INDEX IF NOT EXISTS idx_enquetes_status ON public.enquetes(status);

@@ -1,14 +1,23 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import { sessionService, type Sessao } from '@/modules/session/services/session.service';
+import {
+  sessionService,
+  type Sessao,
+  type CourseSessionInfo,
+} from '@/modules/session/services/session.service';
 import { realtimeManager } from '@/core/supabase/realtime.manager';
 import { useAsyncOperation } from '@/core/composables/useAsyncOperation';
-import type { RealtimePostgresUpdatePayload } from '@supabase/supabase-js';
+import type {
+  RealtimePostgresInsertPayload,
+  RealtimePostgresUpdatePayload,
+} from '@supabase/supabase-js';
 
 export const useSessionStore = defineStore('session', () => {
   const currentSession = ref<Sessao | null>(null);
+  const coursesSessions = ref<Record<string, CourseSessionInfo | null>>({});
   const { isLoading, error, execute } = useAsyncOperation();
   const hasSubscribed = ref(false);
+  const isCoursesSubscribed = ref(false);
 
   /**
    * Carrega a sessão e assina o canal Realtime para escutar mudanças (ex: professor inicia ou encerra)
@@ -61,7 +70,13 @@ export const useSessionStore = defineStore('session', () => {
 
   async function createSession(professorId: string, disciplinaId: string, topico?: string) {
     return execute(async () => {
-      return await sessionService.createSession(professorId, disciplinaId, topico);
+      const sessao = await sessionService.createSession(professorId, disciplinaId, topico);
+      coursesSessions.value[disciplinaId] = {
+        id: sessao.id,
+        status: sessao.status,
+        topico: sessao.topico,
+      };
+      return sessao;
     }, 'Erro ao criar sessão.');
   }
 
@@ -73,6 +88,13 @@ export const useSessionStore = defineStore('session', () => {
       const updated = await sessionService.startSession(session.id);
       if (currentSession.value) {
         currentSession.value = updated;
+      }
+      if (updated.disciplina_id) {
+        coursesSessions.value[updated.disciplina_id] = {
+          id: updated.id,
+          status: updated.status,
+          topico: updated.topico,
+        };
       }
     }, 'Erro ao iniciar aula.');
   }
@@ -86,6 +108,9 @@ export const useSessionStore = defineStore('session', () => {
       if (currentSession.value) {
         currentSession.value = updated;
       }
+      if (updated.disciplina_id) {
+        coursesSessions.value[updated.disciplina_id] = null;
+      }
     }, 'Erro ao encerrar sessão.');
   }
 
@@ -95,8 +120,94 @@ export const useSessionStore = defineStore('session', () => {
     }, 'Erro ao buscar aula ativa.');
   }
 
+  /**
+   * Busca e sincroniza o estado ativo inicial de uma lista de disciplinas
+   */
+  async function fetchCoursesSessions(courseIds: string[]) {
+    if (courseIds.length === 0) return;
+    try {
+      const activeMap = await sessionService.getActiveSessionsForCourses(courseIds);
+      courseIds.forEach((id) => {
+        coursesSessions.value[id] = activeMap[id] || null;
+      });
+    } catch (err: unknown) {
+      console.warn('Erro ao carregar status das turmas:', err);
+    }
+  }
+
+  /**
+   * Assina o canal Realtime para escutar mudanças de status em todas as sessões em tempo real
+   */
+  function subscribeToCoursesSessions() {
+    const channelName = 'courses-sessions-live';
+    const channel = realtimeManager.getChannel(channelName);
+
+    if (!isCoursesSubscribed.value) {
+      isCoursesSubscribed.value = true;
+
+      channel
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'sessoes',
+          },
+          (payload: RealtimePostgresInsertPayload<Sessao>) => {
+            const newSessao = payload.new;
+            if (
+              newSessao?.disciplina_id &&
+              (newSessao.status === 'aguardando' || newSessao.status === 'ativa')
+            ) {
+              coursesSessions.value[newSessao.disciplina_id] = {
+                id: newSessao.id,
+                status: newSessao.status,
+                topico: newSessao.topico,
+              };
+            }
+          },
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'sessoes',
+          },
+          (payload: RealtimePostgresUpdatePayload<Sessao>) => {
+            const updated = payload.new;
+            if (updated?.disciplina_id) {
+              if (updated.status === 'encerrada') {
+                if (coursesSessions.value[updated.disciplina_id]?.id === updated.id) {
+                  coursesSessions.value[updated.disciplina_id] = null;
+                }
+              } else {
+                coursesSessions.value[updated.disciplina_id] = {
+                  id: updated.id,
+                  status: updated.status,
+                  topico: updated.topico,
+                };
+              }
+            }
+          },
+        );
+
+      realtimeManager.subscribe(channelName);
+    }
+  }
+
+  /**
+   * Libera a assinatura do canal Realtime de sessões
+   */
+  function unsubscribeCoursesSessions() {
+    const channelName = 'courses-sessions-live';
+    realtimeManager.releaseChannel(channelName);
+    isCoursesSubscribed.value = false;
+  }
+
   return {
     currentSession,
+    coursesSessions,
     isLoading,
     error,
     joinSession,
@@ -105,5 +216,8 @@ export const useSessionStore = defineStore('session', () => {
     startSession,
     endSession,
     getActiveSession,
+    fetchCoursesSessions,
+    subscribeToCoursesSessions,
+    unsubscribeCoursesSessions,
   };
 });
