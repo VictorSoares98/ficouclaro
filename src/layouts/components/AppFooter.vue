@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import FooterGamifiedBadge from '@/components/footer/FooterGamifiedBadge.vue';
+import { useAccessibilityStore } from '@/stores/accessibility.store';
+import { useQuasar } from 'quasar';
 
+const $q = useQuasar();
+const accessibilityStore = useAccessibilityStore();
 const currentYear = new Date().getFullYear();
 
 function scrollToTop() {
@@ -8,6 +12,48 @@ function scrollToTop() {
     top: 0,
     behavior: 'smooth',
   });
+}
+
+async function handleLibrasAction() {
+  if (accessibilityStore.isLibrasLoading) return;
+
+  if (accessibilityStore.librasEnabled) {
+    $q.notify({
+      type: 'info',
+      icon: 'translate',
+      message: 'O intérprete VLibras já está ativo e pronto para uso na tela.',
+      position: 'bottom-right',
+      timeout: 2000,
+    });
+    return;
+  }
+
+  $q.notify({
+    type: 'info',
+    icon: 'translate',
+    message: 'Carregando intérprete VLibras...',
+    position: 'bottom-right',
+    timeout: 2000,
+  });
+
+  const success = await accessibilityStore.activateLibras();
+  if (!success) {
+    $q.notify({
+      type: 'warning',
+      icon: 'warning',
+      message: 'Não foi possível carregar o VLibras. Verifique sua conexão.',
+      position: 'bottom-right',
+      timeout: 3000,
+    });
+  } else {
+    $q.notify({
+      type: 'positive',
+      icon: 'check_circle',
+      message: 'Intérprete VLibras ativado e memorizado com sucesso!',
+      position: 'bottom-right',
+      timeout: 2500,
+    });
+  }
 }
 </script>
 
@@ -60,7 +106,7 @@ function scrollToTop() {
           <ul class="tw-space-y-2.5 tw-list-none tw-p-0 tw-m-0 tw-text-xs sm:tw-text-sm">
             <li>
               <router-link
-                to="/sala"
+                to="/#simulador"
                 class="tw-flex tw-items-center tw-gap-1.5 hover:tw-text-primary hover:tw-translate-x-1 tw-transition-all"
               >
                 <q-icon name="speed" size="14px" />
@@ -69,7 +115,7 @@ function scrollToTop() {
             </li>
             <li>
               <router-link
-                to="/sala"
+                to="/#recursos"
                 class="tw-flex tw-items-center tw-gap-1.5 hover:tw-text-primary hover:tw-translate-x-1 tw-transition-all"
               >
                 <q-icon name="question_answer" size="14px" />
@@ -88,7 +134,7 @@ function scrollToTop() {
             </li>
             <li>
               <router-link
-                to="/sala"
+                to="/#recursos"
                 class="tw-flex tw-items-center tw-gap-1.5 hover:tw-text-primary hover:tw-translate-x-1 tw-transition-all"
               >
                 <q-icon name="poll" size="14px" />
@@ -115,7 +161,7 @@ function scrollToTop() {
           <ul class="tw-space-y-2.5 tw-list-none tw-p-0 tw-m-0 tw-text-xs sm:tw-text-sm">
             <li>
               <router-link
-                to="/sala"
+                to="/#pin"
                 class="tw-flex tw-items-center tw-gap-1.5 hover:tw-text-primary hover:tw-translate-x-1 tw-transition-all"
               >
                 <q-icon name="pin" size="14px" />
@@ -186,10 +232,49 @@ function scrollToTop() {
               </router-link>
             </li>
             <li>
-              <span class="tw-flex tw-items-center tw-gap-1.5 text-muted">
-                <q-icon name="translate" size="14px" />
+              <router-link
+                to="/lock"
+                class="tw-flex tw-items-center tw-gap-1.5 hover:tw-text-primary hover:tw-translate-x-1 tw-transition-all"
+              >
+                <q-icon name="lock_clock" size="14px" />
+                <span>Bloqueio de Sessão</span>
+              </router-link>
+            </li>
+            <li>
+              <button
+                type="button"
+                class="tw-flex tw-items-center tw-gap-1.5 tw-bg-transparent tw-border-0 tw-p-0 tw-cursor-pointer tw-text-inherit tw-font-inherit hover:tw-text-primary hover:tw-translate-x-1 tw-transition-all"
+                :class="{ 'tw-opacity-60 tw-cursor-wait': accessibilityStore.isLibrasLoading }"
+                :disabled="accessibilityStore.isLibrasLoading"
+                :title="
+                  accessibilityStore.librasEnabled
+                    ? 'Intérprete VLibras ativo'
+                    : 'Clique para ativar o intérprete de Libras'
+                "
+                @click="handleLibrasAction"
+              >
+                <q-spinner v-if="accessibilityStore.isLibrasLoading" size="14px" color="primary" />
+                <q-icon
+                  v-else
+                  name="translate"
+                  size="14px"
+                  :color="accessibilityStore.librasEnabled ? 'primary' : undefined"
+                />
                 <span>Suporte VLibras Integrado</span>
-              </span>
+                <q-badge
+                  :color="accessibilityStore.librasEnabled ? 'positive' : 'grey-7'"
+                  rounded
+                  class="tw-text-[9px] tw-ml-1"
+                >
+                  {{
+                    accessibilityStore.isLibrasLoading
+                      ? 'Carregando...'
+                      : accessibilityStore.librasEnabled
+                        ? 'Ativo'
+                        : 'Ativar'
+                  }}
+                </q-badge>
+              </button>
             </li>
           </ul>
         </div>

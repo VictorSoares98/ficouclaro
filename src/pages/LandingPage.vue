@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, onMounted } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import LandingHeroVisual from '@/components/landing/LandingHeroVisual.vue';
 import LandingFeatureBento from '@/components/landing/LandingFeatureBento.vue';
 import LandingInteractiveSimulator from '@/components/landing/LandingInteractiveSimulator.vue';
 
 const router = useRouter();
+const route = useRoute();
 const roomPin = ref('');
 const isPinError = ref(false);
 
@@ -18,6 +19,15 @@ function handleQuickJoin() {
   isPinError.value = false;
   void router.push(`/sala/${pin}`);
 }
+
+onMounted(() => {
+  if (route.hash === '#pin') {
+    setTimeout(() => {
+      const inputEl = document.querySelector<HTMLInputElement>('#pin input');
+      inputEl?.focus();
+    }, 450);
+  }
+});
 </script>
 
 <template>
@@ -69,7 +79,7 @@ function handleQuickJoin() {
           </p>
 
           <!-- Widget de Entrada Rápida na Sala (Quick PIN) -->
-          <div class="tw-pt-2 tw-max-w-md tw-mx-auto lg:tw-mx-0">
+          <div id="pin" class="tw-pt-2 tw-max-w-md tw-mx-auto lg:tw-mx-0">
             <q-card flat bordered class="tw-p-2 tw-rounded-2xl tw-shadow-lg">
               <div class="tw-flex tw-items-center tw-gap-2">
                 <q-input
@@ -187,10 +197,10 @@ function handleQuickJoin() {
     </section>
 
     <!-- 3. Bento Grid com as 6 Funcionalidades Centrais -->
-    <LandingFeatureBento />
+    <LandingFeatureBento id="recursos" />
 
     <!-- 4. Simulador Interativo Gamificado -->
-    <LandingInteractiveSimulator />
+    <LandingInteractiveSimulator id="simulador" />
 
     <!-- 5. Seção Institucional: Segurança, LGPD e Inclusão -->
     <section

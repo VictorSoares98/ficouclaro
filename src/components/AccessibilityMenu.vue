@@ -39,6 +39,11 @@ function setFontScale(scale: FontScale) {
 function selectTheme(theme: AppTheme) {
   themeStore.setTheme(theme);
 }
+
+function handleLibrasAction() {
+  if (accessibilityStore.isLibrasLoading || accessibilityStore.librasEnabled) return;
+  void accessibilityStore.activateLibras();
+}
 </script>
 
 <template>
@@ -127,18 +132,48 @@ function selectTheme(theme: AppTheme) {
 
       <!-- Seção: Libras -->
       <q-item-label header class="tw-font-bold">Inclusão</q-item-label>
-      <q-item clickable v-close-popup @click="accessibilityStore.toggleLibras()">
+      <q-item
+        clickable
+        v-close-popup
+        :disable="accessibilityStore.isLibrasLoading || accessibilityStore.librasEnabled"
+        @click="handleLibrasAction"
+      >
         <q-item-section avatar>
+          <q-spinner v-if="accessibilityStore.isLibrasLoading" size="20px" color="primary" />
           <q-icon
+            v-else
             name="sign_language"
             :class="{ 'text-primary': accessibilityStore.librasEnabled }"
           />
         </q-item-section>
-        <q-item-section>Intérprete de Libras</q-item-section>
+        <q-item-section>
+          <div>Intérprete de Libras</div>
+          <div v-if="accessibilityStore.isLibrasLoading" class="text-caption text-primary">
+            Carregando intérprete...
+          </div>
+          <div v-else-if="accessibilityStore.librasEnabled" class="text-caption text-positive">
+            Ativo (Salvo no dispositivo)
+          </div>
+          <div v-else class="text-caption text-muted">Clique para ativar</div>
+        </q-item-section>
         <q-item-section side>
-          <q-toggle
-            :model-value="accessibilityStore.librasEnabled"
-            @update:model-value="accessibilityStore.toggleLibras()"
+          <q-badge
+            v-if="accessibilityStore.librasEnabled"
+            color="positive"
+            rounded
+            class="tw-text-[10px]"
+          >
+            Ativo
+          </q-badge>
+          <q-btn
+            v-else
+            outline
+            dense
+            rounded
+            size="sm"
+            color="primary"
+            label="Ativar"
+            :loading="accessibilityStore.isLibrasLoading"
           />
         </q-item-section>
       </q-item>
