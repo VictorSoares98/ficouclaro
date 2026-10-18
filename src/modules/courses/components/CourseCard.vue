@@ -4,14 +4,29 @@ import type { Disciplina } from '@/modules/courses/services/course.service';
 import BaseSurfaceCard from '@/core/components/BaseSurfaceCard.vue';
 import QrcodeVue from 'qrcode.vue';
 import { useQuasar } from 'quasar';
+import {
+  getClassroomJoinUrl,
+  copyClassroomLink,
+  shareClassroomLink,
+} from '@/modules/courses/utils/invite.utils';
 
 const $q = useQuasar();
 
 const showQrCode = ref(false);
-const qrValue = computed(() => {
-  const baseUrl = 'https://ficouclaro.pages.dev/';
-  return `${baseUrl}#/hub?join=${props.course.codigo_convite}`;
-});
+const classroomUrl = computed(() => getClassroomJoinUrl(props.course.codigo_convite));
+const qrValue = computed(() => classroomUrl.value);
+
+async function handleCopyLink() {
+  await copyClassroomLink(classroomUrl.value, props.course.nome);
+}
+
+async function handleShareLink() {
+  await shareClassroomLink({
+    title: `Aula de ${props.course.nome} - Ficou Claro?`,
+    text: `Acesse a matéria de ${props.course.nome} através do link ou utilize o código ${props.course.codigo_convite.toUpperCase()}:`,
+    url: classroomUrl.value,
+  });
+}
 
 const props = defineProps<{
   course: Disciplina;
@@ -200,13 +215,44 @@ defineEmits<{
           <QrcodeVue :value="qrValue" :size="250" level="H" />
         </div>
         <div
-          class="tw-text-3xl tw-font-black tw-tracking-widest tw-mt-6 tw-text-primary tw-uppercase"
+          class="tw-text-3xl tw-font-black tw-tracking-widest tw-mt-6 tw-text-primary tw-uppercase tw-font-mono"
         >
           {{ course.codigo_convite }}
         </div>
+
+        <!-- Ações de Compartilhamento e Cópia de Link da Aula -->
+        <div
+          class="tw-flex tw-flex-col sm:tw-flex-row tw-items-center tw-justify-center tw-gap-2.5 tw-mt-6"
+        >
+          <q-btn
+            unelevated
+            no-caps
+            color="primary"
+            icon="content_copy"
+            label="Copiar Link da Aula"
+            class="tw-rounded-xl tw-px-5 tw-h-10 tw-font-bold tw-w-full sm:tw-w-auto tw-shadow-sm hover:tw-scale-[1.02] tw-transition-transform"
+            @click="handleCopyLink"
+          />
+          <q-btn
+            outline
+            no-caps
+            color="primary"
+            icon="share"
+            label="Compartilhar"
+            class="tw-rounded-xl tw-px-4 tw-h-10 tw-font-bold tw-w-full sm:tw-w-auto"
+            @click="handleShareLink"
+          />
+        </div>
+
+        <!-- Visualização do Link Direto -->
+        <div
+          class="tw-mt-4 tw-p-2.5 tw-bg-slate-100 dark:tw-bg-slate-800/80 tw-rounded-xl tw-text-xs tw-text-muted tw-select-all tw-break-all tw-font-mono tw-border tw-border-slate-200 dark:tw-border-slate-700/60"
+        >
+          {{ classroomUrl }}
+        </div>
       </q-card-section>
-      <q-card-actions align="center">
-        <q-btn flat label="Fechar" color="primary" v-close-popup />
+      <q-card-actions align="center" class="tw-pb-2">
+        <q-btn flat label="Fechar" color="primary" class="tw-rounded-xl" v-close-popup />
       </q-card-actions>
     </q-card>
   </q-dialog>
