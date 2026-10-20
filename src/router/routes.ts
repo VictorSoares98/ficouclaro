@@ -64,6 +64,10 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/layouts/SessionLayout.vue'),
     children: [
       {
+        path: '',
+        component: () => import('@/modules/session/pages/SessionLobbyPage.vue'),
+      },
+      {
         path: ':id',
         component: () => import('@/modules/session/pages/SessionGatewayPage.vue'),
       },
