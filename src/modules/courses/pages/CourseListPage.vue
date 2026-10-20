@@ -10,6 +10,7 @@ import CourseCard from '@/modules/courses/components/CourseCard.vue';
 import CourseCardSkeleton from '@/modules/courses/components/CourseCardSkeleton.vue';
 import StartSessionConfirmDialog from '@/modules/courses/components/StartSessionConfirmDialog.vue';
 import BaseSurfaceCard from '@/core/components/BaseSurfaceCard.vue';
+import { COURSE_ICONS } from '@/modules/courses/constants/course-icons';
 
 const courseStore = useCourseStore();
 const sessionStore = useSessionStore();
@@ -43,15 +44,7 @@ const diaSemanaOptions = [
   { label: 'Sábado', value: 'Sábado' },
 ];
 
-const iconeOptions = [
-  { label: 'Geral (Escola)', value: 'school', icon: 'school' },
-  { label: 'Exatas (Cálculo)', value: 'calculate', icon: 'calculate' },
-  { label: 'Ciências / Lab', value: 'science', icon: 'science' },
-  { label: 'Tecnologia / TI', value: 'computer', icon: 'computer' },
-  { label: 'Humanas / História', value: 'history_edu', icon: 'history_edu' },
-  { label: 'Linguagens / Arte', value: 'palette', icon: 'palette' },
-  { label: 'Negócios / Gestão', value: 'business_center', icon: 'business_center' },
-];
+const iconeOptions = COURSE_ICONS;
 
 const selectedCourseForSession = ref<Disciplina | null>(null);
 const isConfirmDialogOpen = computed({
@@ -520,10 +513,22 @@ function handleOpenInsights(courseId: string) {
       <BaseSurfaceCard
         class="tw-max-w-md tw-w-full tw-p-8 tw-text-center tw-rounded-3xl tw-shadow-lg"
       >
+        <!-- Personagem 3D Professora Microsoft Fluent -->
         <div
-          class="tw-w-16 tw-h-16 tw-rounded-2xl bg-primary-soft text-primary tw-flex tw-items-center tw-justify-center tw-mx-auto tw-mb-4 tw-shadow-sm"
+          class="tw-relative tw-w-28 tw-h-28 tw-mx-auto tw-mb-4 tw-flex tw-items-center tw-justify-center"
         >
-          <q-icon name="school" size="32px" />
+          <div
+            class="tw-absolute tw-inset-0 tw-rounded-full bg-primary-soft tw-blur-xl tw-opacity-50"
+          ></div>
+          <img
+            src="/images/fluent-3d/teacher-3d.png"
+            alt="Professora 3D"
+            width="112"
+            height="112"
+            class="tw-relative tw-w-28 tw-h-28 tw-object-contain tw-drop-shadow-lg hover:tw-scale-105 tw-transition-transform tw-duration-300"
+            loading="lazy"
+            decoding="async"
+          />
         </div>
 
         <h2 class="tw-text-xl tw-font-black tw-font-space-grotesk tw-mb-2">
@@ -695,8 +700,11 @@ function handleOpenInsights(courseId: string) {
                       <q-icon :name="scope.opt.icon" color="primary" />
                     </q-item-section>
                     <q-item-section>
-                      <q-item-label class="tw-text-xs tw-font-medium">{{
+                      <q-item-label class="tw-text-xs tw-font-bold">{{
                         scope.opt.label
+                      }}</q-item-label>
+                      <q-item-label caption class="tw-text-[10px] text-muted">{{
+                        scope.opt.category
                       }}</q-item-label>
                     </q-item-section>
                   </q-item>

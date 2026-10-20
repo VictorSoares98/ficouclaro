@@ -6,6 +6,7 @@ import { useSessionStore } from '@/modules/session/stores/session.store';
 import { useQuasar } from 'quasar';
 import CourseCard from '@/modules/courses/components/CourseCard.vue';
 import CourseCardSkeleton from '@/modules/courses/components/CourseCardSkeleton.vue';
+import BaseSurfaceCard from '@/core/components/BaseSurfaceCard.vue';
 
 const courseStore = useCourseStore();
 const sessionStore = useSessionStore();
@@ -118,14 +119,50 @@ async function handleJoinActiveSession(courseId: string) {
       <CourseCardSkeleton v-for="i in 4" :key="i" />
     </div>
 
-    <!-- Empty State -->
-    <div v-else-if="courseStore.courses.length === 0" class="tw-text-center tw-py-12">
-      <q-icon name="cast_for_education" size="4rem" class="tw-opacity-20 tw-mb-4" />
-      <h2 class="tw-text-xl tw-font-bold">Nenhuma matrícula encontrada</h2>
-      <p class="text-muted tw-mb-4">
-        Peça o código de convite ao seu professor para se matricular.
-      </p>
-      <q-btn color="primary" outline label="Usar Código de Convite" @click="isEnrolling = true" />
+    <!-- Empty State: Nenhuma Matrícula -->
+    <div
+      v-else-if="courseStore.courses.length === 0"
+      class="tw-flex-1 tw-flex tw-items-center tw-justify-center tw-py-12"
+    >
+      <BaseSurfaceCard
+        class="tw-max-w-md tw-w-full tw-p-8 tw-text-center tw-rounded-3xl tw-shadow-lg"
+      >
+        <!-- Personagem 3D Estudante Microsoft Fluent -->
+        <div
+          class="tw-relative tw-w-28 tw-h-28 tw-mx-auto tw-mb-4 tw-flex tw-items-center tw-justify-center"
+        >
+          <div
+            class="tw-absolute tw-inset-0 tw-rounded-full bg-primary-soft tw-blur-xl tw-opacity-50"
+          ></div>
+          <img
+            src="/images/fluent-3d/student-3d.png"
+            alt="Estudante Universitário 3D"
+            width="112"
+            height="112"
+            class="tw-relative tw-w-28 tw-h-28 tw-object-contain tw-drop-shadow-lg hover:tw-scale-105 tw-transition-transform tw-duration-300"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+
+        <h2 class="tw-text-xl tw-font-black tw-font-space-grotesk tw-mb-2">
+          Nenhuma matrícula encontrada
+        </h2>
+        <p class="text-muted tw-text-xs sm:tw-text-sm tw-leading-relaxed tw-mb-6">
+          Você ainda não está vinculado a nenhuma disciplina. Peça o código de convite ou escaneie o
+          QR Code do seu professor para começar a acompanhar as aulas ao vivo.
+        </p>
+
+        <q-btn
+          unelevated
+          no-caps
+          color="primary"
+          icon="add"
+          label="Usar Código de Convite"
+          class="tw-w-full tw-rounded-2xl tw-h-12 tw-font-bold tw-shadow-md hover:tw-scale-105 tw-transition-transform"
+          @click="isEnrolling = true"
+        />
+      </BaseSurfaceCard>
     </div>
 
     <!-- Listagem -->

@@ -242,7 +242,15 @@ onMounted(() => {
         <div
           class="tw-inline-flex tw-items-center tw-gap-2 tw-px-3.5 tw-py-1 tw-rounded-full bg-primary-soft text-primary tw-border tw-border-primary/20 tw-text-xs tw-font-bold"
         >
-          <q-icon name="meeting_room" size="16px" />
+          <img
+            src="/images/fluent-3d/school-3d.png"
+            alt="Campus 3D"
+            width="18"
+            height="18"
+            class="tw-w-4 tw-h-4 tw-object-contain"
+            loading="lazy"
+            decoding="async"
+          />
           <span>LOBBY DE ENTRADA</span>
         </div>
 
@@ -260,11 +268,19 @@ onMounted(() => {
 
       <!-- Card Central: Inserção de PIN / Código da Turma -->
       <BaseSurfaceCard class="tw-p-5 sm:tw-p-7 tw-rounded-3xl tw-shadow-xl">
-        <div class="tw-flex tw-items-center tw-gap-3 tw-mb-4">
+        <div class="tw-flex tw-items-center tw-gap-3.5 tw-mb-4">
           <div
-            class="tw-w-10 tw-h-10 tw-rounded-2xl bg-primary-soft text-primary tw-flex tw-items-center tw-justify-center tw-shrink-0"
+            class="tw-w-12 tw-h-12 tw-rounded-2xl bg-primary-soft tw-flex tw-items-center tw-justify-center tw-shrink-0 tw-p-2"
           >
-            <q-icon name="pin" size="22px" />
+            <img
+              src="/images/fluent-3d/graduation-cap-3d.png"
+              alt="Capelo de Formatura 3D"
+              width="36"
+              height="36"
+              class="tw-w-9 tw-h-9 tw-object-contain tw-drop-shadow"
+              loading="lazy"
+              decoding="async"
+            />
           </div>
           <div>
             <h2 class="tw-text-base sm:tw-text-lg tw-font-bold tw-font-space-grotesk tw-m-0">

@@ -215,9 +215,17 @@ onMounted(() => {
       class="tw-max-w-md tw-w-full tw-p-6 sm:tw-p-8 tw-text-center tw-rounded-3xl tw-shadow-xl"
     >
       <div
-        class="tw-w-16 tw-h-16 tw-rounded-2xl bg-secondary-soft text-secondary tw-flex tw-items-center tw-justify-center tw-mx-auto tw-mb-4"
+        class="tw-w-16 tw-h-16 tw-rounded-2xl bg-secondary-soft tw-flex tw-items-center tw-justify-center tw-mx-auto tw-mb-4 tw-p-2"
       >
-        <q-icon name="school" size="32px" />
+        <img
+          src="/images/fluent-3d/graduation-cap-3d.png"
+          alt="Capelo Acadêmico 3D"
+          width="48"
+          height="48"
+          class="tw-w-12 tw-h-12 tw-object-contain tw-drop-shadow"
+          loading="lazy"
+          decoding="async"
+        />
       </div>
 
       <h1 class="tw-text-xl tw-font-bold tw-font-space-grotesk tw-mb-2">
@@ -277,9 +285,7 @@ onMounted(() => {
       </div>
 
       <!-- Informações do Professor e da Matéria -->
-      <div
-        class="tw-p-4 tw-rounded-2xl tw-bg-slate-50 dark:tw-bg-slate-800/60 tw-border tw-border-slate-200/80 dark:tw-border-slate-700/60 tw-mb-6 tw-space-y-3"
-      >
+      <q-card flat bordered class="tw-p-4 tw-rounded-2xl tw-mb-6 tw-space-y-3">
         <div class="tw-flex tw-items-center tw-gap-3">
           <div
             class="tw-w-10 tw-h-10 tw-rounded-full tw-bg-primary/20 text-primary tw-flex tw-items-center tw-justify-center tw-font-bold tw-text-sm"
@@ -331,7 +337,7 @@ onMounted(() => {
             Sala: {{ inviteDetails.sala }}
           </q-badge>
         </div>
-      </div>
+      </q-card>
 
       <!-- Status da Aula -->
       <div class="tw-mb-6">
@@ -353,7 +359,7 @@ onMounted(() => {
         </div>
         <div
           v-else
-          class="tw-flex tw-items-center tw-gap-2 tw-p-3 tw-rounded-xl tw-bg-slate-100 dark:tw-bg-slate-800/80 text-muted tw-text-xs"
+          class="tw-flex tw-items-center tw-gap-2 tw-p-3 tw-rounded-xl fc-badge-button text-muted tw-text-xs"
         >
           <q-icon name="schedule" size="18px" />
           <span>Nenhuma sessão ao vivo nesta disciplina no momento.</span>
