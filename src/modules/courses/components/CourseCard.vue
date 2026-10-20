@@ -284,9 +284,7 @@ const topBorderStyle = computed(() => {
 
   <!-- Modal de QR Code da Turma -->
   <q-dialog v-model="showQrCode" :position="$q.screen.lt.md ? 'bottom' : 'standard'">
-    <q-card
-      class="tw-rounded-3xl tw-p-5 sm:tw-p-6 tw-text-center tw-max-w-md tw-w-full"
-    >
+    <q-card class="tw-rounded-3xl tw-p-5 sm:tw-p-6 tw-text-center tw-max-w-md tw-w-full">
       <q-card-section class="tw-p-0">
         <div class="tw-flex tw-items-center tw-justify-between tw-mb-2">
           <div class="tw-flex tw-items-center tw-gap-2">

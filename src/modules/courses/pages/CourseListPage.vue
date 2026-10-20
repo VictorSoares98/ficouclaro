@@ -380,11 +380,7 @@ function handleOpenInsights(courseId: string) {
         class="tw-grid tw-grid-cols-2 sm:tw-grid-cols-3 tw-gap-3 tw-mt-5"
       >
         <!-- Card 1: Total -->
-        <q-card
-          flat
-          bordered
-          class="tw-p-3.5 tw-rounded-2xl tw-flex tw-items-center tw-gap-3"
-        >
+        <q-card flat bordered class="tw-p-3.5 tw-rounded-2xl tw-flex tw-items-center tw-gap-3">
           <div
             class="tw-w-9 tw-h-9 tw-rounded-xl bg-primary-soft text-primary tw-flex tw-items-center tw-justify-center"
           >
@@ -401,11 +397,7 @@ function handleOpenInsights(courseId: string) {
         </q-card>
 
         <!-- Card 2: Ao Vivo -->
-        <q-card
-          flat
-          bordered
-          class="tw-p-3.5 tw-rounded-2xl tw-flex tw-items-center tw-gap-3"
-        >
+        <q-card flat bordered class="tw-p-3.5 tw-rounded-2xl tw-flex tw-items-center tw-gap-3">
           <div
             class="tw-w-9 tw-h-9 tw-rounded-xl tw-bg-emerald-500/10 text-positive tw-flex tw-items-center tw-justify-center"
           >
@@ -559,9 +551,7 @@ function handleOpenInsights(courseId: string) {
       v-else-if="filteredCourses.length === 0"
       class="tw-flex-1 tw-flex tw-items-center tw-justify-center tw-py-12"
     >
-      <BaseSurfaceCard
-        class="tw-max-w-md tw-w-full tw-p-6 sm:tw-p-8 tw-text-center tw-rounded-3xl"
-      >
+      <BaseSurfaceCard class="tw-max-w-md tw-w-full tw-p-6 sm:tw-p-8 tw-text-center tw-rounded-3xl">
         <div
           class="tw-w-12 tw-h-12 tw-rounded-2xl bg-primary-soft text-primary tw-flex tw-items-center tw-justify-center tw-mx-auto tw-mb-3"
         >
