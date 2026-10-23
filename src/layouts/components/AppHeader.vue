@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import { useAuthStore } from '@/stores/auth.store';
 import AccessibilityMenu from '@/components/AccessibilityMenu.vue';
+import NotificationSoundToggle from '@/components/NotificationSoundToggle.vue';
 import NavbarUserBadge from '@/components/navbar/NavbarUserBadge.vue';
 
 defineProps<{
@@ -162,6 +163,9 @@ const isAluno = computed(() => authStore.isAluno);
       <div class="tw-flex tw-items-center tw-gap-2 sm:tw-gap-3">
         <!-- Menu Unificado de Acessibilidade -->
         <AccessibilityMenu />
+
+        <!-- Controle Central de Som e Notificações Push -->
+        <NotificationSoundToggle />
 
         <!-- Usuário Autenticado: Badge Gamificado com Avatar e Dropdown -->
         <NavbarUserBadge v-if="isAuthenticated" />
