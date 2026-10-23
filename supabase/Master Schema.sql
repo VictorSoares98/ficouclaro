@@ -1,7 +1,7 @@
 -- ====================================================================
 -- ⚠️ AVISO: ARQUIVO AUTO-GERADO!
 -- NÃO EDITE ESTE ARQUIVO DIRETAMENTE. ALTERE OS SNIPPETS E RODE db:build
--- Gerado em: 2026-10-18T06:12:50.168Z
+-- Gerado em: 2026-10-23T03:46:11.813Z
 -- ====================================================================
 
 -- >>> INÍCIO DO SNIPPET: 00_Init_Extensions.sql <<<
@@ -26,6 +26,8 @@ CREATE TYPE sinal_ritmo AS ENUM ('muito_rapido', 'boiando', 'tudo_certo', 'muito
 CREATE TYPE tipo_grupo_estudo AS ENUM ('estudo', 'reforco', 'monitoria', 'projeto', 'outro');
 CREATE TYPE status_grupo_estudo AS ENUM ('ativo', 'inativo');
 CREATE TYPE status_registro_encontro AS ENUM ('concluido', 'pendente', 'cancelado');
+CREATE TYPE tipo_notificacao AS ENUM ('aula_iniciada', 'aula_encerrada', 'nova_duvida', 'duvida_respondida', 'enquete_aberta', 'sistema');
+
 
 -- >>> FIM DO SNIPPET: 01_Enums.sql <<<
 
@@ -220,7 +222,33 @@ CREATE TABLE public.registros_encontro (
   created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+-- dispositivos_usuarios (Registro de dispositivos para Push Notifications / Web Push)
+CREATE TABLE public.dispositivos_usuarios (
+  id                  UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  usuario_id          UUID NOT NULL REFERENCES public.usuarios(id) ON DELETE CASCADE,
+  endpoint            TEXT NOT NULL,
+  p256dh              TEXT,
+  auth_key            TEXT,
+  user_agent          TEXT,
+  plataforma          TEXT NOT NULL DEFAULT 'web',
+  ativo               BOOLEAN NOT NULL DEFAULT true,
+  created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at          TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE(usuario_id, endpoint)
+);
 
+-- notificacoes (Histórico de alertas e notificações com suporte a Realtime e Web Push)
+CREATE TABLE public.notificacoes (
+  id                  UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  usuario_id          UUID NOT NULL REFERENCES public.usuarios(id) ON DELETE CASCADE,
+  titulo              TEXT NOT NULL,
+  mensagem            TEXT NOT NULL,
+  tipo                tipo_notificacao NOT NULL DEFAULT 'sistema',
+  link                TEXT,
+  lida                BOOLEAN NOT NULL DEFAULT false,
+  dados_extras        JSONB DEFAULT '{}'::jsonb,
+  created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
 
 -- >>> FIM DO SNIPPET: 02_Tabelas.sql <<<
 
@@ -706,6 +734,91 @@ BEGIN
 END;
 $$;
 
+-- Envia uma notificação direta para um usuário específico
+CREATE OR REPLACE FUNCTION public.enviar_notificacao_evento(
+  p_usuario_id UUID,
+  p_titulo TEXT,
+  p_mensagem TEXT,
+  p_tipo tipo_notificacao DEFAULT 'sistema',
+  p_link TEXT DEFAULT NULL,
+  p_dados_extras JSONB DEFAULT '{}'::jsonb
+)
+RETURNS UUID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_notificacao_id UUID;
+BEGIN
+  INSERT INTO public.notificacoes (
+    usuario_id,
+    titulo,
+    mensagem,
+    tipo,
+    link,
+    dados_extras
+  ) VALUES (
+    p_usuario_id,
+    p_titulo,
+    p_mensagem,
+    p_tipo,
+    p_link,
+    p_dados_extras
+  ) RETURNING id INTO v_notificacao_id;
+
+  RETURN v_notificacao_id;
+END;
+$$;
+
+-- Notifica todos os alunos matriculados na disciplina de uma sessão (ex: aula iniciada, enquete aberta)
+CREATE OR REPLACE FUNCTION public.notificar_turma_sessao(
+  p_sessao_id UUID,
+  p_titulo TEXT,
+  p_mensagem TEXT,
+  p_tipo tipo_notificacao DEFAULT 'aula_iniciada',
+  p_link TEXT DEFAULT NULL,
+  p_dados_extras JSONB DEFAULT '{}'::jsonb
+)
+RETURNS INTEGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_disciplina_id UUID;
+  v_count INTEGER := 0;
+  r RECORD;
+BEGIN
+  SELECT disciplina_id INTO v_disciplina_id FROM public.sessoes WHERE id = p_sessao_id;
+  IF v_disciplina_id IS NULL THEN
+    RETURN 0;
+  END IF;
+
+  FOR r IN (
+    SELECT aluno_id FROM public.matriculas WHERE disciplina_id = v_disciplina_id
+  ) LOOP
+    INSERT INTO public.notificacoes (
+      usuario_id,
+      titulo,
+      mensagem,
+      tipo,
+      link,
+      dados_extras
+    ) VALUES (
+      r.aluno_id,
+      p_titulo,
+      p_mensagem,
+      p_tipo,
+      p_link,
+      p_dados_extras
+    );
+    v_count := v_count + 1;
+  END LOOP;
+
+  RETURN v_count;
+END;
+$$;
 
 -- >>> FIM DO SNIPPET: 04_Funcoes.sql <<<
 
@@ -1166,6 +1279,38 @@ GRANT SELECT ON public.view_grupos_estudo_publicos TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.link_member_to_study_group(UUID) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.export_my_data() TO authenticated;
 
+-- ============================================================
+-- RLS & POLICIES: dispositivos_usuarios & notificacoes
+-- ============================================================
+ALTER TABLE public.dispositivos_usuarios ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.notificacoes ENABLE ROW LEVEL SECURITY;
+
+-- POLICIES: dispositivos_usuarios
+CREATE POLICY "Usuário gerencia seus próprios dispositivos cadastrados" ON public.dispositivos_usuarios
+  FOR ALL USING (usuario_id = auth.uid())
+  WITH CHECK (usuario_id = auth.uid());
+
+-- POLICIES: notificacoes
+CREATE POLICY "Usuário lê suas próprias notificações" ON public.notificacoes
+  FOR SELECT USING (usuario_id = auth.uid());
+
+CREATE POLICY "Usuário atualiza status de leitura de suas notificações" ON public.notificacoes
+  FOR UPDATE USING (usuario_id = auth.uid())
+  WITH CHECK (usuario_id = auth.uid());
+
+CREATE POLICY "Usuário remove suas notificações" ON public.notificacoes
+  FOR DELETE USING (usuario_id = auth.uid());
+
+CREATE POLICY "Usuários autenticados criam notificações para si mesmos" ON public.notificacoes
+  FOR INSERT WITH CHECK (usuario_id = auth.uid());
+
+-- GRANTS: Dispositivos, Notificações e RPCs
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.dispositivos_usuarios TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.notificacoes TO authenticated;
+GRANT EXECUTE ON FUNCTION public.enviar_notificacao_evento(UUID, TEXT, TEXT, tipo_notificacao, TEXT, JSONB) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.notificar_turma_sessao(UUID, TEXT, TEXT, tipo_notificacao, TEXT, JSONB) TO authenticated;
+
+
 -- >>> FIM DO SNIPPET: 06_RLS_e_Grants.sql <<<
 
 
@@ -1203,6 +1348,12 @@ CREATE INDEX IF NOT EXISTS idx_grupos_membros_usuario_id ON public.grupos_membro
 CREATE INDEX IF NOT EXISTS idx_registros_encontro_grupo_id ON public.registros_encontro(grupo_id);
 CREATE INDEX IF NOT EXISTS idx_registros_encontro_data ON public.registros_encontro(data_referencia DESC);
 
+-- Índices: dispositivos_usuarios e notificacoes
+CREATE INDEX IF NOT EXISTS idx_dispositivos_usuarios_usuario_id ON public.dispositivos_usuarios(usuario_id);
+CREATE INDEX IF NOT EXISTS idx_notificacoes_usuario_id_created ON public.notificacoes(usuario_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_notificacoes_lida ON public.notificacoes(usuario_id, lida);
+
+
 -- >>> FIM DO SNIPPET: 07_Indexes_Performance.sql <<<
 
 
@@ -1217,12 +1368,15 @@ ALTER PUBLICATION supabase_realtime ADD TABLE public.sinais_ritmo;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.duvidas;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.enquetes;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.respostas_enquete;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.notificacoes;
 
 -- Configuração obrigatória para que políticas RLS consigam ler colunas 
 -- não modificadas (ex: disciplina_id) durante eventos de UPDATE no Realtime
 ALTER TABLE public.sessoes REPLICA IDENTITY FULL;
 ALTER TABLE public.duvidas REPLICA IDENTITY FULL;
 ALTER TABLE public.enquetes REPLICA IDENTITY FULL;
+ALTER TABLE public.notificacoes REPLICA IDENTITY FULL;
+
 
 -- >>> FIM DO SNIPPET: 08_Realtime.sql <<<
 

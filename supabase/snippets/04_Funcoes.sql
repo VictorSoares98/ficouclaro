@@ -430,3 +430,88 @@ BEGIN
 END;
 $$;
 
+-- Envia uma notificação direta para um usuário específico
+CREATE OR REPLACE FUNCTION public.enviar_notificacao_evento(
+  p_usuario_id UUID,
+  p_titulo TEXT,
+  p_mensagem TEXT,
+  p_tipo tipo_notificacao DEFAULT 'sistema',
+  p_link TEXT DEFAULT NULL,
+  p_dados_extras JSONB DEFAULT '{}'::jsonb
+)
+RETURNS UUID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_notificacao_id UUID;
+BEGIN
+  INSERT INTO public.notificacoes (
+    usuario_id,
+    titulo,
+    mensagem,
+    tipo,
+    link,
+    dados_extras
+  ) VALUES (
+    p_usuario_id,
+    p_titulo,
+    p_mensagem,
+    p_tipo,
+    p_link,
+    p_dados_extras
+  ) RETURNING id INTO v_notificacao_id;
+
+  RETURN v_notificacao_id;
+END;
+$$;
+
+-- Notifica todos os alunos matriculados na disciplina de uma sessão (ex: aula iniciada, enquete aberta)
+CREATE OR REPLACE FUNCTION public.notificar_turma_sessao(
+  p_sessao_id UUID,
+  p_titulo TEXT,
+  p_mensagem TEXT,
+  p_tipo tipo_notificacao DEFAULT 'aula_iniciada',
+  p_link TEXT DEFAULT NULL,
+  p_dados_extras JSONB DEFAULT '{}'::jsonb
+)
+RETURNS INTEGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_disciplina_id UUID;
+  v_count INTEGER := 0;
+  r RECORD;
+BEGIN
+  SELECT disciplina_id INTO v_disciplina_id FROM public.sessoes WHERE id = p_sessao_id;
+  IF v_disciplina_id IS NULL THEN
+    RETURN 0;
+  END IF;
+
+  FOR r IN (
+    SELECT aluno_id FROM public.matriculas WHERE disciplina_id = v_disciplina_id
+  ) LOOP
+    INSERT INTO public.notificacoes (
+      usuario_id,
+      titulo,
+      mensagem,
+      tipo,
+      link,
+      dados_extras
+    ) VALUES (
+      r.aluno_id,
+      p_titulo,
+      p_mensagem,
+      p_tipo,
+      p_link,
+      p_dados_extras
+    );
+    v_count := v_count + 1;
+  END LOOP;
+
+  RETURN v_count;
+END;
+$$;

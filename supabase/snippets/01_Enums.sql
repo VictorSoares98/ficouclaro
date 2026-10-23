@@ -9,3 +9,5 @@ CREATE TYPE sinal_ritmo AS ENUM ('muito_rapido', 'boiando', 'tudo_certo', 'muito
 CREATE TYPE tipo_grupo_estudo AS ENUM ('estudo', 'reforco', 'monitoria', 'projeto', 'outro');
 CREATE TYPE status_grupo_estudo AS ENUM ('ativo', 'inativo');
 CREATE TYPE status_registro_encontro AS ENUM ('concluido', 'pendente', 'cancelado');
+CREATE TYPE tipo_notificacao AS ENUM ('aula_iniciada', 'aula_encerrada', 'nova_duvida', 'duvida_respondida', 'enquete_aberta', 'sistema');
+

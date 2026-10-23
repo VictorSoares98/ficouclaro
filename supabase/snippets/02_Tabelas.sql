@@ -187,4 +187,30 @@ CREATE TABLE public.registros_encontro (
   created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+-- dispositivos_usuarios (Registro de dispositivos para Push Notifications / Web Push)
+CREATE TABLE public.dispositivos_usuarios (
+  id                  UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  usuario_id          UUID NOT NULL REFERENCES public.usuarios(id) ON DELETE CASCADE,
+  endpoint            TEXT NOT NULL,
+  p256dh              TEXT,
+  auth_key            TEXT,
+  user_agent          TEXT,
+  plataforma          TEXT NOT NULL DEFAULT 'web',
+  ativo               BOOLEAN NOT NULL DEFAULT true,
+  created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at          TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE(usuario_id, endpoint)
+);
 
+-- notificacoes (Histórico de alertas e notificações com suporte a Realtime e Web Push)
+CREATE TABLE public.notificacoes (
+  id                  UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  usuario_id          UUID NOT NULL REFERENCES public.usuarios(id) ON DELETE CASCADE,
+  titulo              TEXT NOT NULL,
+  mensagem            TEXT NOT NULL,
+  tipo                tipo_notificacao NOT NULL DEFAULT 'sistema',
+  link                TEXT,
+  lida                BOOLEAN NOT NULL DEFAULT false,
+  dados_extras        JSONB DEFAULT '{}'::jsonb,
+  created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);

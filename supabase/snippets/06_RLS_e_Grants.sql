@@ -202,4 +202,36 @@ CREATE POLICY "Registrante ou criador atualiza registro de encontro" ON public.r
 GRANT SELECT ON public.view_grupos_estudo_publicos TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.link_member_to_study_group(UUID) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.export_my_data() TO authenticated;
+
+-- ============================================================
+-- RLS & POLICIES: dispositivos_usuarios & notificacoes
+-- ============================================================
+ALTER TABLE public.dispositivos_usuarios ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.notificacoes ENABLE ROW LEVEL SECURITY;
+
+-- POLICIES: dispositivos_usuarios
+CREATE POLICY "Usuário gerencia seus próprios dispositivos cadastrados" ON public.dispositivos_usuarios
+  FOR ALL USING (usuario_id = auth.uid())
+  WITH CHECK (usuario_id = auth.uid());
+
+-- POLICIES: notificacoes
+CREATE POLICY "Usuário lê suas próprias notificações" ON public.notificacoes
+  FOR SELECT USING (usuario_id = auth.uid());
+
+CREATE POLICY "Usuário atualiza status de leitura de suas notificações" ON public.notificacoes
+  FOR UPDATE USING (usuario_id = auth.uid())
+  WITH CHECK (usuario_id = auth.uid());
+
+CREATE POLICY "Usuário remove suas notificações" ON public.notificacoes
+  FOR DELETE USING (usuario_id = auth.uid());
+
+CREATE POLICY "Usuários autenticados criam notificações para si mesmos" ON public.notificacoes
+  FOR INSERT WITH CHECK (usuario_id = auth.uid());
+
+-- GRANTS: Dispositivos, Notificações e RPCs
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.dispositivos_usuarios TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.notificacoes TO authenticated;
+GRANT EXECUTE ON FUNCTION public.enviar_notificacao_evento(UUID, TEXT, TEXT, tipo_notificacao, TEXT, JSONB) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.notificar_turma_sessao(UUID, TEXT, TEXT, tipo_notificacao, TEXT, JSONB) TO authenticated;
+
 

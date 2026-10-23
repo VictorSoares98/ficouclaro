@@ -30,3 +30,9 @@ CREATE INDEX IF NOT EXISTS idx_grupos_membros_grupo_id ON public.grupos_membros(
 CREATE INDEX IF NOT EXISTS idx_grupos_membros_usuario_id ON public.grupos_membros(usuario_id);
 CREATE INDEX IF NOT EXISTS idx_registros_encontro_grupo_id ON public.registros_encontro(grupo_id);
 CREATE INDEX IF NOT EXISTS idx_registros_encontro_data ON public.registros_encontro(data_referencia DESC);
+
+-- Índices: dispositivos_usuarios e notificacoes
+CREATE INDEX IF NOT EXISTS idx_dispositivos_usuarios_usuario_id ON public.dispositivos_usuarios(usuario_id);
+CREATE INDEX IF NOT EXISTS idx_notificacoes_usuario_id_created ON public.notificacoes(usuario_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_notificacoes_lida ON public.notificacoes(usuario_id, lida);
+
