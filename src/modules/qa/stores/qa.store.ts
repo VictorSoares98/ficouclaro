@@ -5,6 +5,7 @@ import { realtimeManager } from '@/core/supabase/realtime.manager';
 import { useAsyncOperation } from '@/core/composables/useAsyncOperation';
 import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 
+import { soundService } from '@/core/services/sound.service';
 import { useAuthStore } from '@/stores/auth.store';
 
 export const useQaStore = defineStore('qa', () => {
@@ -50,6 +51,7 @@ export const useQaStore = defineStore('qa', () => {
         },
         (payload: RealtimePostgresChangesPayload<Duvida>) => {
           if (payload.eventType === 'INSERT') {
+            soundService.playNewQuestion();
             void (async () => {
               let newQuestion = payload.new;
               // Hidratação sob demanda para contornar a falta de JOINs no Realtime

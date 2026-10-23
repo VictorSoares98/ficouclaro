@@ -7,6 +7,8 @@ import {
 } from '@/modules/session/services/session.service';
 import { realtimeManager } from '@/core/supabase/realtime.manager';
 import { useAsyncOperation } from '@/core/composables/useAsyncOperation';
+import { soundService } from '@/core/services/sound.service';
+import { notificationService } from '@/core/services/notification.service';
 import type {
   RealtimePostgresInsertPayload,
   RealtimePostgresUpdatePayload,
@@ -55,8 +57,16 @@ export const useSessionStore = defineStore('session', () => {
           },
           (payload: RealtimePostgresUpdatePayload<Sessao>) => {
             // Atualizar estado local quando o BD mudar
+            const oldStatus = currentSession.value?.status;
             if (currentSession.value) {
               currentSession.value = payload.new;
+            }
+
+            // Efeitos sonoros sincronizados via Realtime
+            if (payload.new.status === 'ativa' && oldStatus !== 'ativa') {
+              soundService.playClassStarted();
+            } else if (payload.new.status === 'encerrada' && oldStatus !== 'encerrada') {
+              soundService.playClassEnded();
             }
           },
         );
@@ -103,6 +113,18 @@ export const useSessionStore = defineStore('session', () => {
           topico: updated.topico,
         };
       }
+
+      // Som e Notificação Remota para todos os alunos matriculados
+      soundService.playClassStarted();
+      void notificationService.notifyClassSession({
+        sessaoId: session.id,
+        titulo: 'Aula Iniciada! 🎓',
+        mensagem: updated.topico
+          ? `A aula sobre "${updated.topico}" começou ao vivo!`
+          : 'A aula ao vivo foi iniciada pelo professor.',
+        tipo: 'aula_iniciada',
+        link: `/sala/${session.id}`,
+      });
     }, 'Erro ao iniciar aula.');
   }
 
@@ -118,6 +140,8 @@ export const useSessionStore = defineStore('session', () => {
       if (updated.disciplina_id) {
         getCoursesMap()[updated.disciplina_id] = null;
       }
+
+      soundService.playClassEnded();
     }, 'Erro ao encerrar sessão.');
   }
 
