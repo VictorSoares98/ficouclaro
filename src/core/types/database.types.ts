@@ -633,7 +633,99 @@ export type Database = {
           },
         ];
       };
+      dispositivos_usuarios: {
+        Row: {
+          ativo: boolean;
+          auth_key: string | null;
+          created_at: string;
+          endpoint: string;
+          id: string;
+          p256dh: string | null;
+          plataforma: string;
+          updated_at: string;
+          user_agent: string | null;
+          usuario_id: string;
+        };
+        Insert: {
+          ativo?: boolean;
+          auth_key?: string | null;
+          created_at?: string;
+          endpoint: string;
+          id?: string;
+          p256dh?: string | null;
+          plataforma?: string;
+          updated_at?: string;
+          user_agent?: string | null;
+          usuario_id: string;
+        };
+        Update: {
+          ativo?: boolean;
+          auth_key?: string | null;
+          created_at?: string;
+          endpoint?: string;
+          id?: string;
+          p256dh?: string | null;
+          plataforma?: string;
+          updated_at?: string;
+          user_agent?: string | null;
+          usuario_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'dispositivos_usuarios_usuario_id_fkey';
+            columns: ['usuario_id'];
+            isOneToOne: false;
+            referencedRelation: 'usuarios';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      notificacoes: {
+        Row: {
+          created_at: string;
+          dados_extras: Json | null;
+          id: string;
+          lida: boolean;
+          link: string | null;
+          mensagem: string;
+          tipo: Database['public']['Enums']['tipo_notificacao'];
+          titulo: string;
+          usuario_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          dados_extras?: Json | null;
+          id?: string;
+          lida?: boolean;
+          link?: string | null;
+          mensagem: string;
+          tipo?: Database['public']['Enums']['tipo_notificacao'];
+          titulo: string;
+          usuario_id: string;
+        };
+        Update: {
+          created_at?: string;
+          dados_extras?: Json | null;
+          id?: string;
+          lida?: boolean;
+          link?: string | null;
+          mensagem?: string;
+          tipo?: Database['public']['Enums']['tipo_notificacao'];
+          titulo?: string;
+          usuario_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'notificacoes_usuario_id_fkey';
+            columns: ['usuario_id'];
+            isOneToOne: false;
+            referencedRelation: 'usuarios';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
     };
+
     Views: {
       vw_course_insights: {
         Row: {
@@ -842,7 +934,30 @@ export type Database = {
         Args: Record<PropertyKey, never>;
         Returns: Json;
       };
+      enviar_notificacao_evento: {
+        Args: {
+          p_usuario_id: string;
+          p_titulo: string;
+          p_mensagem: string;
+          p_tipo?: Database['public']['Enums']['tipo_notificacao'];
+          p_link?: string | null;
+          p_dados_extras?: Json;
+        };
+        Returns: string;
+      };
+      notificar_turma_sessao: {
+        Args: {
+          p_sessao_id: string;
+          p_titulo: string;
+          p_mensagem: string;
+          p_tipo?: Database['public']['Enums']['tipo_notificacao'];
+          p_link?: string | null;
+          p_dados_extras?: Json;
+        };
+        Returns: number;
+      };
     };
+
     Enums: {
       papel_usuario: 'aluno' | 'professor';
       sinal_ritmo: 'muito_rapido' | 'boiando' | 'tudo_certo' | 'muito_devagar';
@@ -852,7 +967,15 @@ export type Database = {
       status_sessao: 'aguardando' | 'ativa' | 'encerrada';
       tipo_enquete: 'multipla_escolha' | 'nuvem_palavras' | 'escala_clareza' | 'ranking';
       tipo_grupo_estudo: 'estudo' | 'reforco' | 'monitoria' | 'projeto' | 'outro';
+      tipo_notificacao:
+        | 'aula_iniciada'
+        | 'aula_encerrada'
+        | 'nova_duvida'
+        | 'duvida_respondida'
+        | 'enquete_aberta'
+        | 'sistema';
     };
+
     CompositeTypes: {
       [_ in never]: never;
     };
@@ -984,6 +1107,14 @@ export const Constants = {
       status_sessao: ['aguardando', 'ativa', 'encerrada'],
       tipo_enquete: ['multipla_escolha', 'nuvem_palavras', 'escala_clareza', 'ranking'],
       tipo_grupo_estudo: ['estudo', 'reforco', 'monitoria', 'projeto', 'outro'],
+      tipo_notificacao: [
+        'aula_iniciada',
+        'aula_encerrada',
+        'nova_duvida',
+        'duvida_respondida',
+        'enquete_aberta',
+        'sistema',
+      ],
     },
   },
 } as const;
