@@ -14,6 +14,26 @@ const routes: RouteRecordRaw[] = [
         path: 'privacidade-seguranca',
         component: () => import('@/pages/PrivacidadeSegurancaPage.vue'),
       },
+      {
+        path: 'mapa',
+        component: () => import('@/modules/study-groups/pages/StudyGroupsMapPage.vue'),
+      },
+      {
+        path: 'lock',
+        component: () => import('@/components/LockScreen.vue'),
+      },
+      {
+        path: 'recursos/:slug',
+        component: () => import('@/pages/FeatureDetailPage.vue'),
+      },
+      {
+        path: 'join/:code',
+        component: () => import('@/pages/JoinClassroomPage.vue'),
+      },
+      {
+        path: 'join',
+        component: () => import('@/pages/JoinClassroomPage.vue'),
+      },
     ],
   },
   {
@@ -43,6 +63,10 @@ const routes: RouteRecordRaw[] = [
     path: '/sala',
     component: () => import('@/layouts/SessionLayout.vue'),
     children: [
+      {
+        path: '',
+        component: () => import('@/modules/session/pages/SessionLobbyPage.vue'),
+      },
       {
         path: ':id',
         component: () => import('@/modules/session/pages/SessionGatewayPage.vue'),

@@ -1,5 +1,5 @@
 import { supabaseClient } from '@/core/supabase/client';
-import type { AppUser, Perfil } from '@/core/types/auth.types';
+import type { AppUser, Perfil, OAuthMetadata } from '@/core/types/auth.types';
 import type {
   SignInWithPasswordCredentials,
   SignUpWithPasswordCredentials,
@@ -23,11 +23,12 @@ class AuthService {
     if (error) throw new Error(error.message);
   }
 
-  async signInWithOAuth(provider: 'google' | 'github') {
+  async signInWithOAuth(provider: 'google' | 'github', metadata?: OAuthMetadata) {
     const { error } = await supabaseClient.auth.signInWithOAuth({
       provider,
       options: {
         redirectTo: window.location.origin,
+        ...(metadata ? { data: metadata } : {}),
       },
     });
     if (error) throw new Error(error.message);
@@ -40,18 +41,36 @@ class AuthService {
     await supabaseClient.auth.signOut();
   }
 
+  private profilePromiseCache = new Map<string, Promise<Perfil>>();
+
   /**
-   * Busca os metadados da tabela pública de perfis associada ao Auth
+   * Busca os metadados da tabela pública de perfis associada ao Auth.
+   * Utiliza um sistema de deduplicação (Promise Caching) de 1000ms para evitar Race Conditions
+   * (Double Fetch) que deixam o login mais lento quando eventos do Supabase Realtime disparam
+   * ao mesmo tempo que a conclusão da função de Login manual.
    */
   async getProfile(userId: string): Promise<Perfil> {
-    const { data, error } = await supabaseClient
-      .from('usuarios')
-      .select('id, papel, nome_completo, url_avatar, termos_aceitos_em, versao_termos')
-      .eq('id', userId)
-      .single();
+    if (this.profilePromiseCache.has(userId)) {
+      return this.profilePromiseCache.get(userId)!;
+    }
 
-    if (error) throw new Error(error.message);
-    return data;
+    const promise = (async () => {
+      try {
+        const { data, error } = await supabaseClient
+          .from('usuarios')
+          .select('id, papel, nome_completo, url_avatar, termos_aceitos_em, versao_termos')
+          .eq('id', userId)
+          .single();
+
+        if (error) throw new Error(error.message);
+        return data;
+      } finally {
+        setTimeout(() => this.profilePromiseCache.delete(userId), 1000);
+      }
+    })();
+
+    this.profilePromiseCache.set(userId, promise);
+    return promise;
   }
 
   /**

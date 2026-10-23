@@ -18,9 +18,14 @@ export const accessibilityStorageService = {
       if (!stored) return { ...DEFAULT_PREFERENCES };
 
       const parsed = JSON.parse(stored);
-      
-      const fontScale = isValidFontScale(parsed?.fontScale) ? parsed.fontScale : DEFAULT_PREFERENCES.fontScale;
-      const librasEnabled = typeof parsed?.librasEnabled === 'boolean' ? parsed.librasEnabled : DEFAULT_PREFERENCES.librasEnabled;
+
+      const fontScale = isValidFontScale(parsed?.fontScale)
+        ? parsed.fontScale
+        : DEFAULT_PREFERENCES.fontScale;
+      const librasEnabled =
+        typeof parsed?.librasEnabled === 'boolean'
+          ? parsed.librasEnabled
+          : DEFAULT_PREFERENCES.librasEnabled;
 
       return { fontScale, librasEnabled };
     } catch (e) {

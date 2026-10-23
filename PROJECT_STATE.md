@@ -67,10 +67,13 @@ _Uma tarefa só é considerada concluída quando os critérios aplicáveis tiver
 
 _Esta seção é atualizada durante o ciclo de execução dos prompts._
 
-- **Sprint Ativa:** [A DEFINIR PELO FLUXO DA TAREFA]
-- **Tarefa Atual:** [A DEFINIR NO PROMPT 3]
-- **Critérios de Aceite:** [A DEFINIR NO PROMPT 3]
-- **Débitos Técnicos Mapeados:** [A DEFINIR PELO PROMPT 5, QUANDO APLICÁVEL]
+- **Sprint Ativa:** Sprint v2 - Refatoração Visual Global e Ergonomia
+- **Tarefa Atual:** Realtime de Status de Salas e Persistência de Início de Aula sem Duplicação
+- **Critérios de Aceite:**
+  1. Ao abrir ou iniciar uma aula pelo professor, o card correspondente na tela do aluno (`EnrollPage.vue`) deve atualizar seu badge para `🟡 ESPERA` ou `🔴 AO VIVO` em tempo real, sem reload manual.
+  2. Ao encerrar a aula no painel do professor, os cards tanto do aluno quanto do professor devem atualizar imediatamente para `⚪ SEM AULA` via Realtime.
+  3. Se o professor iniciar uma aula, sair do aplicativo e retornar para `CourseListPage.vue`, o card da disciplina deve exibir o status ativo e o botão `"Continuar Aula"`, redirecionando diretamente para `/sala/:id` sem criar nova sessão.
+  4. O banco de dados (índice parcial único) e o serviço devem garantir que uma disciplina possua no máximo uma sessão em status `'aguardando'` ou `'ativa'`, reaproveitando a sessão vigente de forma idempotente.
 
 ---
 

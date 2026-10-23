@@ -452,7 +452,280 @@ export type Database = {
           },
         ];
       };
+      grupos_estudo: {
+        Row: {
+          campus: string | null;
+          categoria_universidade: 'publica' | 'privada' | null;
+          cidade: string | null;
+          codigo_convite: string;
+          created_at: string;
+          criador_id: string;
+          descricao: string | null;
+          dia_reuniao: string | null;
+          disciplina_id: string | null;
+          endereco_completo: string | null;
+          estado: string | null;
+          horario_reuniao: string | null;
+          id: string;
+          instituicao: string;
+          lat: number;
+          lng: number;
+          local_especifico: string | null;
+          nome: string;
+          pais: string | null;
+          place_id: string | null;
+          predio_bloco: string | null;
+          sala: string | null;
+          slug: string | null;
+          status: 'ativo' | 'inativo';
+          status_academico: 'letivo' | 'ferias' | 'greve' | null;
+          tipo: Database['public']['Enums']['tipo_grupo_estudo'];
+          updated_at: string;
+          vagas: number | null;
+        };
+        Insert: {
+          campus?: string | null;
+          categoria_universidade?: 'publica' | 'privada' | null;
+          cidade?: string | null;
+          codigo_convite?: string;
+          created_at?: string;
+          criador_id: string;
+          descricao?: string | null;
+          dia_reuniao?: string | null;
+          disciplina_id?: string | null;
+          endereco_completo?: string | null;
+          estado?: string | null;
+          horario_reuniao?: string | null;
+          id?: string;
+          instituicao: string;
+          lat: number;
+          lng: number;
+          local_especifico?: string | null;
+          nome: string;
+          pais?: string | null;
+          place_id?: string | null;
+          predio_bloco?: string | null;
+          sala?: string | null;
+          slug?: string | null;
+          status?: 'ativo' | 'inativo';
+          status_academico?: 'letivo' | 'ferias' | 'greve' | null;
+          tipo?: Database['public']['Enums']['tipo_grupo_estudo'];
+          updated_at?: string;
+          vagas?: number | null;
+        };
+        Update: {
+          campus?: string | null;
+          categoria_universidade?: 'publica' | 'privada' | null;
+          cidade?: string | null;
+          codigo_convite?: string;
+          created_at?: string;
+          criador_id?: string;
+          descricao?: string | null;
+          dia_reuniao?: string | null;
+          disciplina_id?: string | null;
+          endereco_completo?: string | null;
+          estado?: string | null;
+          horario_reuniao?: string | null;
+          id?: string;
+          instituicao?: string;
+          lat?: number;
+          lng?: number;
+          local_especifico?: string | null;
+          nome?: string;
+          pais?: string | null;
+          place_id?: string | null;
+          predio_bloco?: string | null;
+          sala?: string | null;
+          slug?: string | null;
+          status?: 'ativo' | 'inativo';
+          status_academico?: 'letivo' | 'ferias' | 'greve' | null;
+          tipo?: Database['public']['Enums']['tipo_grupo_estudo'];
+          updated_at?: string;
+          vagas?: number | null;
+        };
+        Relationships: [];
+      };
+      grupos_membros: {
+        Row: {
+          created_at: string;
+          grupo_id: string;
+          id: string;
+          is_monitor: boolean;
+          usuario_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          grupo_id: string;
+          id?: string;
+          is_monitor?: boolean;
+          usuario_id: string;
+        };
+        Update: {
+          created_at?: string;
+          grupo_id?: string;
+          id?: string;
+          is_monitor?: boolean;
+          usuario_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'grupos_membros_grupo_id_fkey';
+            columns: ['grupo_id'];
+            isOneToOne: false;
+            referencedRelation: 'grupos_estudo';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      registros_encontro: {
+        Row: {
+          client_uuid: string | null;
+          created_at: string;
+          data_referencia: string;
+          duracao_minutos: number | null;
+          duvidas_resolvidas: number | null;
+          grupo_id: string;
+          id: string;
+          motivo_cancelamento: string | null;
+          observacoes: string | null;
+          participantes: number;
+          registrado_por: string;
+          status: 'concluido' | 'pendente' | 'cancelado';
+          topico: string | null;
+        };
+        Insert: {
+          client_uuid?: string | null;
+          created_at?: string;
+          data_referencia?: string;
+          duracao_minutos?: number | null;
+          duvidas_resolvidas?: number | null;
+          grupo_id: string;
+          id?: string;
+          motivo_cancelamento?: string | null;
+          observacoes?: string | null;
+          participantes?: number;
+          registrado_por: string;
+          status?: 'concluido' | 'pendente' | 'cancelado';
+          topico?: string | null;
+        };
+        Update: {
+          client_uuid?: string | null;
+          created_at?: string;
+          data_referencia?: string;
+          duracao_minutos?: number | null;
+          duvidas_resolvidas?: number | null;
+          grupo_id?: string;
+          id?: string;
+          motivo_cancelamento?: string | null;
+          observacoes?: string | null;
+          participantes?: number;
+          registrado_por?: string;
+          status?: 'concluido' | 'pendente' | 'cancelado';
+          topico?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'registros_encontro_grupo_id_fkey';
+            columns: ['grupo_id'];
+            isOneToOne: false;
+            referencedRelation: 'grupos_estudo';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      dispositivos_usuarios: {
+        Row: {
+          ativo: boolean;
+          auth_key: string | null;
+          created_at: string;
+          endpoint: string;
+          id: string;
+          p256dh: string | null;
+          plataforma: string;
+          updated_at: string;
+          user_agent: string | null;
+          usuario_id: string;
+        };
+        Insert: {
+          ativo?: boolean;
+          auth_key?: string | null;
+          created_at?: string;
+          endpoint: string;
+          id?: string;
+          p256dh?: string | null;
+          plataforma?: string;
+          updated_at?: string;
+          user_agent?: string | null;
+          usuario_id: string;
+        };
+        Update: {
+          ativo?: boolean;
+          auth_key?: string | null;
+          created_at?: string;
+          endpoint?: string;
+          id?: string;
+          p256dh?: string | null;
+          plataforma?: string;
+          updated_at?: string;
+          user_agent?: string | null;
+          usuario_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'dispositivos_usuarios_usuario_id_fkey';
+            columns: ['usuario_id'];
+            isOneToOne: false;
+            referencedRelation: 'usuarios';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      notificacoes: {
+        Row: {
+          created_at: string;
+          dados_extras: Json | null;
+          id: string;
+          lida: boolean;
+          link: string | null;
+          mensagem: string;
+          tipo: Database['public']['Enums']['tipo_notificacao'];
+          titulo: string;
+          usuario_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          dados_extras?: Json | null;
+          id?: string;
+          lida?: boolean;
+          link?: string | null;
+          mensagem: string;
+          tipo?: Database['public']['Enums']['tipo_notificacao'];
+          titulo: string;
+          usuario_id: string;
+        };
+        Update: {
+          created_at?: string;
+          dados_extras?: Json | null;
+          id?: string;
+          lida?: boolean;
+          link?: string | null;
+          mensagem?: string;
+          tipo?: Database['public']['Enums']['tipo_notificacao'];
+          titulo?: string;
+          usuario_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'notificacoes_usuario_id_fkey';
+            columns: ['usuario_id'];
+            isOneToOne: false;
+            referencedRelation: 'usuarios';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
     };
+
     Views: {
       vw_course_insights: {
         Row: {
@@ -500,6 +773,99 @@ export type Database = {
             referencedColumns: ['id'];
           },
         ];
+      };
+      view_grupos_estudo_publicos: {
+        Row: {
+          campus: string | null;
+          categoria_universidade: 'publica' | 'privada' | null;
+          cidade: string | null;
+          codigo_convite: string | null;
+          created_at: string | null;
+          criador_avatar: string | null;
+          criador_nome: string | null;
+          descricao: string | null;
+          dia_reuniao: string | null;
+          disciplina_id: string | null;
+          estado: string | null;
+          horario_reuniao: string | null;
+          id: string | null;
+          instituicao: string | null;
+          lat: number | null;
+          lng: number | null;
+          local_especifico: string | null;
+          nome: string | null;
+          pais: string | null;
+          place_id: string | null;
+          predio_bloco: string | null;
+          sala: string | null;
+          slug: string | null;
+          status: 'ativo' | 'inativo' | null;
+          status_academico: 'letivo' | 'ferias' | 'greve' | null;
+          tipo: Database['public']['Enums']['tipo_grupo_estudo'] | null;
+          total_membros: number | null;
+          vagas: number | null;
+        };
+        Insert: {
+          campus?: string | null;
+          categoria_universidade?: 'publica' | 'privada' | null;
+          cidade?: string | null;
+          codigo_convite?: string | null;
+          created_at?: string | null;
+          criador_avatar?: string | null;
+          criador_nome?: string | null;
+          descricao?: string | null;
+          dia_reuniao?: string | null;
+          disciplina_id?: string | null;
+          estado?: string | null;
+          horario_reuniao?: string | null;
+          id?: string | null;
+          instituicao?: string | null;
+          lat?: number | null;
+          lng?: number | null;
+          local_especifico?: string | null;
+          nome?: string | null;
+          pais?: string | null;
+          place_id?: string | null;
+          predio_bloco?: string | null;
+          sala?: string | null;
+          slug?: string | null;
+          status?: 'ativo' | 'inativo' | null;
+          status_academico?: 'letivo' | 'ferias' | 'greve' | null;
+          tipo?: Database['public']['Enums']['tipo_grupo_estudo'] | null;
+          total_membros?: number | null;
+          vagas?: number | null;
+        };
+        Update: {
+          campus?: string | null;
+          categoria_universidade?: 'publica' | 'privada' | null;
+          cidade?: string | null;
+          codigo_convite?: string | null;
+          created_at?: string | null;
+          criador_avatar?: string | null;
+          criador_nome?: string | null;
+          descricao?: string | null;
+          dia_reuniao?: string | null;
+          disciplina_id?: string | null;
+          estado?: string | null;
+          horario_reuniao?: string | null;
+          id?: string | null;
+          instituicao?: string | null;
+          lat?: number | null;
+          lng?: number | null;
+          local_especifico?: string | null;
+          nome?: string | null;
+          pais?: string | null;
+          place_id?: string | null;
+          predio_bloco?: string | null;
+          sala?: string | null;
+          slug?: string | null;
+          status?: 'ativo' | 'inativo' | null;
+          status_academico?: 'letivo' | 'ferias' | 'greve' | null;
+          tipo?: Database['public']['Enums']['tipo_grupo_estudo'] | null;
+          total_membros?: number | null;
+          vagas?: number | null;
+        };
+        Relationships: [];
       };
     };
     Functions: {
@@ -560,14 +926,56 @@ export type Database = {
         Args: { p_sessao_id: string; p_nota: number; p_comentario: string | null };
         Returns: undefined;
       };
+      link_member_to_study_group: {
+        Args: { p_grupo_id: string };
+        Returns: boolean;
+      };
+      export_my_data: {
+        Args: Record<PropertyKey, never>;
+        Returns: Json;
+      };
+      enviar_notificacao_evento: {
+        Args: {
+          p_usuario_id: string;
+          p_titulo: string;
+          p_mensagem: string;
+          p_tipo?: Database['public']['Enums']['tipo_notificacao'];
+          p_link?: string | null;
+          p_dados_extras?: Json;
+        };
+        Returns: string;
+      };
+      notificar_turma_sessao: {
+        Args: {
+          p_sessao_id: string;
+          p_titulo: string;
+          p_mensagem: string;
+          p_tipo?: Database['public']['Enums']['tipo_notificacao'];
+          p_link?: string | null;
+          p_dados_extras?: Json;
+        };
+        Returns: number;
+      };
     };
+
     Enums: {
       papel_usuario: 'aluno' | 'professor';
       sinal_ritmo: 'muito_rapido' | 'boiando' | 'tudo_certo' | 'muito_devagar';
       status_enquete: 'rascunho' | 'ativa' | 'encerrada';
+      status_grupo_estudo: 'ativo' | 'inativo';
+      status_registro_encontro: 'concluido' | 'pendente' | 'cancelado';
       status_sessao: 'aguardando' | 'ativa' | 'encerrada';
       tipo_enquete: 'multipla_escolha' | 'nuvem_palavras' | 'escala_clareza' | 'ranking';
+      tipo_grupo_estudo: 'estudo' | 'reforco' | 'monitoria' | 'projeto' | 'outro';
+      tipo_notificacao:
+        | 'aula_iniciada'
+        | 'aula_encerrada'
+        | 'nova_duvida'
+        | 'duvida_respondida'
+        | 'enquete_aberta'
+        | 'sistema';
     };
+
     CompositeTypes: {
       [_ in never]: never;
     };
@@ -694,8 +1102,19 @@ export const Constants = {
       papel_usuario: ['aluno', 'professor'],
       sinal_ritmo: ['muito_rapido', 'boiando', 'tudo_certo', 'muito_devagar'],
       status_enquete: ['rascunho', 'ativa', 'encerrada'],
+      status_grupo_estudo: ['ativo', 'inativo'],
+      status_registro_encontro: ['concluido', 'pendente', 'cancelado'],
       status_sessao: ['aguardando', 'ativa', 'encerrada'],
       tipo_enquete: ['multipla_escolha', 'nuvem_palavras', 'escala_clareza', 'ranking'],
+      tipo_grupo_estudo: ['estudo', 'reforco', 'monitoria', 'projeto', 'outro'],
+      tipo_notificacao: [
+        'aula_iniciada',
+        'aula_encerrada',
+        'nova_duvida',
+        'duvida_respondida',
+        'enquete_aberta',
+        'sistema',
+      ],
     },
   },
 } as const;

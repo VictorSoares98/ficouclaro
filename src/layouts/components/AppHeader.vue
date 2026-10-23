@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { useAuthStore } from '@/stores/auth.store';
-import { useQuasar } from 'quasar';
 import AccessibilityMenu from '@/components/AccessibilityMenu.vue';
+import NotificationSoundToggle from '@/components/NotificationSoundToggle.vue';
+import NavbarUserBadge from '@/components/navbar/NavbarUserBadge.vue';
 
 defineProps<{
   subtitle?: string;
@@ -10,59 +12,185 @@ defineProps<{
 }>();
 
 const authStore = useAuthStore();
-const $q = useQuasar();
 
-async function handleLogout() {
-  try {
-    await authStore.signOut();
-    $q.notify({ color: 'positive', message: 'Sessão encerrada com sucesso!' });
-    setTimeout(() => {
-      window.location.href = '/login'; // Hard reload após a notificação redirecionando para login
-    }, 500);
-  } catch (error) {
-    const err = error as Error;
-    $q.notify({ color: 'negative', message: 'Erro ao sair: ' + err.message });
-  }
-}
+const isAuthenticated = computed(() => authStore.isAuthenticated);
+const isProfessor = computed(() => authStore.isProfessor);
+const isAluno = computed(() => authStore.isAluno);
 </script>
 
 <template>
-  <q-header elevated class="tw-bg-primary tw-text-white tw-transition-colors tw-duration-300">
-    <q-toolbar class="tw-h-16">
-      <q-toolbar-title class="tw-font-bold tw-tracking-tight tw-text-white tw-text-2xl">
-        Ficou Claro?
-        <span v-if="subtitle" class="tw-text-sm tw-font-normal text-muted">| {{ subtitle }}</span>
-      </q-toolbar-title>
+  <q-header class="fc-glass-header tw-shadow-sm" style="padding-top: env(safe-area-inset-top, 0px)">
+    <q-toolbar
+      class="tw-h-16 tw-max-w-7xl tw-mx-auto tw-px-4 sm:tw-px-6 md:tw-px-8 tw-flex tw-items-center tw-justify-between"
+    >
+      <!-- 1. Esquerda: Logotipo Institucional com Tipografia Space Grotesk -->
+      <div class="tw-flex tw-items-center tw-gap-3">
+        <router-link
+          to="/"
+          class="tw-flex tw-items-center tw-gap-2 tw-text-inherit tw-no-underline focus:tw-outline-none"
+          aria-label="Página Inicial do Ficou Claro"
+        >
+          <div
+            class="tw-w-9 tw-h-9 tw-rounded-xl bg-primary-soft text-primary tw-flex tw-items-center tw-justify-center tw-shadow-sm"
+          >
+            <q-icon name="lightbulb" size="20px" />
+          </div>
+          <div class="tw-flex tw-flex-col">
+            <span
+              class="text-subtitle1 sm:text-h6 text-weight-bold tw-font-space-grotesk tw-leading-none tw-tracking-tight"
+            >
+              FICOU <span class="text-primary">CLARO?</span>
+            </span>
+            <span v-if="subtitle" class="tw-text-[10px] text-muted tw-leading-tight tw-font-medium">
+              {{ subtitle }}
+            </span>
+          </div>
+        </router-link>
+      </div>
 
-      <!-- Accessibility Menu Unificado (Substitui o ThemeSwitcher antigo e os botões individuais) -->
-      <AccessibilityMenu />
+      <!-- 2. Centro: Navegação Primária por Papel (Apenas Desktop / gt-sm) -->
+      <nav class="tw-hidden md:tw-flex tw-items-center tw-gap-1 lg:tw-gap-2">
+        <!-- Navegação para Visitante (Não Autenticado) -->
+        <template v-if="!isAuthenticated">
+          <q-btn
+            flat
+            no-caps
+            to="/"
+            label="Início"
+            active-class="text-primary text-weight-bold"
+            class="tw-rounded-xl tw-px-3.5 tw-py-1.5 tw-text-xs sm:tw-text-sm tw-font-semibold tw-transition-colors"
+          />
+          <q-btn
+            flat
+            no-caps
+            to="/mapa"
+            active-class="text-primary text-weight-bold"
+            class="tw-rounded-xl tw-px-3.5 tw-py-1.5 tw-text-xs sm:tw-text-sm tw-font-semibold tw-transition-colors"
+          >
+            <div class="tw-flex tw-items-center tw-gap-1.5">
+              <q-icon name="explore" size="16px" color="primary" />
+              <span>Mapa de Monitorias</span>
+              <q-badge color="primary" rounded class="tw-text-[9px] tw-ml-0.5">Novo ✨</q-badge>
+            </div>
+          </q-btn>
+          <q-btn
+            flat
+            no-caps
+            to="/sala"
+            label="Entrar em Aula"
+            icon="meeting_room"
+            active-class="text-primary text-weight-bold"
+            class="tw-rounded-xl tw-px-3.5 tw-py-1.5 tw-text-xs sm:tw-text-sm tw-font-semibold tw-transition-colors"
+          />
+        </template>
 
-      <!-- Menu de Perfil (Áreas Restritas) -->
-      <q-btn-dropdown
-        v-if="showProfileMenu"
-        flat
-        round
-        dense
-        icon="person"
-        class="tw-ml-2"
-        color="white"
-      >
-        <q-list>
-          <q-item clickable v-close-popup @click="handleLogout">
-            <q-item-section avatar>
-              <q-icon name="logout" />
-            </q-item-section>
-            <q-item-section>Sair</q-item-section>
-          </q-item>
-          <q-separator />
-          <q-item clickable v-close-popup to="/privacidade-seguranca" class="tw-text-gray-700">
-            <q-item-section avatar>
-              <q-icon name="security" color="primary" />
-            </q-item-section>
-            <q-item-section>Privacidade e Segurança</q-item-section>
-          </q-item>
-        </q-list>
-      </q-btn-dropdown>
+        <!-- Navegação para Aluno -->
+        <template v-else-if="isAluno">
+          <q-btn
+            flat
+            no-caps
+            to="/hub"
+            label="Meu Hub de Aulas"
+            icon="school"
+            active-class="text-primary text-weight-bold"
+            class="tw-rounded-xl tw-px-3.5 tw-py-1.5 tw-text-xs sm:tw-text-sm tw-font-semibold tw-transition-colors"
+          />
+          <q-btn
+            flat
+            no-caps
+            to="/mapa"
+            active-class="text-primary text-weight-bold"
+            class="tw-rounded-xl tw-px-3.5 tw-py-1.5 tw-text-xs sm:tw-text-sm tw-font-semibold tw-transition-colors"
+          >
+            <div class="tw-flex tw-items-center tw-gap-1.5">
+              <q-icon name="explore" size="16px" color="primary" />
+              <span>Mapa do Campus</span>
+            </div>
+          </q-btn>
+          <q-btn
+            flat
+            no-caps
+            to="/sala"
+            label="Entrar na Sala"
+            icon="pin"
+            active-class="text-primary text-weight-bold"
+            class="tw-rounded-xl tw-px-3.5 tw-py-1.5 tw-text-xs sm:tw-text-sm tw-font-semibold tw-transition-colors"
+          />
+        </template>
+
+        <!-- Navegação para Professor -->
+        <template v-else-if="isProfessor">
+          <q-btn
+            flat
+            no-caps
+            to="/dashboard"
+            label="Dashboard Geral"
+            icon="dashboard"
+            active-class="text-secondary text-weight-bold"
+            class="tw-rounded-xl tw-px-3.5 tw-py-1.5 tw-text-xs sm:tw-text-sm tw-font-semibold tw-transition-colors"
+          />
+          <q-btn
+            flat
+            no-caps
+            to="/disciplinas"
+            label="Minhas Turmas"
+            icon="library_books"
+            active-class="text-secondary text-weight-bold"
+            class="tw-rounded-xl tw-px-3.5 tw-py-1.5 tw-text-xs sm:tw-text-sm tw-font-semibold tw-transition-colors"
+          />
+          <q-btn
+            flat
+            no-caps
+            to="/sala"
+            label="Iniciar Sessão"
+            icon="cast_for_education"
+            active-class="text-secondary text-weight-bold"
+            class="tw-rounded-xl tw-px-3.5 tw-py-1.5 tw-text-xs sm:tw-text-sm tw-font-semibold tw-transition-colors"
+          />
+          <q-btn
+            flat
+            no-caps
+            to="/mapa"
+            label="Monitorias"
+            icon="explore"
+            active-class="text-secondary text-weight-bold"
+            class="tw-rounded-xl tw-px-3.5 tw-py-1.5 tw-text-xs sm:tw-text-sm tw-font-semibold tw-transition-colors"
+          />
+        </template>
+      </nav>
+
+      <!-- 3. Direita: Acessibilidade, Perfil Gamificado e Ações Rápidas -->
+      <div class="tw-flex tw-items-center tw-gap-2 sm:tw-gap-3">
+        <!-- Menu Unificado de Acessibilidade -->
+        <AccessibilityMenu />
+
+        <!-- Controle Central de Som e Notificações Push -->
+        <NotificationSoundToggle />
+
+        <!-- Usuário Autenticado: Badge Gamificado com Avatar e Dropdown -->
+        <NavbarUserBadge v-if="isAuthenticated" />
+
+        <!-- Usuário Visitante (Não Autenticado) -->
+        <div v-else class="tw-flex tw-items-center tw-gap-1.5 sm:tw-gap-2">
+          <q-btn
+            flat
+            no-caps
+            to="/login"
+            label="Entrar"
+            class="tw-rounded-xl tw-px-3 tw-h-8 sm:tw-h-9 tw-text-xs sm:tw-text-sm tw-font-bold tw-transition-colors"
+          />
+          <q-btn
+            unelevated
+            no-caps
+            color="primary"
+            to="/register"
+            label="Começar"
+            class="tw-rounded-xl tw-px-3 sm:tw-px-4 tw-h-8 sm:tw-h-9 tw-text-xs sm:tw-text-sm tw-font-bold tw-shadow-md hover:tw-scale-105 tw-transition-transform"
+          >
+            <span class="tw-hidden sm:tw-inline tw-ml-1">Grátis</span>
+          </q-btn>
+        </div>
+      </div>
     </q-toolbar>
   </q-header>
 </template>

@@ -10,6 +10,12 @@ import ProfessorPollPanel from '@/modules/poll/components/ProfessorPollPanel.vue
 import ProfessorReviewPanel from '@/modules/flash-review/components/ProfessorReviewPanel.vue';
 import QrcodeVue from 'qrcode.vue';
 
+import {
+  getClassroomJoinUrl,
+  copyClassroomLink,
+  shareClassroomLink,
+} from '@/modules/courses/utils/invite.utils';
+
 const route = useRoute();
 const router = useRouter();
 const sessionStore = useSessionStore();
@@ -26,11 +32,26 @@ const currentCourse = computed(() => {
   );
 });
 
-const qrValue = computed(() => {
+const classroomUrl = computed(() => {
   if (!currentCourse.value) return '';
-  const baseUrl = 'https://ficouclaro.pages.dev/';
-  return `${baseUrl}#/hub?join=${currentCourse.value.codigo_convite}`;
+  return getClassroomJoinUrl(currentCourse.value.codigo_convite);
 });
+
+const qrValue = computed(() => classroomUrl.value);
+
+async function handleCopyLink() {
+  if (!classroomUrl.value) return;
+  await copyClassroomLink(classroomUrl.value, currentCourse.value?.nome);
+}
+
+async function handleShareLink() {
+  if (!classroomUrl.value || !currentCourse.value) return;
+  await shareClassroomLink({
+    title: `Aula de ${currentCourse.value.nome} - Ficou Claro?`,
+    text: `Acesse a matéria de ${currentCourse.value.nome} através do link ou use o código ${currentCourse.value.codigo_convite.toUpperCase()}:`,
+    url: classroomUrl.value,
+  });
+}
 
 onMounted(async () => {
   try {
@@ -212,9 +233,41 @@ function handleEnd() {
 
         <div
           v-if="currentCourse"
-          class="tw-text-4xl tw-font-black tw-tracking-widest tw-text-primary tw-uppercase tw-mb-8"
+          class="tw-text-4xl tw-font-black tw-tracking-widest tw-text-primary tw-uppercase tw-mb-4 tw-font-mono"
         >
           {{ currentCourse.codigo_convite }}
+        </div>
+
+        <!-- Ações de Compartilhamento do Link da Aula -->
+        <div
+          v-if="currentCourse"
+          class="tw-flex tw-flex-col sm:tw-flex-row tw-items-center tw-justify-center tw-gap-2.5 tw-mb-6 tw-max-w-md tw-mx-auto"
+        >
+          <q-btn
+            unelevated
+            no-caps
+            color="primary"
+            icon="content_copy"
+            label="Copiar Link da Aula"
+            class="tw-rounded-xl tw-px-5 tw-h-10 tw-font-bold tw-w-full sm:tw-w-auto tw-shadow-sm hover:tw-scale-[1.02] tw-transition-transform"
+            @click="handleCopyLink"
+          />
+          <q-btn
+            outline
+            no-caps
+            color="primary"
+            icon="share"
+            label="Compartilhar"
+            class="tw-rounded-xl tw-px-4 tw-h-10 tw-font-bold tw-w-full sm:tw-w-auto"
+            @click="handleShareLink"
+          />
+        </div>
+
+        <div
+          v-if="currentCourse && classroomUrl"
+          class="tw-mb-8 tw-p-2.5 tw-bg-slate-100 dark:tw-bg-slate-800/80 tw-rounded-xl tw-text-xs text-muted tw-select-all tw-break-all tw-font-mono tw-max-w-md tw-mx-auto tw-border tw-border-slate-200 dark:tw-border-slate-700/60"
+        >
+          {{ classroomUrl }}
         </div>
 
         <q-btn

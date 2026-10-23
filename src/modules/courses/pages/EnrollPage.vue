@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useCourseStore } from '@/modules/courses/stores/course.store';
 import { useSessionStore } from '@/modules/session/stores/session.store';
 import { useQuasar } from 'quasar';
-import { sessionService, type StatusSessao } from '@/modules/session/services/session.service';
 import CourseCard from '@/modules/courses/components/CourseCard.vue';
 import CourseCardSkeleton from '@/modules/courses/components/CourseCardSkeleton.vue';
+import BaseSurfaceCard from '@/core/components/BaseSurfaceCard.vue';
 
 const courseStore = useCourseStore();
 const sessionStore = useSessionStore();
@@ -16,28 +16,18 @@ const $q = useQuasar();
 const isEnrolling = ref(false);
 const inviteCode = ref('');
 const isRefreshing = ref(false);
-const activeSessions = ref<Record<string, StatusSessao | 'nenhuma'>>({});
-
-async function loadSessionStatuses() {
-  if (courseStore.courses.length === 0) return;
-  const courseIds = courseStore.courses.map((c) => c.id);
-  const statuses = await sessionService.getActiveSessionsForCourses(courseIds);
-
-  // Mapeia garantindo que mesmo sem aula tenha a marcação 'nenhuma'
-  courseIds.forEach((id) => {
-    activeSessions.value[id] = statuses[id] || 'nenhuma';
-  });
-}
 
 async function handleRefresh() {
   isRefreshing.value = true;
   await courseStore.fetchMyCourses();
-  await loadSessionStatuses();
+  const courseIds = courseStore.courses.map((c) => c.id);
+  await sessionStore.fetchCoursesSessions(courseIds);
   isRefreshing.value = false;
 }
 
 onMounted(async () => {
   await handleRefresh();
+  sessionStore.subscribeToCoursesSessions();
 
   // Abordagem Premium (Universal/Deep Links):
   // Se o aluno escanear um QR code web, a URL trará ?join=CODIGO
@@ -50,6 +40,10 @@ onMounted(async () => {
     // Limpa a URL para não matricular de novo caso ele atualize a página
     void router.replace({ query: { ...router.currentRoute.value.query, join: undefined } });
   }
+});
+
+onUnmounted(() => {
+  sessionStore.unsubscribeCoursesSessions();
 });
 
 async function handleEnroll() {
@@ -67,20 +61,28 @@ async function handleEnroll() {
   }
 }
 
+function getSessionStatus(courseId: string): 'aguardando' | 'ativa' | 'encerrada' | 'nenhuma' {
+  return sessionStore.coursesSessions?.[courseId]?.status || 'nenhuma';
+}
+
 async function handleJoinActiveSession(courseId: string) {
+  const session = sessionStore.coursesSessions?.[courseId];
+  if (session && (session.status === 'aguardando' || session.status === 'ativa')) {
+    void router.push(`/sala/${session.id}`);
+    return;
+  }
+
   try {
     $q.loading.show({ message: 'Buscando aula ativa...' });
-
-    // Busca a sessão mais recente deste curso que não esteja encerrada via store
     const sessionId = await sessionStore.getActiveSession(courseId);
-
     $q.loading.hide();
     void router.push(`/sala/${sessionId}`);
   } catch (err: unknown) {
     $q.loading.hide();
     $q.notify({
       color: 'warning',
-      message: err instanceof Error ? err.message : 'Erro ao entrar na aula',
+      message:
+        err instanceof Error ? err.message : 'Não há aula aberta nesta disciplina no momento.',
     });
   }
 }
@@ -117,14 +119,50 @@ async function handleJoinActiveSession(courseId: string) {
       <CourseCardSkeleton v-for="i in 4" :key="i" />
     </div>
 
-    <!-- Empty State -->
-    <div v-else-if="courseStore.courses.length === 0" class="tw-text-center tw-py-12">
-      <q-icon name="cast_for_education" size="4rem" class="tw-opacity-20 tw-mb-4" />
-      <h2 class="tw-text-xl tw-font-bold">Nenhuma matrícula encontrada</h2>
-      <p class="text-muted tw-mb-4">
-        Peça o código de convite ao seu professor para se matricular.
-      </p>
-      <q-btn color="primary" outline label="Usar Código de Convite" @click="isEnrolling = true" />
+    <!-- Empty State: Nenhuma Matrícula -->
+    <div
+      v-else-if="courseStore.courses.length === 0"
+      class="tw-flex-1 tw-flex tw-items-center tw-justify-center tw-py-12"
+    >
+      <BaseSurfaceCard
+        class="tw-max-w-md tw-w-full tw-p-8 tw-text-center tw-rounded-3xl tw-shadow-lg"
+      >
+        <!-- Personagem 3D Estudante Microsoft Fluent -->
+        <div
+          class="tw-relative tw-w-28 tw-h-28 tw-mx-auto tw-mb-4 tw-flex tw-items-center tw-justify-center"
+        >
+          <div
+            class="tw-absolute tw-inset-0 tw-rounded-full bg-primary-soft tw-blur-xl tw-opacity-50"
+          ></div>
+          <img
+            src="/images/fluent-3d/student-3d.png"
+            alt="Estudante Universitário 3D"
+            width="112"
+            height="112"
+            class="tw-relative tw-w-28 tw-h-28 tw-object-contain tw-drop-shadow-lg hover:tw-scale-105 tw-transition-transform tw-duration-300"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+
+        <h2 class="tw-text-xl tw-font-black tw-font-space-grotesk tw-mb-2">
+          Nenhuma matrícula encontrada
+        </h2>
+        <p class="text-muted tw-text-xs sm:tw-text-sm tw-leading-relaxed tw-mb-6">
+          Você ainda não está vinculado a nenhuma disciplina. Peça o código de convite ou escaneie o
+          QR Code do seu professor para começar a acompanhar as aulas ao vivo.
+        </p>
+
+        <q-btn
+          unelevated
+          no-caps
+          color="primary"
+          icon="add"
+          label="Usar Código de Convite"
+          class="tw-w-full tw-rounded-2xl tw-h-12 tw-font-bold tw-shadow-md hover:tw-scale-105 tw-transition-transform"
+          @click="isEnrolling = true"
+        />
+      </BaseSurfaceCard>
     </div>
 
     <!-- Listagem -->
@@ -133,7 +171,7 @@ async function handleJoinActiveSession(courseId: string) {
         v-for="course in courseStore.courses"
         :key="course.id"
         :course="course"
-        :sessionStatus="activeSessions[course.id] || 'nenhuma'"
+        :sessionStatus="getSessionStatus(course.id)"
         actionLabel="Entrar na Aula"
         actionIcon="login"
         actionColor="positive"

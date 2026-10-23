@@ -44,21 +44,25 @@ async function submit() {
     return;
   }
 
-  await flashReviewStore.submitReview(
-    {
-      sessao_id: sessionStore.currentSession.id,
-      nota: rating.value,
-      comentario: comentario.value.trim() || null,
-    },
-    isAnonymous.value,
-  );
+  try {
+    await flashReviewStore.submitReview(
+      {
+        sessao_id: sessionStore.currentSession.id,
+        nota: rating.value,
+        comentario: comentario.value.trim() || null,
+      },
+      isAnonymous.value,
+    );
 
-  if (!flashReviewStore.error) {
-    $q.notify({
-      type: 'positive',
-      message: 'Avaliação enviada! Obrigado pelo feedback.',
-    });
-    isOpen.value = false;
+    if (!flashReviewStore.error) {
+      $q.notify({
+        type: 'positive',
+        message: 'Avaliação enviada! Obrigado pelo feedback.',
+      });
+      isOpen.value = false;
+    }
+  } catch {
+    // Erros de rede ou moderação já são tratados e exibidos pelo useAsyncOperation
   }
 }
 
@@ -115,6 +119,9 @@ function skip() {
                   ? 'O professor não verá quem enviou.'
                   : 'Seu nome será enviado junto à avaliação.'
               }}
+            </div>
+            <div v-if="isAnonymous" class="tw-text-[10px] text-warning tw-mt-1">
+              O anonimato é revogado em caso de ofensas.
             </div>
           </div>
           <q-toggle v-model="isAnonymous" color="primary" />

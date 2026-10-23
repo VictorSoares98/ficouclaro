@@ -1,0 +1,237 @@
+-- ============================================================
+-- 06 - ROW LEVEL SECURITY (RLS) E POLÍTICAS
+-- ============================================================
+-- Nota: A role 'anon' não possui grants no schema public (Zero-Trust).
+
+-- Role: authenticated & service_role (Mantém ALL)
+REVOKE ALL ON ALL ROUTINES IN SCHEMA public FROM PUBLIC;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE ALL ON ROUTINES FROM PUBLIC;
+
+GRANT ALL ON ALL TABLES IN SCHEMA public TO authenticated, service_role;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO authenticated, service_role;
+GRANT ALL ON ALL ROUTINES IN SCHEMA public TO authenticated, service_role;
+
+-- Grants para o schema private (necessário para as políticas RLS)
+GRANT USAGE ON SCHEMA private TO authenticated, service_role;
+GRANT EXECUTE ON ALL ROUTINES IN SCHEMA private TO authenticated, service_role;
+
+ALTER TABLE public.usuarios ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.disciplinas ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.matriculas ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.sessoes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.sinais_ritmo ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.enquetes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.respostas_enquete ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.duvidas ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.votos_duvida ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.avaliacoes_rapidas ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.grupos_estudo ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.grupos_membros ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.registros_encontro ENABLE ROW LEVEL SECURITY;
+
+-- Grants para visualização pública de grupos no mapa (Fachada de Isolamento Zero-Direct-Access)
+GRANT SELECT ON public.view_grupos_estudo_publicos TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.obter_detalhes_convite(TEXT) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.esta_matriculado(UUID) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.get_thermometer_stats(UUID) TO anon, authenticated;
+GRANT SELECT ON public.sessoes TO anon;
+GRANT SELECT ON public.enquetes TO anon;
+GRANT SELECT ON public.duvidas TO anon;
+GRANT SELECT ON public.usuarios TO anon;
+GRANT SELECT ON public.disciplinas TO anon;
+
+-- POLICIES: usuarios
+CREATE POLICY "Usuário lê o próprio perfil" ON public.usuarios FOR SELECT TO authenticated USING (id = auth.uid());
+CREATE POLICY "Usuário atualiza o próprio perfil" ON public.usuarios FOR UPDATE TO authenticated USING (id = auth.uid());
+CREATE POLICY "Professor vê perfis de alunos matriculados" ON public.usuarios FOR SELECT TO authenticated USING (
+  private.obter_meu_papel() = 'professor' AND EXISTS (
+    SELECT 1 FROM public.matriculas m
+    JOIN public.disciplinas d ON m.disciplina_id = d.id
+    WHERE m.aluno_id = usuarios.id AND d.professor_id = auth.uid()
+  )
+);
+CREATE POLICY "Visitantes e alunos veem autores de duvidas" ON public.usuarios FOR SELECT TO anon, authenticated USING (
+  EXISTS (
+    SELECT 1 FROM public.duvidas d
+    WHERE d.autor_id = usuarios.id
+  )
+);
+
+-- POLICIES: disciplinas
+CREATE POLICY "Professor gerencia próprias disciplinas" ON public.disciplinas FOR ALL USING (professor_id = auth.uid());
+CREATE POLICY "Usuários autenticados podem ver disciplinas" ON public.disciplinas FOR SELECT TO authenticated USING (auth.role() = 'authenticated');
+CREATE POLICY "Visitantes podem ver dados de disciplinas" ON public.disciplinas FOR SELECT TO anon USING (true);
+
+-- POLICIES: matriculas
+CREATE POLICY "Aluno se matricula" ON public.matriculas FOR INSERT WITH CHECK (aluno_id = auth.uid());
+CREATE POLICY "Aluno vê próprias matrículas" ON public.matriculas FOR SELECT USING (aluno_id = auth.uid());
+CREATE POLICY "Professor vê matrículas das próprias disciplinas" ON public.matriculas FOR SELECT USING (
+  EXISTS (SELECT 1 FROM public.disciplinas d WHERE d.id = matriculas.disciplina_id AND d.professor_id = auth.uid())
+);
+
+-- POLICIES: sessoes
+CREATE POLICY "Professor gerencia próprias sessões" ON public.sessoes FOR ALL USING (professor_id = auth.uid());
+CREATE POLICY "Aluno vê sessões das disciplinas matriculadas" ON public.sessoes FOR SELECT USING (esta_matriculado(disciplina_id));
+CREATE POLICY "Visitantes podem ver sessões de aula" ON public.sessoes FOR SELECT TO anon USING (
+  status IN ('aguardando', 'ativa', 'encerrada')
+);
+
+-- POLICIES: sinais_ritmo
+CREATE POLICY "Aluno envia sinal de ritmo" ON public.sinais_ritmo FOR INSERT WITH CHECK (
+  EXISTS (SELECT 1 FROM public.sessoes s WHERE s.id = sinais_ritmo.sessao_id AND s.status = 'ativa' AND esta_matriculado(s.disciplina_id))
+);
+CREATE POLICY "Professor lê sinais das próprias sessões" ON public.sinais_ritmo FOR SELECT USING (
+  EXISTS (SELECT 1 FROM public.sessoes s WHERE s.id = sinais_ritmo.sessao_id AND s.professor_id = auth.uid())
+);
+
+-- POLICIES: enquetes
+CREATE POLICY "Professor gerencia enquetes" ON public.enquetes FOR ALL USING (
+  EXISTS (SELECT 1 FROM public.sessoes s WHERE s.id = enquetes.sessao_id AND s.professor_id = auth.uid())
+);
+CREATE POLICY "Aluno vê enquetes ativas" ON public.enquetes FOR SELECT USING (
+  status = 'ativa' AND EXISTS (SELECT 1 FROM public.sessoes s WHERE s.id = enquetes.sessao_id AND esta_matriculado(s.disciplina_id))
+);
+CREATE POLICY "Visitantes podem ver enquetes ativas" ON public.enquetes FOR SELECT TO anon USING (
+  status = 'ativa'
+);
+
+-- POLICIES: respostas_enquete
+CREATE POLICY "Aluno responde enquetes" ON public.respostas_enquete FOR INSERT WITH CHECK (
+  EXISTS (SELECT 1 FROM public.enquetes e JOIN public.sessoes s ON s.id = e.sessao_id WHERE e.id = respostas_enquete.enquete_id AND e.status = 'ativa' AND esta_matriculado(s.disciplina_id))
+);
+CREATE POLICY "Professor lê respostas" ON public.respostas_enquete FOR SELECT USING (
+  EXISTS (SELECT 1 FROM public.enquetes e JOIN public.sessoes s ON s.id = e.sessao_id WHERE e.id = respostas_enquete.enquete_id AND s.professor_id = auth.uid())
+);
+
+-- POLICIES: duvidas
+CREATE POLICY "Aluno envia dúvida" ON public.duvidas FOR INSERT WITH CHECK (
+  EXISTS (SELECT 1 FROM public.sessoes s WHERE s.id = duvidas.sessao_id AND s.status = 'ativa' AND esta_matriculado(s.disciplina_id))
+);
+CREATE POLICY "Todos veem dúvidas da sessão" ON public.duvidas FOR SELECT USING (
+  EXISTS (SELECT 1 FROM public.sessoes s WHERE s.id = duvidas.sessao_id AND (s.professor_id = auth.uid() OR esta_matriculado(s.disciplina_id)))
+);
+CREATE POLICY "Visitantes podem ver dúvidas da sessão" ON public.duvidas FOR SELECT TO anon USING (
+  EXISTS (SELECT 1 FROM public.sessoes s WHERE s.id = duvidas.sessao_id)
+);
+CREATE POLICY "Professor responde dúvidas" ON public.duvidas FOR UPDATE USING (
+  EXISTS (SELECT 1 FROM public.sessoes s WHERE s.id = duvidas.sessao_id AND s.professor_id = auth.uid())
+);
+
+-- POLICIES: votos_duvida
+CREATE POLICY "Aluno dá upvote" ON public.votos_duvida FOR INSERT WITH CHECK (
+  EXISTS (SELECT 1 FROM public.duvidas d JOIN public.sessoes s ON s.id = d.sessao_id WHERE d.id = votos_duvida.duvida_id AND s.status = 'ativa' AND esta_matriculado(s.disciplina_id))
+);
+
+-- POLICIES: avaliacoes_rapidas
+CREATE POLICY "Aluno avalia aula" ON public.avaliacoes_rapidas FOR INSERT WITH CHECK (
+  EXISTS (SELECT 1 FROM public.sessoes s WHERE s.id = avaliacoes_rapidas.sessao_id AND s.status = 'encerrada' AND esta_matriculado(s.disciplina_id))
+);
+CREATE POLICY "Professor lê avaliações" ON public.avaliacoes_rapidas FOR SELECT USING (
+  EXISTS (SELECT 1 FROM public.sessoes s WHERE s.id = avaliacoes_rapidas.sessao_id AND s.professor_id = auth.uid())
+);
+
+-- GRANT da função analítica (Dashboard)
+GRANT EXECUTE ON FUNCTION public.get_course_insights(UUID) TO authenticated;
+
+-- POLICIES: grupos_estudo
+CREATE POLICY "Qualquer um pode ver grupos de estudo ativos" ON public.grupos_estudo 
+  FOR SELECT USING (status = 'ativo' OR criador_id = auth.uid());
+
+CREATE POLICY "Usuário autenticado pode criar grupo de estudo" ON public.grupos_estudo 
+  FOR INSERT WITH CHECK (criador_id = auth.uid() AND auth.role() = 'authenticated');
+
+CREATE POLICY "Criador gerencia próprio grupo de estudo" ON public.grupos_estudo 
+  FOR UPDATE USING (criador_id = auth.uid());
+
+CREATE POLICY "Criador deleta próprio grupo de estudo" ON public.grupos_estudo 
+  FOR DELETE USING (criador_id = auth.uid());
+
+-- POLICIES: grupos_membros (Padrão FMP - Sem auto-joins recursivos)
+CREATE POLICY "Membros são públicos para leitura" ON public.grupos_membros 
+  FOR SELECT USING (true);
+
+CREATE POLICY "Usuário se inscreve em grupo de estudo" ON public.grupos_membros 
+  FOR INSERT TO authenticated WITH CHECK (usuario_id = auth.uid());
+
+CREATE POLICY "Usuário cancela inscrição ou criador remove membro" ON public.grupos_membros 
+  FOR DELETE TO authenticated USING (
+    usuario_id = auth.uid() 
+    OR EXISTS (
+      SELECT 1 FROM public.grupos_estudo ge 
+      WHERE ge.id = grupos_membros.grupo_id AND ge.criador_id = auth.uid()
+    )
+  );
+
+-- POLICIES: registros_encontro
+CREATE POLICY "Membros veem registros de encontros do grupo" ON public.registros_encontro 
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM public.grupos_membros gm 
+      WHERE gm.grupo_id = registros_encontro.grupo_id AND gm.usuario_id = auth.uid()
+    )
+    OR EXISTS (
+      SELECT 1 FROM public.grupos_estudo ge 
+      WHERE ge.id = registros_encontro.grupo_id AND ge.criador_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Monitores e criadores registram encontros" ON public.registros_encontro 
+  FOR INSERT WITH CHECK (
+    registrado_por = auth.uid() AND (
+      EXISTS (
+        SELECT 1 FROM public.grupos_estudo ge 
+        WHERE ge.id = registros_encontro.grupo_id AND ge.criador_id = auth.uid()
+      )
+      OR EXISTS (
+        SELECT 1 FROM public.grupos_membros gm 
+        WHERE gm.grupo_id = registros_encontro.grupo_id AND gm.usuario_id = auth.uid() AND gm.is_monitor = true
+      )
+    )
+  );
+
+CREATE POLICY "Registrante ou criador atualiza registro de encontro" ON public.registros_encontro 
+  FOR UPDATE USING (
+    registrado_por = auth.uid() 
+    OR EXISTS (
+      SELECT 1 FROM public.grupos_estudo ge 
+      WHERE ge.id = registros_encontro.grupo_id AND ge.criador_id = auth.uid()
+    )
+  );
+
+-- GRANTS: View pública e RPCs de grupos de estudo (Zero-Direct-Access)
+GRANT SELECT ON public.view_grupos_estudo_publicos TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.link_member_to_study_group(UUID) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.export_my_data() TO authenticated;
+
+-- ============================================================
+-- RLS & POLICIES: dispositivos_usuarios & notificacoes
+-- ============================================================
+ALTER TABLE public.dispositivos_usuarios ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.notificacoes ENABLE ROW LEVEL SECURITY;
+
+-- POLICIES: dispositivos_usuarios
+CREATE POLICY "Usuário gerencia seus próprios dispositivos cadastrados" ON public.dispositivos_usuarios
+  FOR ALL USING (usuario_id = auth.uid())
+  WITH CHECK (usuario_id = auth.uid());
+
+-- POLICIES: notificacoes
+CREATE POLICY "Usuário lê suas próprias notificações" ON public.notificacoes
+  FOR SELECT USING (usuario_id = auth.uid());
+
+CREATE POLICY "Usuário atualiza status de leitura de suas notificações" ON public.notificacoes
+  FOR UPDATE USING (usuario_id = auth.uid())
+  WITH CHECK (usuario_id = auth.uid());
+
+CREATE POLICY "Usuário remove suas notificações" ON public.notificacoes
+  FOR DELETE USING (usuario_id = auth.uid());
+
+CREATE POLICY "Usuários autenticados criam notificações para si mesmos" ON public.notificacoes
+  FOR INSERT WITH CHECK (usuario_id = auth.uid());
+
+-- GRANTS: Dispositivos, Notificações e RPCs
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.dispositivos_usuarios TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.notificacoes TO authenticated;
+GRANT EXECUTE ON FUNCTION public.enviar_notificacao_evento(UUID, TEXT, TEXT, tipo_notificacao, TEXT, JSONB) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.notificar_turma_sessao(UUID, TEXT, TEXT, tipo_notificacao, TEXT, JSONB) TO authenticated;
+
+

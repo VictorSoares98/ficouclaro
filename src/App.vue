@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
+
 import { App as CapacitorApp } from '@capacitor/app';
 import { SplashScreen } from '@capacitor/splash-screen';
 import { Platform } from 'quasar';
@@ -9,23 +10,44 @@ import { supabaseClient } from '@/core/supabase/client';
 import { useAuthStore } from '@/stores/auth.store';
 import { useThemeStore } from '@/stores/theme.store';
 import { useAccessibilityStore } from '@/stores/accessibility.store';
+import { useNotificationStore } from '@/stores/notification.store';
 import type { AuthChangeEvent, Session, Subscription } from '@supabase/supabase-js';
 import { useQuasar } from 'quasar';
 import { useNetworkStatus } from '@/core/composables/useNetworkStatus';
 import LibrasWidget from '@/components/LibrasWidget.vue';
+import LockScreen from '@/components/LockScreen.vue';
+import { useSessionTimeout } from '@/core/composables/useSessionTimeout';
+import { ROUTE_ROLES } from '@/router/route-meta';
 
 const authStore = useAuthStore();
 const themeStore = useThemeStore();
 const accessibilityStore = useAccessibilityStore();
+const notificationStore = useNotificationStore();
 const router = useRouter();
 const $q = useQuasar();
 
 const { isOnline } = useNetworkStatus();
 
+// Ativa temporizadores de inatividade e background (Padrão 3)
+useSessionTimeout();
+
 // Inicialização síncrona do tema antes de montar o DOM para prevenir FOUC visual
 themeStore.initTheme();
 accessibilityStore.initAccessibility();
 let authListener: Subscription | null = null;
+
+if (import.meta.env.DEV) {
+  window.lockSession = (force = true) => {
+    if (force) {
+      authStore.isLocked = true;
+    } else {
+      authStore.lockSession();
+    }
+  };
+  window.unlockSession = () => {
+    authStore.unlockSession();
+  };
+}
 
 const splashRef = ref<InstanceType<typeof AnimatedSplash> | null>(null);
 const showVueSplash = ref(true);
@@ -92,6 +114,11 @@ onMounted(async () => {
     async (event: AuthChangeEvent, session: Session | null) => {
       if (event === 'SIGNED_OUT' || !session) {
         authStore.clearUser();
+        const currentPath = router.currentRoute.value.path;
+        const rootPath = `/${currentPath.split('/')[1]}`;
+        if (ROUTE_ROLES[rootPath]) {
+          void router.replace('/login');
+        }
       } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
         await authStore.reloadProfile(session.user);
       }
@@ -100,8 +127,22 @@ onMounted(async () => {
   authListener = data.subscription;
 });
 
+// Sincroniza escuta em tempo real de notificações quando o usuário autenticado mudar
+watch(
+  () => authStore.user?.auth.id,
+  (newUserId) => {
+    if (newUserId) {
+      void notificationStore.initUserNotifications(newUserId);
+    } else {
+      notificationStore.cleanupUserNotifications();
+    }
+  },
+  { immediate: true },
+);
+
 onUnmounted(() => {
   // Limpeza de memória obrigatória (Observability rule)
+  notificationStore.cleanupUserNotifications();
   if (authListener) {
     authListener.unsubscribe();
   }
@@ -120,8 +161,9 @@ onUnmounted(() => {
 
   <!-- SPLASH ANIMADO SOBREPOSTO A TUDO -->
   <AnimatedSplash v-if="showVueSplash" ref="splashRef" />
-  
+
   <LibrasWidget />
+  <LockScreen v-if="authStore.isLocked" />
 
   <router-view v-slot="{ Component }">
     <transition name="q-transition--fade" mode="out-in">

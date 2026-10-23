@@ -23,15 +23,20 @@ function handleSubmit() {
 
 <template>
   <q-card flat bordered class="tw-p-4 tw-rounded-xl tw-w-full">
-    <div class="tw-flex tw-items-center tw-justify-between tw-mb-2">
-      <div class="tw-text-sm tw-font-semibold text-muted">Tem alguma dúvida?</div>
-      <q-checkbox
-        v-model="isAnonymous"
-        label="Enviar anonimamente"
-        color="primary"
-        dense
-        class="text-muted tw-text-sm"
-      />
+    <div class="tw-flex tw-items-start tw-justify-between tw-mb-2">
+      <div class="tw-text-sm tw-font-semibold text-muted tw-pt-1">Tem alguma dúvida?</div>
+      <div class="tw-flex tw-flex-col tw-items-end">
+        <q-checkbox
+          v-model="isAnonymous"
+          label="Enviar anonimamente"
+          color="primary"
+          dense
+          class="text-muted tw-text-sm"
+        />
+        <div v-if="isAnonymous" class="tw-text-[10px] text-warning tw-mt-1">
+          O anonimato é revogado em caso de ofensas.
+        </div>
+      </div>
     </div>
     <q-input
       v-model="text"

@@ -4,12 +4,45 @@ import type { Database } from '@/core/types/database.types';
 export type StatusSessao = Database['public']['Enums']['status_sessao'];
 export type Sessao = Database['public']['Tables']['sessoes']['Row'];
 
+export interface CourseSessionInfo {
+  id: string;
+  status: StatusSessao;
+  topico: string | null;
+}
+
 export class SessionService {
   /**
    * Cria uma nova sessão (aula) para uma disciplina.
    * A sessão inicia com o status 'aguardando'.
    */
   async createSession(professorId: string, disciplinaId: string, topico?: string): Promise<Sessao> {
+    // 1. Verifica se já existe uma sessão em 'aguardando' ou 'ativa' para esta disciplina (idempotência)
+    const { data: existingSession, error: checkError } = await supabase
+      .from('sessoes')
+      .select('*')
+      .eq('disciplina_id', disciplinaId)
+      .in('status', ['aguardando', 'ativa'])
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (checkError) {
+      console.warn('Erro ao verificar sessão existente:', checkError.message);
+    }
+
+    if (existingSession) {
+      if (topico && existingSession.status === 'aguardando' && existingSession.topico !== topico) {
+        const { data: updated } = await supabase
+          .from('sessoes')
+          .update({ topico })
+          .eq('id', existingSession.id)
+          .select()
+          .single();
+        if (updated) return updated;
+      }
+      return existingSession;
+    }
+
     const { data, error } = await supabase
       .from('sessoes')
       .insert({
@@ -93,15 +126,17 @@ export class SessionService {
   }
 
   /**
-   * Busca o status atual da sessão mais recente para uma lista de cursos.
-   * Retorna um mapa { [courseId]: StatusSessao }
+   * Busca as sessões ativas ('aguardando' ou 'ativa') para uma lista de cursos.
+   * Retorna um mapa { [courseId]: CourseSessionInfo }
    */
-  async getActiveSessionsForCourses(courseIds: string[]): Promise<Record<string, StatusSessao>> {
+  async getActiveSessionsForCourses(
+    courseIds: string[],
+  ): Promise<Record<string, CourseSessionInfo>> {
     if (courseIds.length === 0) return {};
 
     const { data, error } = await supabase
       .from('sessoes')
-      .select('disciplina_id, status')
+      .select('id, disciplina_id, status, topico')
       .in('disciplina_id', courseIds)
       .in('status', ['aguardando', 'ativa'])
       .order('created_at', { ascending: false });
@@ -111,15 +146,19 @@ export class SessionService {
       return {};
     }
 
-    const statusMap: Record<string, StatusSessao> = {};
-    // Como está ordenado decrescente, o primeiro que aparecer de cada disciplina é o mais recente
+    const sessionMap: Record<string, CourseSessionInfo> = {};
+    // Como está ordenado decrescente, o primeiro que aparecer de cada disciplina é a sessão ativa mais recente
     data?.forEach((sessao) => {
-      if (!statusMap[sessao.disciplina_id]) {
-        statusMap[sessao.disciplina_id] = sessao.status;
+      if (!sessionMap[sessao.disciplina_id]) {
+        sessionMap[sessao.disciplina_id] = {
+          id: sessao.id,
+          status: sessao.status,
+          topico: sessao.topico,
+        };
       }
     });
 
-    return statusMap;
+    return sessionMap;
   }
 }
 
