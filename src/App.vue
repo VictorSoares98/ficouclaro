@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
+
 import { App as CapacitorApp } from '@capacitor/app';
 import { SplashScreen } from '@capacitor/splash-screen';
 import { Platform } from 'quasar';
@@ -9,6 +10,7 @@ import { supabaseClient } from '@/core/supabase/client';
 import { useAuthStore } from '@/stores/auth.store';
 import { useThemeStore } from '@/stores/theme.store';
 import { useAccessibilityStore } from '@/stores/accessibility.store';
+import { useNotificationStore } from '@/stores/notification.store';
 import type { AuthChangeEvent, Session, Subscription } from '@supabase/supabase-js';
 import { useQuasar } from 'quasar';
 import { useNetworkStatus } from '@/core/composables/useNetworkStatus';
@@ -20,6 +22,7 @@ import { ROUTE_ROLES } from '@/router/route-meta';
 const authStore = useAuthStore();
 const themeStore = useThemeStore();
 const accessibilityStore = useAccessibilityStore();
+const notificationStore = useNotificationStore();
 const router = useRouter();
 const $q = useQuasar();
 
@@ -124,8 +127,22 @@ onMounted(async () => {
   authListener = data.subscription;
 });
 
+// Sincroniza escuta em tempo real de notificações quando o usuário autenticado mudar
+watch(
+  () => authStore.user?.auth.id,
+  (newUserId) => {
+    if (newUserId) {
+      void notificationStore.initUserNotifications(newUserId);
+    } else {
+      notificationStore.cleanupUserNotifications();
+    }
+  },
+  { immediate: true },
+);
+
 onUnmounted(() => {
   // Limpeza de memória obrigatória (Observability rule)
+  notificationStore.cleanupUserNotifications();
   if (authListener) {
     authListener.unsubscribe();
   }
