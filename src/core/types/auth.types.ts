@@ -11,3 +11,9 @@ export interface AppUser {
   auth: SupabaseUser;
   perfil: Perfil;
 }
+
+export interface OAuthMetadata {
+  papel?: PapelUsuario;
+  termos_aceitos_em?: string;
+  versao_termos?: string;
+}

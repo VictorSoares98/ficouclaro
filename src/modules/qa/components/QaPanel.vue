@@ -14,6 +14,11 @@ const authStore = useAuthStore();
 const $q = useQuasar();
 
 const isProfessor = computed(() => authStore.user?.perfil.papel === 'professor');
+const isGuest = computed(() => {
+  return (
+    typeof window !== 'undefined' && Boolean(sessionStorage.getItem('ficouclaro_guest_session'))
+  );
+});
 
 onMounted(() => {
   if (sessionStore.currentSession) {
@@ -28,6 +33,17 @@ onUnmounted(() => {
 });
 
 async function handleSubmit(payload: { text: string; isAnonymous: boolean }) {
+  if (isGuest.value) {
+    $q.notify({
+      type: 'warning',
+      icon: 'school',
+      message:
+        'Você está no modo visitante! Crie sua conta gratuita de aluno para registrar dúvidas no painel da turma.',
+      position: 'top',
+    });
+    return;
+  }
+
   if (sessionStore.currentSession) {
     try {
       await qaStore.submitQuestion(

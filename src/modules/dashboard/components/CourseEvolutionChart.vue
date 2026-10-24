@@ -101,7 +101,11 @@ const chartOptions = computed<EChartsOption>(() => {
 </script>
 
 <template>
-  <div class="tw-h-[300px] tw-w-full" role="img" aria-label="Gráfico em linha mostrando a evolução da média de avaliações das sessões">
+  <div
+    class="tw-h-[300px] tw-w-full"
+    role="img"
+    aria-label="Gráfico em linha mostrando a evolução da média de avaliações das sessões"
+  >
     <v-chart class="tw-w-full tw-h-full" :option="chartOptions" autoresize />
   </div>
 </template>

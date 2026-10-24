@@ -8,7 +8,10 @@ import ThermometerDisplay from '@/modules/thermometer/components/ThermometerDisp
 import QaPanel from '@/modules/qa/components/QaPanel.vue';
 import ProfessorPollPanel from '@/modules/poll/components/ProfessorPollPanel.vue';
 import ProfessorReviewPanel from '@/modules/flash-review/components/ProfessorReviewPanel.vue';
-import QrcodeVue from 'qrcode.vue';
+import ClassroomQrCard from '@/components/ClassroomQrCard.vue';
+import ProfessorWaitingRoom from '@/modules/session/components/ProfessorWaitingRoom.vue';
+
+import { getClassroomJoinUrl } from '@/modules/courses/utils/invite.utils';
 
 const route = useRoute();
 const router = useRouter();
@@ -18,6 +21,7 @@ const $q = useQuasar();
 
 const sessionId = String((route.params as Record<string, unknown>).id);
 const tab = ref('termometro');
+const isQrDialogOpen = ref(false);
 
 const currentCourse = computed(() => {
   if (!sessionStore.currentSession) return null;
@@ -26,10 +30,9 @@ const currentCourse = computed(() => {
   );
 });
 
-const qrValue = computed(() => {
+const classroomUrl = computed(() => {
   if (!currentCourse.value) return '';
-  const baseUrl = 'https://ficouclaro.pages.dev/';
-  return `${baseUrl}#/hub?join=${currentCourse.value.codigo_convite}`;
+  return getClassroomJoinUrl(currentCourse.value.codigo_convite);
 });
 
 onMounted(async () => {
@@ -85,41 +88,45 @@ function handleEnd() {
 
 <template>
   <q-page class="tw-flex tw-flex-col tw-h-[calc(100vh-64px)]">
-    <!-- Header Fixo da Sessão -->
-    <div class="tw-p-4 tw-shadow-sm tw-flex tw-justify-between tw-items-center">
-      <div v-if="sessionStore.currentSession">
+    <!-- Header Fixo da Sessão (Exibido apenas quando a aula estiver Ativa ou Encerrada) -->
+    <div
+      v-if="sessionStore.currentSession && sessionStore.currentSession.status !== 'aguardando'"
+      class="tw-p-4 tw-shadow-sm tw-flex tw-justify-between tw-items-center"
+    >
+      <div>
         <h1 class="tw-text-xl tw-font-bold tw-text-primary">
           {{ sessionStore.currentSession.topico || 'Aula sem Tópico' }}
         </h1>
         <div class="tw-flex tw-items-center tw-space-x-2 tw-mt-1 tw-text-sm">
           <q-badge
-            :color="
-              sessionStore.currentSession.status === 'aguardando'
-                ? 'warning'
-                : sessionStore.currentSession.status === 'ativa'
-                  ? 'positive'
-                  : 'negative'
-            "
+            :color="sessionStore.currentSession.status === 'ativa' ? 'positive' : 'negative'"
           >
             {{ sessionStore.currentSession.status.toUpperCase() }}
           </q-badge>
         </div>
       </div>
-      <div v-else>
-        <q-skeleton type="text" width="150px" />
-      </div>
 
-      <!-- Controles de Ação -->
-      <div v-if="sessionStore.currentSession" class="tw-flex tw-space-x-2">
+      <!-- Controles de Ação para Aula Ativa ou Encerrada -->
+      <div class="tw-flex tw-items-center tw-space-x-2">
         <q-btn
-          v-if="
-            sessionStore.currentSession.status === 'aguardando' ||
-            sessionStore.currentSession.status === 'encerrada'
-          "
+          v-if="currentCourse"
+          outline
+          color="primary"
+          icon="qr_code_2"
+          :label="$q.screen.gt.xs ? 'QR Code' : undefined"
+          class="tw-rounded-xl"
+          @click="isQrDialogOpen = true"
+        >
+          <q-tooltip>Exibir QR Code e Código da Turma</q-tooltip>
+        </q-btn>
+
+        <q-btn
+          v-if="sessionStore.currentSession.status === 'encerrada'"
           color="primary"
           outline
           icon="arrow_back"
           label="Voltar"
+          class="tw-rounded-xl"
           to="/disciplinas"
         />
         <q-btn
@@ -127,6 +134,7 @@ function handleEnd() {
           color="negative"
           icon="stop"
           label="Encerrar"
+          class="tw-rounded-xl"
           @click="handleEnd"
         />
       </div>
@@ -190,42 +198,28 @@ function handleEnd() {
       </q-tab-panels>
     </div>
 
-    <!-- State Aguardando -->
-    <div
-      class="tw-flex-1 tw-flex tw-items-center tw-justify-center"
+    <!-- State Aguardando: Nova Sala de Espera Completa com Cockpit Bento -->
+    <ProfessorWaitingRoom
       v-else-if="sessionStore.currentSession && sessionStore.currentSession.status === 'aguardando'"
-    >
-      <div class="tw-text-center">
-        <h2 class="tw-text-2xl tw-font-bold tw-text-primary tw-mb-2">Sala de Espera</h2>
-        <p class="text-muted tw-max-w-md tw-mx-auto tw-mb-6">
-          Os alunos já podem entrar na aula. Escaneie o QR Code abaixo ou acesse pelo código da
-          turma.
-        </p>
+      :session="sessionStore.currentSession"
+      :course="currentCourse"
+      :classroomUrl="classroomUrl"
+      :isStarting="sessionStore.isLoading"
+      @start="handleStart"
+    />
 
-        <!-- QR Code -->
-        <div
+    <!-- Modal de Exibição Rápida do QR Code da Turma -->
+    <q-dialog v-model="isQrDialogOpen" :position="$q.screen.lt.md ? 'bottom' : 'standard'">
+      <div class="tw-max-w-md tw-w-full">
+        <ClassroomQrCard
           v-if="currentCourse"
-          class="tw-bg-white tw-p-4 tw-rounded-xl tw-shadow-sm tw-inline-block tw-mb-4"
-        >
-          <QrcodeVue :value="qrValue" :size="200" level="H" />
-        </div>
-
-        <div
-          v-if="currentCourse"
-          class="tw-text-4xl tw-font-black tw-tracking-widest tw-text-primary tw-uppercase tw-mb-8"
-        >
-          {{ currentCourse.codigo_convite }}
-        </div>
-
-        <q-btn
-          color="positive"
-          size="lg"
-          icon="play_arrow"
-          label="Iniciar Aula"
-          class="tw-w-full tw-max-w-xs tw-rounded-xl tw-shadow-md"
-          @click="handleStart"
+          :code="currentCourse.codigo_convite"
+          :title="currentCourse.nome"
+          :url="classroomUrl"
+          :showClose="true"
+          @close="isQrDialogOpen = false"
         />
       </div>
-    </div>
+    </q-dialog>
   </q-page>
 </template>

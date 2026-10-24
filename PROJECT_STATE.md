@@ -67,10 +67,15 @@ _Uma tarefa só é considerada concluída quando os critérios aplicáveis tiver
 
 _Esta seção é atualizada durante o ciclo de execução dos prompts._
 
-- **Sprint Ativa:** [A DEFINIR PELO FLUXO DA TAREFA]
-- **Tarefa Atual:** [A DEFINIR NO PROMPT 3]
-- **Critérios de Aceite:** [A DEFINIR NO PROMPT 3]
-- **Débitos Técnicos Mapeados:** [A DEFINIR PELO PROMPT 5, QUANDO APLICÁVEL]
+- **Sprint Ativa:** Sprint v2 - Refatoração Visual Global e Ergonomia
+- **Tarefa Atual:** Verificar QR Code (Aula 5)
+- **Critérios de Aceite:**
+  1. **Leitura e escaneamento de QR Code:** Modal com leitor de câmera de alto desempenho com mira visual responsiva, laser animado e renderização otimizada sem congelar a UI.
+  2. **Controle de lanterna e fallback de galeria:** Suporte a acionamento de tocha/lanterna (`torch`) em aparelhos compatíveis e carregamento de foto/print do rolo da câmera em caso de ausência de permissão.
+  3. **Parser resiliente e verificação semântica:** Reconhecimento automático de URLs completas (`https://.../join/:code`), hash links (`#/join/:code`), esquemas customizados (`ficouclaro://`) ou PIN direto de 8 dígitos alfanuméricos com checagem assíncrona no backend.
+  4. **Feedback multissensorial:** Notificação sonora procedural suave e vibração háptica (`@capacitor/haptics`) ao detectar o código com sucesso.
+  5. **Exibição persistente do QR Code pelo professor:** Botão de acesso rápido no cabeçalho de `ProfessorSessionPage.vue` para projetar o QR Code, copiar link ou compartilhar a qualquer momento durante a aula ativa.
+  6. **Integração nas telas de entrada do aluno:** Inclusão de gatilhos visuais de escaneamento em `SessionLobbyPage.vue` e `EnrollPage.vue`, conectando o aluno diretamente à aula ao vivo se houver sessão em andamento.
 
 ---
 

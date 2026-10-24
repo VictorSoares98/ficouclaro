@@ -9,6 +9,7 @@ import type {
   RealtimePostgresUpdatePayload,
 } from '@supabase/supabase-js';
 import { useAuthStore } from '@/stores/auth.store';
+import { soundService } from '@/core/services/sound.service';
 
 // Anti-corruption layer: Tipos locais planos para evitar limite de recursão (TS2589) no Pinia
 export interface Resposta {
@@ -220,6 +221,7 @@ export const usePollStore = defineStore('poll', () => {
       { event: 'INSERT', schema: 'public', table: 'enquetes', filter: `sessao_id=eq.${sessionId}` },
       (payload: RealtimePostgresInsertPayload<Enquete>) => {
         if (payload.new.status === 'ativa') {
+          soundService.playPollOpened();
           activePolls.value = [payload.new, ...activePolls.value];
         } else if (isProfessor) {
           pastPolls.value = [payload.new, ...pastPolls.value];
@@ -242,6 +244,7 @@ export const usePollStore = defineStore('poll', () => {
         }
         // Adiciona nas ativas se ativou
         else if (updatedPoll.status === 'ativa') {
+          soundService.playPollOpened();
           if (!activePolls.value.find((p) => p.id === updatedPoll.id)) {
             activePolls.value = [updatedPoll, ...activePolls.value];
           }

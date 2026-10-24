@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { authService } from '@/modules/auth/services/auth.service';
 import { useAsyncOperation } from '@/core/composables/useAsyncOperation';
-import type { AppUser } from '@/core/types/auth.types';
+import type { AppUser, OAuthMetadata } from '@/core/types/auth.types';
 import type {
   User as SupabaseUser,
   SignInWithPasswordCredentials,
@@ -14,11 +14,20 @@ export const useAuthStore = defineStore('auth', () => {
 
   // Flag para prevenção de FOUC (Flash of Unauthenticated Content)
   const isReady = ref(false);
+  const isLocked = ref(false);
   const { isLoading, error, execute } = useAsyncOperation();
 
   const isAuthenticated = computed(() => !!user.value);
   const isProfessor = computed(() => user.value?.perfil.papel === 'professor');
   const isAluno = computed(() => user.value?.perfil.papel === 'aluno');
+
+  const isOAuthUser = computed(() => {
+    if (!user.value) return false;
+    const provider = user.value.auth.app_metadata?.provider;
+    if (provider && provider !== 'email') return true;
+    const providers = user.value.auth.app_metadata?.providers;
+    return Boolean(providers && providers.length > 0 && !providers.includes('email'));
+  });
 
   /**
    * Carrega a sessão pela primeira vez quando o app inicia.
@@ -26,6 +35,9 @@ export const useAuthStore = defineStore('auth', () => {
   async function loadInitialSession() {
     await execute(async () => {
       user.value = await authService.getSessionUser();
+      if (user.value && typeof window !== 'undefined' && window.sessionStorage) {
+        sessionStorage.removeItem('ficouclaro_guest_session');
+      }
     }, 'Erro ao carregar sessão.');
     isReady.value = true;
   }
@@ -38,6 +50,9 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       const perfil = await authService.getProfile(authUser.id);
       user.value = { auth: authUser, perfil };
+      if (typeof window !== 'undefined' && window.sessionStorage) {
+        sessionStorage.removeItem('ficouclaro_guest_session');
+      }
     } catch (e) {
       console.error('Falha ao recarregar perfil no listener:', e);
       user.value = null;
@@ -49,11 +64,60 @@ export const useAuthStore = defineStore('auth', () => {
 
   function clearUser() {
     user.value = null;
+    isLocked.value = false;
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      sessionStorage.removeItem('ficouclaro_guest_session');
+    }
   }
 
   async function signOut() {
-    await authService.signOut();
-    clearUser();
+    try {
+      await authService.signOut();
+    } catch (error) {
+      console.warn(
+        '[AuthStore] Erro ao encerrar sessão remotamente, limpando estado local:',
+        error,
+      );
+    } finally {
+      clearUser();
+    }
+  }
+
+  function lockSession() {
+    if (isAuthenticated.value) {
+      isLocked.value = true;
+    }
+  }
+
+  function unlockSession() {
+    isLocked.value = false;
+  }
+
+  async function unlockWithPassword(password: string): Promise<boolean> {
+    const userEmail = user.value?.auth.email;
+    if (!userEmail) return false;
+
+    try {
+      const data = await execute(async () => {
+        return await authService.signIn({
+          email: userEmail,
+          password,
+        });
+      }, 'Senha incorreta.');
+
+      if (data?.user) {
+        unlockSession();
+        return true;
+      }
+      return false;
+    } catch {
+      return false;
+    }
+  }
+
+  async function unlockWithGoogle() {
+    unlockSession();
+    await loginWithGoogle();
   }
 
   async function deleteAccount() {
@@ -72,9 +136,9 @@ export const useAuthStore = defineStore('auth', () => {
     }, 'Erro ao fazer login. Verifique suas credenciais.');
   }
 
-  async function loginWithGoogle() {
+  async function loginWithGoogle(metadata?: OAuthMetadata) {
     return execute(async () => {
-      await authService.signInWithOAuth('google');
+      await authService.signInWithOAuth('google', metadata);
     }, 'Erro ao inicializar login com Google.');
   }
 
@@ -90,15 +154,21 @@ export const useAuthStore = defineStore('auth', () => {
   return {
     user,
     isReady,
+    isLocked,
     isLoading,
     error,
     isAuthenticated,
     isProfessor,
     isAluno,
+    isOAuthUser,
     loadInitialSession,
     reloadProfile,
     clearUser,
     signOut,
+    lockSession,
+    unlockSession,
+    unlockWithPassword,
+    unlockWithGoogle,
     login,
     loginWithGoogle,
     register,

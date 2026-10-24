@@ -164,6 +164,53 @@ export class CourseService {
 
     return data;
   }
+
+  /**
+   * Busca os metadados públicos de uma disciplina através do código de convite.
+   * Funciona tanto para visitantes não autenticados quanto para alunos autenticados.
+   */
+  async getCourseDetailsByInviteCode(
+    codigoConvite: string,
+  ): Promise<ClassroomInviteDetails | null> {
+    const code = codigoConvite.trim().toLowerCase();
+    const { data, error } = await (
+      supabase as unknown as {
+        rpc: (
+          fn: string,
+          args: Record<string, unknown>,
+        ) => Promise<{ data: ClassroomInviteDetails[] | null; error: Error | null }>;
+      }
+    ).rpc('obter_detalhes_convite', {
+      p_codigo: code,
+    });
+
+    if (error) {
+      console.warn('Erro ao obter detalhes do convite:', error.message);
+      return null;
+    }
+
+    if (data && Array.isArray(data) && data.length > 0) {
+      return data[0] || null;
+    }
+
+    return null;
+  }
+}
+
+export interface ClassroomInviteDetails {
+  disciplina_id: string;
+  nome: string;
+  descricao: string | null;
+  curso: string | null;
+  semestre: string | null;
+  turma: string | null;
+  sala: string | null;
+  bloco: string | null;
+  icone: string | null;
+  codigo_convite: string;
+  professor_nome: string;
+  professor_avatar: string | null;
+  sessao_ativa_id: string | null;
 }
 
 export const courseService = new CourseService();

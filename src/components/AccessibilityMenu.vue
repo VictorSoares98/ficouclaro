@@ -7,6 +7,15 @@ import type { FontScale } from '@/core/types/accessibility.types';
 const accessibilityStore = useAccessibilityStore();
 const themeStore = useThemeStore();
 
+withDefaults(
+  defineProps<{
+    color?: string;
+  }>(),
+  {
+    color: 'primary',
+  },
+);
+
 const themeOptions: { value: AppTheme; label: string }[] = [
   { value: 'default', label: 'Default (Azul)' },
   { value: 'ocean', label: 'Ocean (Ciano)' },
@@ -30,15 +39,20 @@ function setFontScale(scale: FontScale) {
 function selectTheme(theme: AppTheme) {
   themeStore.setTheme(theme);
 }
+
+function handleLibrasAction() {
+  if (accessibilityStore.isLibrasLoading || accessibilityStore.librasEnabled) return;
+  void accessibilityStore.activateLibras();
+}
 </script>
 
 <template>
   <q-btn-dropdown
     flat
     dense
-    color="white"
+    :color="color"
     icon="settings_accessibility"
-    class="tw-mr-2"
+    class="tw-mr-2 tw-rounded-xl"
     aria-label="Menu de Acessibilidade e Aparência"
   >
     <q-list style="min-width: 250px">
@@ -53,7 +67,10 @@ function selectTheme(theme: AppTheme) {
         :active="accessibilityStore.fontScale === option.value"
       >
         <q-item-section avatar>
-          <q-icon name="format_size" :class="{ 'text-primary': accessibilityStore.fontScale === option.value }" />
+          <q-icon
+            name="format_size"
+            :class="{ 'text-primary': accessibilityStore.fontScale === option.value }"
+          />
         </q-item-section>
         <q-item-section>{{ option.label }}</q-item-section>
       </q-item>
@@ -70,8 +87,11 @@ function selectTheme(theme: AppTheme) {
         @click="selectTheme(option.value)"
         :active="themeStore.activeTheme === option.value"
       >
-         <q-item-section avatar>
-          <q-icon name="palette" :class="{ 'text-primary': themeStore.activeTheme === option.value }" />
+        <q-item-section avatar>
+          <q-icon
+            name="palette"
+            :class="{ 'text-primary': themeStore.activeTheme === option.value }"
+          />
         </q-item-section>
         <q-item-section>{{ option.label }}</q-item-section>
       </q-item>
@@ -80,15 +100,30 @@ function selectTheme(theme: AppTheme) {
 
       <!-- Seção: Iluminação -->
       <q-item-label header class="tw-font-bold">Iluminação</q-item-label>
-      <q-item clickable v-close-popup @click="themeStore.setMode('light')" :active="themeStore.activeMode === 'light'">
+      <q-item
+        clickable
+        v-close-popup
+        @click="themeStore.setMode('light')"
+        :active="themeStore.activeMode === 'light'"
+      >
         <q-item-section avatar><q-icon name="light_mode" /></q-item-section>
         <q-item-section>Claro</q-item-section>
       </q-item>
-      <q-item clickable v-close-popup @click="themeStore.setMode('dark')" :active="themeStore.activeMode === 'dark'">
+      <q-item
+        clickable
+        v-close-popup
+        @click="themeStore.setMode('dark')"
+        :active="themeStore.activeMode === 'dark'"
+      >
         <q-item-section avatar><q-icon name="dark_mode" /></q-item-section>
         <q-item-section>Escuro</q-item-section>
       </q-item>
-      <q-item clickable v-close-popup @click="themeStore.setMode('auto')" :active="themeStore.activeMode === 'auto'">
+      <q-item
+        clickable
+        v-close-popup
+        @click="themeStore.setMode('auto')"
+        :active="themeStore.activeMode === 'auto'"
+      >
         <q-item-section avatar><q-icon name="brightness_auto" /></q-item-section>
         <q-item-section>Automático</q-item-section>
       </q-item>
@@ -97,13 +132,49 @@ function selectTheme(theme: AppTheme) {
 
       <!-- Seção: Libras -->
       <q-item-label header class="tw-font-bold">Inclusão</q-item-label>
-      <q-item clickable v-close-popup @click="accessibilityStore.toggleLibras()">
+      <q-item
+        clickable
+        v-close-popup
+        :disable="accessibilityStore.isLibrasLoading || accessibilityStore.librasEnabled"
+        @click="handleLibrasAction"
+      >
         <q-item-section avatar>
-          <q-icon name="sign_language" :class="{ 'text-primary': accessibilityStore.librasEnabled }" />
+          <q-spinner v-if="accessibilityStore.isLibrasLoading" size="20px" color="primary" />
+          <q-icon
+            v-else
+            name="sign_language"
+            :class="{ 'text-primary': accessibilityStore.librasEnabled }"
+          />
         </q-item-section>
-        <q-item-section>Intérprete de Libras</q-item-section>
+        <q-item-section>
+          <div>Intérprete de Libras</div>
+          <div v-if="accessibilityStore.isLibrasLoading" class="text-caption text-primary">
+            Carregando intérprete...
+          </div>
+          <div v-else-if="accessibilityStore.librasEnabled" class="text-caption text-positive">
+            Ativo (Salvo no dispositivo)
+          </div>
+          <div v-else class="text-caption text-muted">Clique para ativar</div>
+        </q-item-section>
         <q-item-section side>
-          <q-toggle :model-value="accessibilityStore.librasEnabled" @update:model-value="accessibilityStore.toggleLibras()" />
+          <q-badge
+            v-if="accessibilityStore.librasEnabled"
+            color="positive"
+            rounded
+            class="tw-text-[10px]"
+          >
+            Ativo
+          </q-badge>
+          <q-btn
+            v-else
+            outline
+            dense
+            rounded
+            size="sm"
+            color="primary"
+            label="Ativar"
+            :loading="accessibilityStore.isLibrasLoading"
+          />
         </q-item-section>
       </q-item>
     </q-list>

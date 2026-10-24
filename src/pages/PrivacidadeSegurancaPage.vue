@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth.store';
 import { useQuasar } from 'quasar';
+import { supabaseClient } from '@/core/supabase/client';
 import BaseSurfaceCard from '@/core/components/BaseSurfaceCard.vue';
 
 const authStore = useAuthStore();
@@ -29,7 +30,7 @@ function confirmDeleteAccount() {
 
     void (async () => {
       try {
-        $q.loading.show({ message: 'Excluindo conta...' });
+        $q.loading.show({ message: 'Excluindo conta com segurança...' });
         await authStore.deleteAccount();
         $q.notify({ color: 'positive', message: 'Conta excluída com sucesso.' });
         setTimeout(() => {
@@ -45,45 +46,117 @@ function confirmDeleteAccount() {
   });
 }
 
-function getSanitizedData() {
+function getFallbackData() {
   if (!authStore.user) return null;
   return {
-    id: authStore.user.auth.id,
-    email: authStore.user.auth.email,
-    nome: authStore.user.perfil.nome_completo,
-    papel: authStore.user.perfil.papel,
-    criado_em: authStore.user.auth.created_at,
-    termos_aceitos_em: authStore.user.perfil.termos_aceitos_em,
-    versao_termos: authStore.user.perfil.versao_termos,
+    titular: {
+      id: authStore.user.auth.id,
+      email: authStore.user.auth.email,
+      nome_completo: authStore.user.perfil.nome_completo,
+      papel: authStore.user.perfil.papel,
+      criado_em: authStore.user.auth.created_at,
+      termos_aceitos_em: authStore.user.perfil.termos_aceitos_em,
+      versao_termos: authStore.user.perfil.versao_termos,
+    },
     exportado_em: new Date().toISOString(),
   };
 }
 
-function exportDataJSON() {
-  const dataToExport = getSanitizedData();
-  if (!dataToExport) {
-    $q.notify({ color: 'negative', message: 'Usuário não autenticado.' });
-    return;
+async function fetchFullUserData(): Promise<Record<string, unknown> | null> {
+  try {
+    const { data, error } = await supabaseClient.rpc('export_my_data');
+    if (error || !data) {
+      console.warn('[DSAR] Erro na RPC export_my_data, utilizando dados locais:', error);
+      return getFallbackData();
+    }
+    const parsed = typeof data === 'string' ? JSON.parse(data) : data;
+    return parsed as Record<string, unknown>;
+  } catch (err) {
+    console.warn('[DSAR] Exceção ao consultar export_my_data:', err);
+    return getFallbackData();
   }
-
-  const dataStr =
-    'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(dataToExport, null, 2));
-  triggerDownload(dataStr, 'meus_dados_ficou_claro.json');
 }
 
-function exportDataCSV() {
-  const data = getSanitizedData();
-  if (!data) {
-    $q.notify({ color: 'negative', message: 'Usuário não autenticado.' });
-    return;
+async function exportDataJSON() {
+  $q.loading.show({ message: 'Compilando seus dados...' });
+  try {
+    const dataToExport = await fetchFullUserData();
+    if (!dataToExport) {
+      $q.notify({ color: 'negative', message: 'Usuário não autenticado.' });
+      return;
+    }
+
+    const dataStr =
+      'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(dataToExport, null, 2));
+    triggerDownload(dataStr, 'meus_dados_ficou_claro.json');
+  } finally {
+    $q.loading.hide();
   }
+}
 
-  const keys = Object.keys(data);
-  const values = Object.values(data).map((v) => `"${String(v || '').replace(/"/g, '""')}"`);
-  const csvContent = `${keys.join(',')}\n${values.join(',')}`;
+function safeCsvVal(val: unknown): string {
+  if (typeof val === 'string') return val.replace(/"/g, '""');
+  if (typeof val === 'number' || typeof val === 'boolean') return String(val);
+  return '';
+}
 
-  const dataStr = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvContent);
-  triggerDownload(dataStr, 'meus_dados_ficou_claro.csv');
+async function exportDataCSV() {
+  $q.loading.show({ message: 'Compilando relatório em formato CSV...' });
+  try {
+    const fullData = await fetchFullUserData();
+    if (!fullData) {
+      $q.notify({ color: 'negative', message: 'Usuário não autenticado.' });
+      return;
+    }
+
+    const lines: string[] = ['=== PERFIL DO TITULAR ===', 'Campo,Valor'];
+    const titular = (fullData.titular as Record<string, unknown>) || {};
+    for (const [k, v] of Object.entries(titular)) {
+      lines.push(`"${k}","${safeCsvVal(v)}"`);
+    }
+
+    lines.push('', '=== MATRÍCULAS E DISCIPLINAS ===', 'Tipo,Nome,Curso,Semestre');
+    const matriculas = (fullData.matriculas as Array<Record<string, unknown>>) || [];
+    for (const m of matriculas) {
+      lines.push(
+        `"Aluno","${safeCsvVal(m.disciplina_nome)}","${safeCsvVal(m.curso)}","${safeCsvVal(m.semestre)}"`,
+      );
+    }
+    const lecionadas = (fullData.disciplinas_lecionadas as Array<Record<string, unknown>>) || [];
+    for (const d of lecionadas) {
+      lines.push(
+        `"Professor","${safeCsvVal(d.nome)}","${safeCsvVal(d.curso)}","${safeCsvVal(d.semestre)}"`,
+      );
+    }
+
+    lines.push('', '=== DÚVIDAS SUBMETIDAS ===', 'Texto,Votos,Respondida,Data');
+    const duvidas = (fullData.duvidas_submetidas as Array<Record<string, unknown>>) || [];
+    for (const dv of duvidas) {
+      const resp = dv.foi_respondida ? 'Sim' : 'Não';
+      lines.push(
+        `"${safeCsvVal(dv.texto)}","${safeCsvVal(dv.votos)}","${resp}","${safeCsvVal(dv.created_at)}"`,
+      );
+    }
+
+    lines.push('', '=== GRUPOS DE ESTUDO ===', 'Grupo,Papel,Instituição,Campus');
+    const criados = (fullData.grupos_estudo_criados as Array<Record<string, unknown>>) || [];
+    for (const g of criados) {
+      lines.push(
+        `"${safeCsvVal(g.nome)}","Criador","${safeCsvVal(g.instituicao)}","${safeCsvVal(g.campus)}"`,
+      );
+    }
+    const membro = (fullData.grupos_membro as Array<Record<string, unknown>>) || [];
+    for (const gm of membro) {
+      const papel = gm.is_monitor ? 'Monitor' : 'Membro';
+      lines.push(`"${safeCsvVal(gm.grupo_nome)}","${papel}","",""`);
+    }
+
+    const csvContent = lines.join('\n');
+    const dataStr = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvContent);
+    triggerDownload(dataStr, 'meus_dados_ficou_claro.csv');
+  } finally {
+    $q.loading.hide();
+  }
 }
 
 function triggerDownload(href: string, filename: string) {

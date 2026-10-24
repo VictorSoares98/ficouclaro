@@ -13,9 +13,9 @@ const $q = useQuasar();
 
     <q-page-container>
       <router-view />
+      <AppFooter v-if="$q.screen.gt.sm" />
     </q-page-container>
 
-    <AppFooter v-if="$q.screen.gt.sm" />
     <MobileNavBottom v-if="$q.screen.lt.md" />
   </q-layout>
 </template>
