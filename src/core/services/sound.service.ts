@@ -5,6 +5,45 @@
 class SoundService {
   private audioCtx: AudioContext | null = null;
   private isMuted = false;
+  private hasUserInteracted = false;
+
+  constructor() {
+    this.registerUserGestureListener();
+  }
+
+  /**
+   * Registra listeners passivos de interação para desbloquear o AudioContext
+   * em estrita conformidade com a política de Autoplay dos navegadores (W3C/MDN).
+   */
+  private registerUserGestureListener(): void {
+    if (typeof window === 'undefined') return;
+
+    const unlock = () => {
+      this.hasUserInteracted = true;
+      if (this.audioCtx && this.audioCtx.state === 'suspended') {
+        void this.audioCtx.resume().catch(() => {
+          // Ignora silenciosamente se o navegador ainda rejeitar
+        });
+      }
+      window.removeEventListener('pointerdown', unlock);
+      window.removeEventListener('keydown', unlock);
+      window.removeEventListener('touchstart', unlock);
+    };
+
+    window.addEventListener('pointerdown', unlock, { once: true, passive: true });
+    window.addEventListener('keydown', unlock, { once: true, passive: true });
+    window.addEventListener('touchstart', unlock, { once: true, passive: true });
+  }
+
+  /**
+   * Permite que componentes desbloqueiem ativamente o áudio ao receberem cliques de botões.
+   */
+  public unlockAudio(): void {
+    this.hasUserInteracted = true;
+    if (this.audioCtx && this.audioCtx.state === 'suspended') {
+      void this.audioCtx.resume().catch(() => {});
+    }
+  }
 
   private getAudioContext(): AudioContext | null {
     if (typeof window === 'undefined') return null;
@@ -14,12 +53,21 @@ class SoundService {
         window.AudioContext ||
         (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       if (AudioContextClass) {
-        this.audioCtx = new AudioContextClass();
+        try {
+          this.audioCtx = new AudioContextClass();
+        } catch {
+          return null;
+        }
       }
     }
 
     if (this.audioCtx && this.audioCtx.state === 'suspended') {
-      void this.audioCtx.resume();
+      if (this.hasUserInteracted) {
+        void this.audioCtx.resume().catch(() => {});
+      } else {
+        // Se ainda não houve interação do usuário, não tente tocar para não violar Autoplay Policy
+        return null;
+      }
     }
 
     return this.audioCtx;
@@ -43,7 +91,7 @@ class SoundService {
     peakVolume = 0.15,
   ): void {
     const ctx = this.getAudioContext();
-    if (!ctx || this.isMuted) return;
+    if (!ctx || ctx.state === 'suspended' || this.isMuted) return;
 
     try {
       const osc = ctx.createOscillator();
@@ -62,8 +110,8 @@ class SoundService {
 
       osc.start(startTime);
       osc.stop(startTime + duration + 0.05);
-    } catch (e) {
-      console.warn('[SoundService] Falha ao reproduzir tom procedural:', e);
+    } catch {
+      // Falha graciosa sem poluir o console
     }
   }
 

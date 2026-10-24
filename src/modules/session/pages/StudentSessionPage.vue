@@ -118,7 +118,12 @@ onUnmounted(() => {
     >
       <!-- Aguardando Professor -->
       <div v-if="sessionStore.currentSession.status === 'aguardando'" class="tw-w-full">
-        <WaitingRoomWidget :topic="sessionStore.currentSession.topico" />
+        <WaitingRoomWidget
+          :topic="sessionStore.currentSession.topico"
+          :sessionId="sessionStore.currentSession.id"
+          :isGuest="isGuest"
+          :guestName="guestSession?.guestName"
+        />
       </div>
 
       <!-- Sessão Ativa (Onde o termômetro ficará) -->

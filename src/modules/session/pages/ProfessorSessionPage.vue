@@ -9,6 +9,7 @@ import QaPanel from '@/modules/qa/components/QaPanel.vue';
 import ProfessorPollPanel from '@/modules/poll/components/ProfessorPollPanel.vue';
 import ProfessorReviewPanel from '@/modules/flash-review/components/ProfessorReviewPanel.vue';
 import ClassroomQrCard from '@/components/ClassroomQrCard.vue';
+import ProfessorWaitingRoom from '@/modules/session/components/ProfessorWaitingRoom.vue';
 
 import { getClassroomJoinUrl } from '@/modules/courses/utils/invite.utils';
 
@@ -206,39 +207,14 @@ function handleEnd() {
       </q-tab-panels>
     </div>
 
-    <!-- State Aguardando -->
-    <div
-      class="tw-flex-1 tw-flex tw-items-center tw-justify-center"
+    <!-- State Aguardando: Nova Sala de Espera Completa com Cockpit Bento -->
+    <ProfessorWaitingRoom
       v-else-if="sessionStore.currentSession && sessionStore.currentSession.status === 'aguardando'"
-    >
-      <div class="tw-text-center">
-        <h2 class="tw-text-2xl tw-font-bold tw-text-primary tw-mb-2">Sala de Espera</h2>
-        <p class="text-muted tw-max-w-md tw-mx-auto tw-mb-6">
-          Os alunos já podem entrar na aula. Escaneie o QR Code abaixo ou acesse pelo código da
-          turma.
-        </p>
-
-        <!-- QR Code com Moldura e Modo Telão -->
-        <div class="tw-max-w-md tw-mx-auto tw-mb-6">
-          <ClassroomQrCard
-            v-if="currentCourse"
-            :code="currentCourse.codigo_convite"
-            :title="currentCourse.nome"
-            :subtitle="'Os alunos já podem entrar na aula. Escaneie o QR Code abaixo ou acesse pelo código da turma.'"
-            :url="classroomUrl"
-          />
-        </div>
-
-        <q-btn
-          color="positive"
-          size="lg"
-          icon="play_arrow"
-          label="Iniciar Aula"
-          class="tw-w-full tw-max-w-xs tw-rounded-xl tw-shadow-md"
-          @click="handleStart"
-        />
-      </div>
-    </div>
+      :session="sessionStore.currentSession"
+      :course="currentCourse"
+      :classroomUrl="classroomUrl"
+      @start="handleStart"
+    />
 
     <!-- Modal de Exibição Rápida do QR Code da Turma -->
     <q-dialog v-model="isQrDialogOpen" :position="$q.screen.lt.md ? 'bottom' : 'standard'">
