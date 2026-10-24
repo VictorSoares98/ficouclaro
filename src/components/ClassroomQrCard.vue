@@ -9,6 +9,7 @@ import {
   shareClassroomLink,
 } from '@/modules/courses/utils/invite.utils';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
+import Fluent3dIcon from '@/core/components/Fluent3dIcon.vue';
 
 const props = withDefaults(
   defineProps<{
@@ -79,6 +80,42 @@ async function handleShare() {
   });
 }
 
+function loadImage(src: string): Promise<HTMLImageElement | null> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => resolve(img);
+    img.onerror = () => resolve(null);
+    img.src = src;
+  });
+}
+
+function drawRoundedRect(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  radius: number,
+) {
+  if (typeof ctx.roundRect === 'function') {
+    ctx.beginPath();
+    ctx.roundRect(x, y, width, height, radius);
+  } else {
+    ctx.beginPath();
+    ctx.moveTo(x + radius, y);
+    ctx.lineTo(x + width - radius, y);
+    ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+    ctx.lineTo(x + width, y + height - radius);
+    ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+    ctx.lineTo(x + radius, y + height);
+    ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+    ctx.lineTo(x, y + radius);
+    ctx.quadraticCurveTo(x, y, x + radius, y);
+    ctx.closePath();
+  }
+}
+
 async function downloadQrImage() {
   try {
     await Haptics.impact({ style: ImpactStyle.Medium });
@@ -97,45 +134,260 @@ async function downloadQrImage() {
       return;
     }
 
+    $q.loading.show({ message: 'Gerando Cartaz da Aula em Alta Resolução...' });
+
+    // 1. Converte SVG do QR code em imagem para desenho no Canvas
     const svgData = new XMLSerializer().serializeToString(svgElement);
     const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
     const URL = window.URL || window.webkitURL || window;
     const blobURL = URL.createObjectURL(svgBlob);
 
-    const image = new Image();
-    image.onload = () => {
-      const canvas = document.createElement('canvas');
-      const scale = 3; // Alta resolução (print quality)
-      const canvasSize = props.size * scale;
-      canvas.width = canvasSize;
-      canvas.height = canvasSize;
+    // 2. Carrega concorrentemente o QR Code e os Ícones 3D oficiais do repositório
+    const [qrImage, cap3dImage, bulb3dImage] = await Promise.all([
+      loadImage(blobURL),
+      loadImage('/images/fluent-3d/graduation-cap-3d.png'),
+      loadImage('/images/fluent-3d/light-bulb-3d.png'),
+    ]);
 
-      const context = canvas.getContext('2d');
-      if (!context) return;
+    URL.revokeObjectURL(blobURL);
 
-      // Fundo branco sólido para garantir contraste ótico em impressões
-      context.fillStyle = '#ffffff';
-      context.fillRect(0, 0, canvas.width, canvas.height);
-      context.drawImage(image, 0, 0, canvas.width, canvas.height);
+    if (!qrImage) {
+      $q.loading.hide();
+      throw new Error('Falha ao processar imagem do QR Code.');
+    }
 
-      const pngUrl = canvas.toDataURL('image/png');
-      const downloadLink = document.createElement('a');
-      downloadLink.download = `qrcode-${props.code.toUpperCase()}.png`;
-      downloadLink.href = pngUrl;
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-      document.body.removeChild(downloadLink);
-      URL.revokeObjectURL(blobURL);
+    // 3. Configura Canvas Poster Ultra-HD (1200 x 1600 px para slides e impressão A4)
+    const canvas = document.createElement('canvas');
+    canvas.width = 1200;
+    canvas.height = 1600;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      $q.loading.hide();
+      throw new Error('Canvas 2D não suportado pelo navegador.');
+    }
 
-      $q.notify({
-        type: 'positive',
-        message: 'QR Code exportado com sucesso em alta resolução!',
-        position: 'top',
-      });
-    };
-    image.src = blobURL;
+    // Fundo Geral Suave
+    ctx.fillStyle = '#f8fafc';
+    ctx.fillRect(0, 0, 1200, 1600);
+
+    // Cartão Principal Centralizado com Sombra
+    const cardX = 60;
+    const cardY = 60;
+    const cardW = 1080;
+    const cardH = 1480;
+    const cardR = 48;
+
+    ctx.save();
+    ctx.shadowColor = 'rgba(15, 23, 42, 0.08)';
+    ctx.shadowBlur = 40;
+    ctx.shadowOffsetY = 16;
+    drawRoundedRect(ctx, cardX, cardY, cardW, cardH, cardR);
+    ctx.fillStyle = '#ffffff';
+    ctx.fill();
+    ctx.restore();
+
+    // Borda do Cartão Principal
+    drawRoundedRect(ctx, cardX, cardY, cardW, cardH, cardR);
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = '#e2e8f0';
+    ctx.stroke();
+
+    // Faixa Superior de Destaque com Gradiente Institucional
+    ctx.save();
+    drawRoundedRect(ctx, cardX, cardY, cardW, cardH, cardR);
+    ctx.clip();
+    const topBarGradient = ctx.createLinearGradient(cardX, cardY, cardX + cardW, cardY);
+    topBarGradient.addColorStop(0, '#1976d2');
+    topBarGradient.addColorStop(0.5, '#4f46e5');
+    topBarGradient.addColorStop(1, '#0284c7');
+    ctx.fillStyle = topBarGradient;
+    ctx.fillRect(cardX, cardY, cardW, 16);
+    ctx.restore();
+
+    // --- Header Institucional com Ícone 3D Centralizado ---
+    const badgeY = 150;
+    const badgeText = 'FICOU CLARO?  ·  SALA DE AULA INTERATIVA';
+    ctx.font = 'bold 24px "Space Grotesk", sans-serif';
+    const badgeTextWidth = ctx.measureText(badgeText).width;
+    const iconSize = 68;
+    const iconGap = 16;
+    const totalBadgeWidth = cap3dImage ? iconSize + iconGap + badgeTextWidth : badgeTextWidth;
+    const badgeStartX = (1200 - totalBadgeWidth) / 2;
+
+    if (cap3dImage) {
+      ctx.drawImage(cap3dImage, badgeStartX, badgeY - 34, iconSize, iconSize);
+      ctx.fillStyle = '#1976d2';
+      ctx.textAlign = 'left';
+      ctx.fillText(badgeText, badgeStartX + iconSize + iconGap, badgeY + 8);
+    } else {
+      ctx.fillStyle = '#1976d2';
+      ctx.textAlign = 'center';
+      ctx.fillText(badgeText, 600, badgeY + 8);
+    }
+
+    // Título da Disciplina Centralizado
+    ctx.fillStyle = '#0f172a';
+    ctx.font = 'bold 50px "Space Grotesk", sans-serif';
+    ctx.textAlign = 'center';
+
+    const titleText = props.title || 'Acesso à Aula';
+    let truncatedTitle = titleText;
+    if (ctx.measureText(truncatedTitle).width > 900) {
+      while (ctx.measureText(truncatedTitle + '...').width > 900 && truncatedTitle.length > 0) {
+        truncatedTitle = truncatedTitle.slice(0, -1);
+      }
+      truncatedTitle += '...';
+    }
+    ctx.fillText(truncatedTitle, 600, 245);
+
+    // Subtítulo
+    ctx.fillStyle = '#64748b';
+    ctx.font = '500 24px "Inter", sans-serif';
+    ctx.fillText('Aponte a câmera do seu celular ou utilize o código da turma', 600, 290);
+
+    // --- Moldura Nobre do QR Code ---
+    const qrBoxX = 330;
+    const qrBoxY = 340;
+    const qrBoxSize = 540;
+
+    // Fundo branco do QR Code
+    drawRoundedRect(ctx, qrBoxX, qrBoxY, qrBoxSize, qrBoxSize, 36);
+    ctx.fillStyle = '#ffffff';
+    ctx.fill();
+    ctx.lineWidth = 2.5;
+    ctx.strokeStyle = '#e2e8f0';
+    ctx.stroke();
+
+    // Cantoneiras High-Tech do Design System
+    const cornerLen = 42;
+    const cornerW = 6;
+    ctx.strokeStyle = '#1976d2';
+    ctx.lineWidth = cornerW;
+    ctx.lineCap = 'round';
+
+    // Top-Left
+    ctx.beginPath();
+    ctx.moveTo(qrBoxX - 4, qrBoxY + cornerLen);
+    ctx.lineTo(qrBoxX - 4, qrBoxY - 4);
+    ctx.lineTo(qrBoxX + cornerLen, qrBoxY - 4);
+    ctx.stroke();
+
+    // Top-Right
+    ctx.beginPath();
+    ctx.moveTo(qrBoxX + qrBoxSize + 4 - cornerLen, qrBoxY - 4);
+    ctx.lineTo(qrBoxX + qrBoxSize + 4, qrBoxY - 4);
+    ctx.lineTo(qrBoxX + qrBoxSize + 4, qrBoxY + cornerLen);
+    ctx.stroke();
+
+    // Bottom-Left
+    ctx.beginPath();
+    ctx.moveTo(qrBoxX - 4, qrBoxY + qrBoxSize - cornerLen);
+    ctx.lineTo(qrBoxX - 4, qrBoxY + qrBoxSize + 4);
+    ctx.lineTo(qrBoxX + cornerLen, qrBoxY + qrBoxSize + 4);
+    ctx.stroke();
+
+    // Bottom-Right
+    ctx.beginPath();
+    ctx.moveTo(qrBoxX + qrBoxSize + 4 - cornerLen, qrBoxY + qrBoxSize + 4);
+    ctx.lineTo(qrBoxX + qrBoxSize + 4, qrBoxY + qrBoxSize + 4);
+    ctx.lineTo(qrBoxX + qrBoxSize + 4, qrBoxY + qrBoxSize - cornerLen);
+    ctx.stroke();
+
+    // Desenha o QR Code
+    ctx.drawImage(qrImage, qrBoxX + 30, qrBoxY + 30, qrBoxSize - 60, qrBoxSize - 60);
+
+    // Ícone 3D Flutuante Lâmpada no canto da moldura
+    if (bulb3dImage) {
+      ctx.drawImage(bulb3dImage, qrBoxX + qrBoxSize - 54, qrBoxY - 42, 92, 92);
+    }
+
+    // --- Bloco do Código de Convite (PIN Gigante) ---
+    const pinBoxX = 260;
+    const pinBoxY = 935;
+    const pinBoxW = 680;
+    const pinBoxH = 145;
+    const pinBoxR = 30;
+
+    drawRoundedRect(ctx, pinBoxX, pinBoxY, pinBoxW, pinBoxH, pinBoxR);
+    ctx.fillStyle = 'rgba(25, 118, 210, 0.08)';
+    ctx.fill();
+    ctx.lineWidth = 2.5;
+    ctx.strokeStyle = 'rgba(25, 118, 210, 0.35)';
+    ctx.stroke();
+
+    ctx.fillStyle = '#1976d2';
+    ctx.font = 'bold 20px "Inter", sans-serif';
+    ctx.fillText('CÓDIGO DE ACESSO DIRETO', 600, 975);
+
+    ctx.font = '900 70px "Space Grotesk", monospace';
+    ctx.fillText(uppercaseCode.value, 600, 1045);
+
+    // --- Pílula de Link Direto ---
+    const linkBoxX = 140;
+    const linkBoxY = 1120;
+    const linkBoxW = 920;
+    const linkBoxH = 74;
+
+    drawRoundedRect(ctx, linkBoxX, linkBoxY, linkBoxW, linkBoxH, 20);
+    ctx.fillStyle = '#f8fafc';
+    ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#e2e8f0';
+    ctx.stroke();
+
+    ctx.fillStyle = '#475569';
+    ctx.font = '500 24px monospace';
+    ctx.fillText(`Link direto: ${computedUrl.value}`, 600, 1165);
+
+    // --- Passo a Passo para os Alunos ---
+    const stepsY = 1270;
+    ctx.fillStyle = '#334155';
+    ctx.font = 'bold 22px "Inter", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(
+      '1. Abra a câmera do celular   ·   2. Aponte para o QR Code   ·   3. Participe ao vivo',
+      600,
+      stepsY,
+    );
+
+    // --- Rodapé Institucional com Linha Divisória ---
+    ctx.beginPath();
+    ctx.moveTo(120, 1370);
+    ctx.lineTo(1080, 1370);
+    ctx.strokeStyle = '#e2e8f0';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    ctx.fillStyle = '#64748b';
+    ctx.font = '500 20px "Inter", sans-serif';
+    ctx.fillText(
+      '⚡ Feedback 100% Anônimo  ·  Perguntas em Tempo Real  ·  Sem Necessidade de Instalação',
+      600,
+      1425,
+    );
+
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '16px "Inter", sans-serif';
+    ctx.fillText('Ficou Claro? © Plataforma Acadêmica de Engajamento Síncrono', 600, 1465);
+
+    // 4. Download Automático do Arquivo PNG em Alta Resolução
+    const pngUrl = canvas.toDataURL('image/png');
+    const downloadLink = document.createElement('a');
+    downloadLink.download = `cartaz-qrcode-${uppercaseCode.value}.png`;
+    downloadLink.href = pngUrl;
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+
+    $q.loading.hide();
+    $q.notify({
+      type: 'positive',
+      message: 'Cartaz institucional em alta resolução exportado com sucesso!',
+      position: 'top',
+    });
   } catch (error) {
-    console.error('[ClassroomQrCard] Falha ao exportar imagem do QR Code:', error);
+    $q.loading.hide();
+    console.error('[ClassroomQrCard] Falha ao exportar cartaz do QR Code:', error);
     $q.notify({
       type: 'negative',
       message: 'Não foi possível exportar a imagem do QR Code.',
@@ -151,20 +403,20 @@ async function downloadQrImage() {
     bordered
     class="fc-classroom-qr-card tw-rounded-3xl tw-p-5 sm:tw-p-6 tw-text-center tw-relative tw-overflow-hidden tw-w-full"
   >
-    <!-- Topo: Título, Subtítulo e Fechar -->
+    <!-- Topo: Título, Subtítulo e Fechar com Ícone 3D -->
     <header class="tw-flex tw-items-center tw-justify-between tw-mb-4">
-      <div class="tw-text-left tw-flex-1 tw-min-w-0 tw-pr-2">
-        <div class="tw-flex tw-items-center tw-gap-2">
-          <q-icon name="qr_code_2" size="22px" color="primary" />
+      <div class="tw-text-left tw-flex-1 tw-min-w-0 tw-pr-2 tw-flex tw-items-center tw-gap-3">
+        <Fluent3dIcon name="graduation-cap" :size="32" floating class="tw-shrink-0" />
+        <div class="tw-min-w-0 tw-flex-1">
           <h2
             class="tw-text-base sm:tw-text-lg tw-font-bold tw-font-space-grotesk tw-m-0 tw-truncate"
           >
             {{ title }}
           </h2>
+          <p v-if="subtitle" class="text-muted tw-text-xs tw-mt-0.5 tw-mb-0 tw-line-clamp-2">
+            {{ subtitle }}
+          </p>
         </div>
-        <p v-if="subtitle" class="text-muted tw-text-xs tw-mt-0.5 tw-mb-0 tw-line-clamp-2">
-          {{ subtitle }}
-        </p>
       </div>
 
       <div class="tw-flex tw-items-center tw-gap-1">
@@ -321,14 +573,10 @@ async function downloadQrImage() {
           padding-right: max(16px, env(safe-area-inset-right));
         "
       >
-        <!-- Topo da Apresentação -->
+        <!-- Topo da Apresentação com Ícone 3D -->
         <header class="tw-flex tw-items-center tw-justify-between tw-gap-3 tw-mb-2">
-          <div class="tw-flex tw-items-center tw-gap-2.5 sm:tw-gap-3 tw-min-w-0">
-            <div
-              class="tw-w-9 tw-h-9 sm:tw-w-10 sm:tw-h-10 tw-rounded-2xl tw-bg-primary/20 text-primary tw-flex tw-items-center tw-justify-center tw-shrink-0"
-            >
-              <q-icon name="cast_for_education" size="22px" />
-            </div>
+          <div class="tw-flex tw-items-center tw-gap-3 sm:tw-gap-4 tw-min-w-0">
+            <Fluent3dIcon name="graduation-cap" :size="40" floating class="tw-shrink-0" />
             <div class="tw-min-w-0 tw-flex-1">
               <h1
                 class="tw-text-base sm:tw-text-xl md:tw-text-2xl tw-font-black tw-font-space-grotesk tw-m-0 tw-truncate"
@@ -381,11 +629,14 @@ async function downloadQrImage() {
           <div
             class="tw-flex tw-flex-col tw-items-center landscape:sm:tw-items-start tw-text-center landscape:sm:tw-text-left tw-max-w-xl"
           >
-            <span
-              class="tw-text-xs sm:tw-text-sm tw-font-bold tw-text-primary tw-uppercase tw-tracking-wider tw-mb-1"
-            >
-              Código de Acesso à Sala
-            </span>
+            <div class="tw-flex tw-items-center tw-gap-2 tw-mb-1">
+              <Fluent3dIcon name="bulb" :size="20" floating />
+              <span
+                class="tw-text-xs sm:tw-text-sm tw-font-bold tw-text-primary tw-uppercase tw-tracking-wider"
+              >
+                Código de Acesso à Sala
+              </span>
+            </div>
 
             <!-- Código Gigante para Leitura do Fundo da Sala (UPPERCASE e Cópia Interativa) -->
             <div
