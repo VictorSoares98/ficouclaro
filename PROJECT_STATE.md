@@ -68,12 +68,14 @@ _Uma tarefa só é considerada concluída quando os critérios aplicáveis tiver
 _Esta seção é atualizada durante o ciclo de execução dos prompts._
 
 - **Sprint Ativa:** Sprint v2 - Refatoração Visual Global e Ergonomia
-- **Tarefa Atual:** Realtime de Status de Salas e Persistência de Início de Aula sem Duplicação
+- **Tarefa Atual:** Verificar QR Code (Aula 5)
 - **Critérios de Aceite:**
-  1. Ao abrir ou iniciar uma aula pelo professor, o card correspondente na tela do aluno (`EnrollPage.vue`) deve atualizar seu badge para `🟡 ESPERA` ou `🔴 AO VIVO` em tempo real, sem reload manual.
-  2. Ao encerrar a aula no painel do professor, os cards tanto do aluno quanto do professor devem atualizar imediatamente para `⚪ SEM AULA` via Realtime.
-  3. Se o professor iniciar uma aula, sair do aplicativo e retornar para `CourseListPage.vue`, o card da disciplina deve exibir o status ativo e o botão `"Continuar Aula"`, redirecionando diretamente para `/sala/:id` sem criar nova sessão.
-  4. O banco de dados (índice parcial único) e o serviço devem garantir que uma disciplina possua no máximo uma sessão em status `'aguardando'` ou `'ativa'`, reaproveitando a sessão vigente de forma idempotente.
+  1. **Leitura e escaneamento de QR Code:** Modal com leitor de câmera de alto desempenho com mira visual responsiva, laser animado e renderização otimizada sem congelar a UI.
+  2. **Controle de lanterna e fallback de galeria:** Suporte a acionamento de tocha/lanterna (`torch`) em aparelhos compatíveis e carregamento de foto/print do rolo da câmera em caso de ausência de permissão.
+  3. **Parser resiliente e verificação semântica:** Reconhecimento automático de URLs completas (`https://.../join/:code`), hash links (`#/join/:code`), esquemas customizados (`ficouclaro://`) ou PIN direto de 8 dígitos alfanuméricos com checagem assíncrona no backend.
+  4. **Feedback multissensorial:** Notificação sonora procedural suave e vibração háptica (`@capacitor/haptics`) ao detectar o código com sucesso.
+  5. **Exibição persistente do QR Code pelo professor:** Botão de acesso rápido no cabeçalho de `ProfessorSessionPage.vue` para projetar o QR Code, copiar link ou compartilhar a qualquer momento durante a aula ativa.
+  6. **Integração nas telas de entrada do aluno:** Inclusão de gatilhos visuais de escaneamento em `SessionLobbyPage.vue` e `EnrollPage.vue`, conectando o aluno diretamente à aula ao vivo se houver sessão em andamento.
 
 ---
 
