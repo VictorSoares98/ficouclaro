@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted } from 'vue';
+import { computed, onMounted, onUnmounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth.store';
 import { useSessionStore } from '@/modules/session/stores/session.store';
 import { usePollStore } from '@/modules/poll/stores/poll.store';
 import { useQuasar } from 'quasar';
+import { soundService } from '@/core/services/sound.service';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import PaceButton from '@/modules/thermometer/components/PaceButton.vue';
 import QaPanel from '@/modules/qa/components/QaPanel.vue';
 import ActivePollPanel from '@/modules/poll/components/ActivePollPanel.vue';
@@ -65,10 +67,35 @@ onUnmounted(() => {
   sessionStore.leaveSession();
   pollStore.unsubscribeFromSessionPolls(sessionId);
 });
+
+// Transição Cinematográfica: detecta início da aula pelo professor
+watch(
+  () => sessionStore.currentSession?.status,
+  (newStatus, oldStatus) => {
+    if (oldStatus === 'aguardando' && newStatus === 'ativa') {
+      try {
+        soundService.playClassStarted();
+      } catch {
+        // Fallback silencioso de áudio
+      }
+      void Haptics.impact({ style: ImpactStyle.Medium }).catch(() => {});
+      $q.notify({
+        type: 'positive',
+        icon: 'rocket_launch',
+        message: 'A aula começou! Bom aprendizado.',
+        position: 'top',
+        timeout: 4000,
+      });
+    }
+  },
+);
 </script>
 
 <template>
-  <q-page class="tw-p-4 tw-flex tw-flex-col tw-items-center tw-max-w-xl tw-mx-auto">
+  <q-page
+    class="tw-p-4 tw-flex tw-flex-col tw-items-center tw-mx-auto tw-w-full tw-transition-all"
+    :class="sessionStore.currentSession?.status === 'aguardando' ? 'tw-max-w-5xl' : 'tw-max-w-xl'"
+  >
     <!-- Banner de Modo Visitante Convidado -->
     <div
       v-if="isGuest"

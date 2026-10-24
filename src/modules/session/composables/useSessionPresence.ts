@@ -18,6 +18,7 @@ export interface SessionPresenceUser {
 export function useSessionPresence(sessionId: string, isProfessor = false) {
   const participants = ref<SessionPresenceUser[]>([]);
   const isConnected = ref(false);
+  const lastWave = ref<{ senderName: string; senderId: string; timestamp: number } | null>(null);
   const channelName = `session-presence-${sessionId}`;
   let channel: RealtimeChannel | null = null;
   const mountedAt = Date.now();
@@ -93,9 +94,45 @@ export function useSessionPresence(sessionId: string, isProfessor = false) {
       })
       .on('presence', { event: 'leave' }, () => {
         syncPresence();
-      });
+      })
+      .on(
+        'broadcast',
+        { event: 'wave' },
+        (payload: { payload?: { senderName?: string; senderId?: string } }) => {
+          const data = payload?.payload;
+          if (data?.senderName) {
+            lastWave.value = {
+              senderName: data.senderName,
+              senderId: data.senderId || '',
+              timestamp: Date.now(),
+            };
+          }
+        },
+      );
 
     realtimeManager.subscribe(channelName);
+  }
+
+  async function sendWave(senderName: string, senderId: string) {
+    if (!channel) {
+      initChannel();
+    }
+    if (!channel) return;
+
+    try {
+      await channel.send({
+        type: 'broadcast',
+        event: 'wave',
+        payload: { senderName, senderId },
+      });
+      lastWave.value = {
+        senderName,
+        senderId,
+        timestamp: Date.now(),
+      };
+    } catch (err) {
+      console.warn('[useSessionPresence] Falha ao enviar aceno:', err);
+    }
   }
 
   async function trackUser(user: SessionPresenceUser) {
@@ -138,6 +175,8 @@ export function useSessionPresence(sessionId: string, isProfessor = false) {
   return {
     participants,
     isConnected,
+    lastWave,
+    sendWave,
     trackUser,
     untrackUser,
   };
