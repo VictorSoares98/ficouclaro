@@ -49,6 +49,36 @@ onMounted(() => {
   >
     <!-- Cabeçalho do Cockpit Docente -->
     <header class="tw-mb-6 sm:tw-mb-8">
+      <!-- Barra Rápida Superior Exclusiva para Mobile (< sm) -->
+      <div class="tw-flex sm:tw-hidden tw-items-center tw-justify-between tw-w-full tw-mb-3">
+        <!-- Voltar à Esquerda (Apenas Seta) -->
+        <q-btn
+          flat
+          round
+          dense
+          color="primary"
+          icon="arrow_back"
+          class="tw-rounded-xl"
+          to="/disciplinas"
+          aria-label="Voltar para o painel de disciplinas"
+        >
+          <q-tooltip>Voltar para disciplinas</q-tooltip>
+        </q-btn>
+
+        <!-- Play de Iniciar Aula à Direita com Texto "Iniciar" -->
+        <q-btn
+          color="positive"
+          unelevated
+          icon="play_arrow"
+          label="Iniciar"
+          :loading="isStarting"
+          class="tw-rounded-xl tw-font-bold tw-px-3.5 tw-py-1 tw-shadow-sm"
+          @click="$emit('start')"
+        >
+          <q-tooltip>Iniciar aula imediatamente</q-tooltip>
+        </q-btn>
+      </div>
+
       <div
         class="tw-flex tw-flex-col sm:tw-flex-row sm:tw-items-center sm:tw-justify-between tw-gap-4"
       >
@@ -87,30 +117,19 @@ onMounted(() => {
           </p>
         </div>
 
-        <div class="tw-flex tw-items-center tw-gap-3">
-          <q-btn
-            color="positive"
-            unelevated
-            icon="play_arrow"
-            :label="$q.screen.gt.xs ? (isStarting ? 'Iniciando...' : 'Iniciar Aula') : undefined"
-            :loading="isStarting"
-            class="tw-rounded-xl tw-font-bold tw-px-4 tw-shadow-sm hover:tw-scale-105 tw-transition-all"
-            @click="$emit('start')"
-          >
-            <q-tooltip>Iniciar aula imediatamente para todos os alunos conectados</q-tooltip>
-          </q-btn>
-
+        <!-- Ações do Desktop (>= sm): Apenas Voltar e Ícone 3D (Sem botão Iniciar superior no Desktop) -->
+        <div class="tw-hidden sm:tw-flex tw-items-center tw-gap-3">
           <q-btn
             outline
             color="primary"
             icon="arrow_back"
-            :label="$q.screen.gt.xs ? 'Voltar' : undefined"
+            label="Voltar"
             class="tw-rounded-xl tw-font-bold tw-px-4"
             to="/disciplinas"
           >
             <q-tooltip>Voltar para o painel de disciplinas</q-tooltip>
           </q-btn>
-          <Fluent3dIcon name="school" :size="48" floating class="tw-hidden sm:tw-block" />
+          <Fluent3dIcon name="school" :size="48" floating />
         </div>
       </div>
     </header>
