@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue';
 import type { Disciplina } from '@/modules/courses/services/course.service';
 import BaseSurfaceCard from '@/core/components/BaseSurfaceCard.vue';
-import QrcodeVue from 'qrcode.vue';
+import { QrcodeSvg } from 'qrcode.vue';
 import { useQuasar } from 'quasar';
 import {
   getClassroomJoinUrl,
@@ -302,9 +302,18 @@ const topBorderStyle = computed(() => {
 
         <!-- Moldura do QR Code -->
         <div
-          class="tw-bg-white tw-p-4 tw-rounded-2xl tw-shadow-sm tw-inline-block tw-border tw-border-slate-100"
+          v-if="qrValue"
+          class="tw-bg-white tw-p-3 sm:tw-p-4 tw-rounded-2xl tw-shadow-sm tw-inline-block tw-border tw-border-slate-100 tw-overflow-hidden"
         >
-          <QrcodeVue :value="qrValue" :size="240" level="H" />
+          <QrcodeSvg
+            :value="qrValue"
+            :size="240"
+            level="H"
+            :margin="2"
+            background="#ffffff"
+            foreground="#000000"
+            class="tw-block tw-mx-auto"
+          />
         </div>
 
         <div

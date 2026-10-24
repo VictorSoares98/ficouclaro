@@ -8,7 +8,7 @@ import ThermometerDisplay from '@/modules/thermometer/components/ThermometerDisp
 import QaPanel from '@/modules/qa/components/QaPanel.vue';
 import ProfessorPollPanel from '@/modules/poll/components/ProfessorPollPanel.vue';
 import ProfessorReviewPanel from '@/modules/flash-review/components/ProfessorReviewPanel.vue';
-import QrcodeVue from 'qrcode.vue';
+import { QrcodeSvg } from 'qrcode.vue';
 
 import {
   getClassroomJoinUrl,
@@ -24,6 +24,7 @@ const $q = useQuasar();
 
 const sessionId = String((route.params as Record<string, unknown>).id);
 const tab = ref('termometro');
+const isQrDialogOpen = ref(false);
 
 const currentCourse = computed(() => {
   if (!sessionStore.currentSession) return null;
@@ -131,7 +132,19 @@ function handleEnd() {
       </div>
 
       <!-- Controles de Ação -->
-      <div v-if="sessionStore.currentSession" class="tw-flex tw-space-x-2">
+      <div v-if="sessionStore.currentSession" class="tw-flex tw-items-center tw-space-x-2">
+        <q-btn
+          v-if="currentCourse"
+          outline
+          color="primary"
+          icon="qr_code_2"
+          :label="$q.screen.gt.xs ? 'QR Code' : undefined"
+          class="tw-rounded-xl"
+          @click="isQrDialogOpen = true"
+        >
+          <q-tooltip>Exibir QR Code e Código da Turma</q-tooltip>
+        </q-btn>
+
         <q-btn
           v-if="
             sessionStore.currentSession.status === 'aguardando' ||
@@ -141,6 +154,7 @@ function handleEnd() {
           outline
           icon="arrow_back"
           label="Voltar"
+          class="tw-rounded-xl"
           to="/disciplinas"
         />
         <q-btn
@@ -148,6 +162,7 @@ function handleEnd() {
           color="negative"
           icon="stop"
           label="Encerrar"
+          class="tw-rounded-xl"
           @click="handleEnd"
         />
       </div>
@@ -225,10 +240,18 @@ function handleEnd() {
 
         <!-- QR Code -->
         <div
-          v-if="currentCourse"
-          class="tw-bg-white tw-p-4 tw-rounded-xl tw-shadow-sm tw-inline-block tw-mb-4"
+          v-if="currentCourse && qrValue"
+          class="tw-bg-white tw-p-3 sm:tw-p-4 tw-rounded-2xl tw-shadow-sm tw-inline-block tw-mb-4 tw-border tw-border-slate-100 tw-overflow-hidden"
         >
-          <QrcodeVue :value="qrValue" :size="200" level="H" />
+          <QrcodeSvg
+            :value="qrValue"
+            :size="220"
+            level="H"
+            :margin="2"
+            background="#ffffff"
+            foreground="#000000"
+            class="tw-block tw-mx-auto"
+          />
         </div>
 
         <div
@@ -280,5 +303,71 @@ function handleEnd() {
         />
       </div>
     </div>
+
+    <!-- Modal de Exibição Rápida do QR Code da Turma -->
+    <q-dialog v-model="isQrDialogOpen">
+      <q-card class="tw-p-6 tw-rounded-3xl tw-text-center tw-max-w-sm tw-w-full">
+        <div class="tw-flex tw-items-center tw-justify-between tw-mb-4">
+          <div class="tw-text-left">
+            <h2 class="tw-text-base sm:tw-text-lg tw-font-bold tw-font-space-grotesk tw-m-0">
+              Acesso à Turma
+            </h2>
+            <p class="text-muted tw-text-xs tw-m-0">
+              {{ currentCourse?.nome || 'Disciplina' }}
+            </p>
+          </div>
+          <q-btn flat round dense icon="close" v-close-popup />
+        </div>
+
+        <!-- Renderizador do QR Code -->
+        <div
+          v-if="currentCourse && qrValue"
+          class="tw-bg-white tw-p-3 sm:tw-p-4 tw-rounded-2xl tw-shadow-inner tw-inline-block tw-mb-4 tw-border tw-border-slate-200 tw-overflow-hidden"
+        >
+          <QrcodeSvg
+            :value="qrValue"
+            :size="220"
+            level="H"
+            :margin="2"
+            background="#ffffff"
+            foreground="#000000"
+            class="tw-block tw-mx-auto"
+          />
+        </div>
+
+        <div
+          v-if="currentCourse"
+          class="tw-text-3xl tw-font-black tw-tracking-widest tw-text-primary tw-uppercase tw-mb-3 tw-font-mono"
+        >
+          {{ currentCourse.codigo_convite }}
+        </div>
+
+        <p class="text-muted tw-text-xs tw-mb-4">
+          Aponte a câmera para ingressar ou digite o código acima.
+        </p>
+
+        <!-- Botões de Ação -->
+        <div class="tw-flex tw-gap-2 tw-justify-center">
+          <q-btn
+            unelevated
+            no-caps
+            color="primary"
+            icon="content_copy"
+            label="Copiar Link"
+            class="tw-rounded-xl tw-text-xs tw-font-bold tw-flex-1"
+            @click="handleCopyLink"
+          />
+          <q-btn
+            outline
+            no-caps
+            color="primary"
+            icon="share"
+            label="Compartilhar"
+            class="tw-rounded-xl tw-text-xs tw-font-bold tw-flex-1"
+            @click="handleShareLink"
+          />
+        </div>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
