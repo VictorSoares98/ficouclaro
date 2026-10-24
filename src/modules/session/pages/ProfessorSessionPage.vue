@@ -88,32 +88,26 @@ function handleEnd() {
 
 <template>
   <q-page class="tw-flex tw-flex-col tw-h-[calc(100vh-64px)]">
-    <!-- Header Fixo da Sessão -->
-    <div class="tw-p-4 tw-shadow-sm tw-flex tw-justify-between tw-items-center">
-      <div v-if="sessionStore.currentSession">
+    <!-- Header Fixo da Sessão (Exibido apenas quando a aula estiver Ativa ou Encerrada) -->
+    <div
+      v-if="sessionStore.currentSession && sessionStore.currentSession.status !== 'aguardando'"
+      class="tw-p-4 tw-shadow-sm tw-flex tw-justify-between tw-items-center"
+    >
+      <div>
         <h1 class="tw-text-xl tw-font-bold tw-text-primary">
           {{ sessionStore.currentSession.topico || 'Aula sem Tópico' }}
         </h1>
         <div class="tw-flex tw-items-center tw-space-x-2 tw-mt-1 tw-text-sm">
           <q-badge
-            :color="
-              sessionStore.currentSession.status === 'aguardando'
-                ? 'warning'
-                : sessionStore.currentSession.status === 'ativa'
-                  ? 'positive'
-                  : 'negative'
-            "
+            :color="sessionStore.currentSession.status === 'ativa' ? 'positive' : 'negative'"
           >
             {{ sessionStore.currentSession.status.toUpperCase() }}
           </q-badge>
         </div>
       </div>
-      <div v-else>
-        <q-skeleton type="text" width="150px" />
-      </div>
 
-      <!-- Controles de Ação -->
-      <div v-if="sessionStore.currentSession" class="tw-flex tw-items-center tw-space-x-2">
+      <!-- Controles de Ação para Aula Ativa ou Encerrada -->
+      <div class="tw-flex tw-items-center tw-space-x-2">
         <q-btn
           v-if="currentCourse"
           outline
@@ -127,10 +121,7 @@ function handleEnd() {
         </q-btn>
 
         <q-btn
-          v-if="
-            sessionStore.currentSession.status === 'aguardando' ||
-            sessionStore.currentSession.status === 'encerrada'
-          "
+          v-if="sessionStore.currentSession.status === 'encerrada'"
           color="primary"
           outline
           icon="arrow_back"
@@ -213,6 +204,7 @@ function handleEnd() {
       :session="sessionStore.currentSession"
       :course="currentCourse"
       :classroomUrl="classroomUrl"
+      :isStarting="sessionStore.isLoading"
       @start="handleStart"
     />
 

@@ -8,11 +8,17 @@ import ClassroomQrCard from '@/components/ClassroomQrCard.vue';
 import FloatingParticipantsGrid from '@/modules/session/components/FloatingParticipantsGrid.vue';
 import Fluent3dIcon from '@/core/components/Fluent3dIcon.vue';
 
-const props = defineProps<{
-  session: Sessao;
-  course: Disciplina | null;
-  classroomUrl: string;
-}>();
+const props = withDefaults(
+  defineProps<{
+    session: Sessao;
+    course: Disciplina | null;
+    classroomUrl: string;
+    isStarting?: boolean;
+  }>(),
+  {
+    isStarting: false,
+  },
+);
 
 defineEmits<{
   (e: 'start'): void;
@@ -47,7 +53,7 @@ onMounted(() => {
         class="tw-flex tw-flex-col sm:tw-flex-row sm:tw-items-center sm:tw-justify-between tw-gap-4"
       >
         <div>
-          <!-- Pílula de Status e Tópico -->
+          <!-- Pílula de Status Limpa -->
           <div
             class="tw-inline-flex tw-items-center tw-gap-2 tw-px-3.5 tw-py-1.5 tw-rounded-full bg-primary-soft text-primary tw-font-bold tw-text-xs tw-mb-2"
           >
@@ -60,8 +66,6 @@ onMounted(() => {
               ></span>
             </span>
             <span>SALA DE ESPERA ABERTA</span>
-            <span v-if="session.topico" class="tw-opacity-40">·</span>
-            <span v-if="session.topico" class="tw-truncate tw-max-w-xs">{{ session.topico }}</span>
           </div>
 
           <h1
@@ -69,6 +73,12 @@ onMounted(() => {
           >
             {{ course?.nome || 'Disciplina' }}
           </h1>
+          <div
+            v-if="session.topico && session.topico !== course?.nome"
+            class="tw-text-xs sm:tw-text-sm tw-font-semibold tw-text-primary tw-mt-1"
+          >
+            Tópico da Aula: {{ session.topico }}
+          </div>
           <p
             class="text-muted tw-text-xs sm:tw-text-sm tw-mt-1 tw-mb-0 tw-max-w-2xl tw-leading-relaxed"
           >
@@ -77,7 +87,29 @@ onMounted(() => {
           </p>
         </div>
 
-        <div class="tw-flex tw-items-center tw-gap-2">
+        <div class="tw-flex tw-items-center tw-gap-3">
+          <q-btn
+            color="positive"
+            unelevated
+            icon="play_arrow"
+            :label="$q.screen.gt.xs ? (isStarting ? 'Iniciando...' : 'Iniciar Aula') : undefined"
+            :loading="isStarting"
+            class="tw-rounded-xl tw-font-bold tw-px-4 tw-shadow-sm hover:tw-scale-105 tw-transition-all"
+            @click="$emit('start')"
+          >
+            <q-tooltip>Iniciar aula imediatamente para todos os alunos conectados</q-tooltip>
+          </q-btn>
+
+          <q-btn
+            outline
+            color="primary"
+            icon="arrow_back"
+            :label="$q.screen.gt.xs ? 'Voltar' : undefined"
+            class="tw-rounded-xl tw-font-bold tw-px-4"
+            to="/disciplinas"
+          >
+            <q-tooltip>Voltar para o painel de disciplinas</q-tooltip>
+          </q-btn>
           <Fluent3dIcon name="school" :size="48" floating class="tw-hidden sm:tw-block" />
         </div>
       </div>

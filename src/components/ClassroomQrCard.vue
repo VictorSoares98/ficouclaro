@@ -519,29 +519,33 @@ async function downloadQrImage() {
 
     <!-- Ações de Compartilhamento na Thumb Zone (≥ 44px) -->
     <footer
-      class="tw-flex tw-flex-col sm:tw-flex-row tw-items-center tw-justify-center tw-gap-2.5 tw-mt-5"
+      class="tw-flex tw-flex-col sm:tw-flex-row tw-items-center tw-justify-center tw-gap-2 tw-mt-5 tw-w-full"
     >
       <q-btn
         unelevated
         no-caps
         color="primary"
         icon="content_copy"
-        label="Copiar Link"
-        class="tw-rounded-2xl tw-px-5 tw-h-11 tw-font-bold tw-w-full sm:tw-w-auto tw-flex-1 tw-shadow-sm hover:tw-scale-[1.01] tw-transition-transform"
+        :label="$q.screen.lt.md ? 'Copiar' : 'Copiar Link'"
+        class="tw-rounded-2xl tw-px-3 sm:tw-px-4 tw-h-11 tw-font-bold tw-text-xs sm:tw-text-sm tw-w-full sm:tw-w-auto tw-flex-1 tw-min-w-0 tw-shadow-sm hover:tw-scale-[1.01] tw-transition-transform"
         aria-label="Copiar link direto da aula"
         @click="handleCopy"
-      />
+      >
+        <q-tooltip>Copiar Link da Turma</q-tooltip>
+      </q-btn>
 
       <q-btn
         outline
         no-caps
         color="primary"
         icon="share"
-        label="Compartilhar"
-        class="tw-rounded-2xl tw-px-4 tw-h-11 tw-font-bold tw-w-full sm:tw-w-auto tw-flex-1"
+        :label="$q.screen.lt.md ? 'Enviar' : 'Compartilhar'"
+        class="tw-rounded-2xl tw-px-2.5 sm:tw-px-4 tw-h-11 tw-font-bold tw-text-xs sm:tw-text-sm tw-w-full sm:tw-w-auto tw-flex-1 tw-min-w-0"
         aria-label="Compartilhar link da aula via aplicativo"
         @click="handleShare"
-      />
+      >
+        <q-tooltip>Compartilhar Link da Aula</q-tooltip>
+      </q-btn>
 
       <q-btn
         v-if="allowDownload"
@@ -549,7 +553,7 @@ async function downloadQrImage() {
         no-caps
         color="secondary"
         icon="download"
-        class="tw-rounded-2xl tw-h-11 tw-px-3.5 hover:tw-bg-secondary-soft"
+        class="tw-rounded-2xl tw-h-11 tw-px-3 hover:tw-bg-secondary-soft tw-shrink-0"
         aria-label="Baixar imagem em PNG do QR Code"
         @click="downloadQrImage"
       >
