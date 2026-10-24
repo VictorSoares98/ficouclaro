@@ -149,6 +149,15 @@ npm run dev
 A aplicação estará acessível no navegador pelo endereço:
 👉 **`http://localhost:9000`**
 
+> 📱 **Acesso via Rede Local / Dispositivos Móveis:**  
+> Para testar a aplicação em smartphones ou outros computadores conectados na mesma rede Wi-Fi, passe a flag de host para o Quasar:
+>
+> ```bash
+> npm run dev -- -H 0.0.0.0
+> ```
+>
+> O terminal exibirá o endereço IP da sua máquina na rede local (ex: `http://192.168.1.15:9000`).
+
 ---
 
 ## 6. Scripts Disponíveis

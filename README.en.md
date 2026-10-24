@@ -149,6 +149,15 @@ npm run dev
 Open your browser at:
 👉 **`http://localhost:9000`**
 
+> 📱 **Local Network / Mobile Device Access:**  
+> To test the application on smartphones or other machines on the same local Wi-Fi network, forward the host flag to Quasar:
+>
+> ```bash
+> npm run dev -- -H 0.0.0.0
+> ```
+>
+> The CLI will display your local IP network address (e.g., `http://192.168.1.15:9000`).
+
 ---
 
 ## 6. Available Scripts

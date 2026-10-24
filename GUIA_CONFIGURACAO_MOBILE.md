@@ -70,10 +70,16 @@ Sempre que quiser rodar o app no dispositivo testando contra o banco local:
 2.  **Rodar em modo Desenvolvimento (com Live Reload):**
 
     ```bash
-    npx quasar dev -m capacitor -T android -- --address 0.0.0.0
+    npx quasar dev -m capacitor -T android -- -H 0.0.0.0
     ```
 
-    _⚠️ **ATENÇÃO:** O comando `quasar dev` puxa estritamente as chaves do seu arquivo `.env` base (Supabase Local). O `--address 0.0.0.0` permite que o celular acesse o servidor do PC._
+    _⚠️ **ATENÇÃO:** O comando `quasar dev` puxa estritamente as chaves do seu arquivo `.env` base (Supabase Local). O `-H 0.0.0.0` (ou `--hostname 0.0.0.0`) instrui o servidor a escutar em todas as interfaces de rede, permitindo que o celular físico ou emulador acesse o servidor do computador._
+
+    Para rodar apenas o frontend web acessível por dispositivos na mesma rede Wi-Fi:
+
+    ```bash
+    npm run dev -- -H 0.0.0.0
+    ```
 
 3.  **Abrir o projeto no Android Studio:**
     ```bash
