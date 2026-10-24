@@ -86,3 +86,39 @@ export async function shareClassroomLink(payload: {
 
   return copyClassroomLink(payload.url, payload.title);
 }
+
+/**
+ * Copia o código de convite da turma em UPPERCASE com feedback tátil e notificação Quasar.
+ */
+export async function copyInviteCode(code: string, courseName?: string): Promise<boolean> {
+  if (!code) return false;
+  const uppercaseCode = code.trim().toUpperCase();
+  try {
+    await copyToClipboard(uppercaseCode);
+    try {
+      await Haptics.impact({ style: ImpactStyle.Light });
+    } catch {
+      // Haptics silencioso se não suportado no ambiente web
+    }
+
+    Notify.create({
+      type: 'positive',
+      icon: 'content_copy',
+      message: courseName
+        ? `Código "${uppercaseCode}" de ${courseName} copiado!`
+        : `Código "${uppercaseCode}" copiado para a área de transferência!`,
+      position: 'top',
+      timeout: 2500,
+    });
+    return true;
+  } catch (err) {
+    console.error('Falha ao copiar código:', err);
+    Notify.create({
+      type: 'negative',
+      icon: 'error_outline',
+      message: 'Não foi possível copiar o código automaticamente.',
+      position: 'top',
+    });
+    return false;
+  }
+}

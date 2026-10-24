@@ -9,6 +9,8 @@ import { sessionService } from '@/modules/session/services/session.service';
 import { courseService, type Disciplina } from '@/modules/courses/services/course.service';
 import BaseSurfaceCard from '@/core/components/BaseSurfaceCard.vue';
 import StartSessionConfirmDialog from '@/modules/courses/components/StartSessionConfirmDialog.vue';
+import QrCodeScannerModal from '@/components/QrCodeScannerModal.vue';
+import type { ClassroomInviteDetails } from '@/modules/courses/services/course.service';
 
 const router = useRouter();
 const $q = useQuasar();
@@ -19,6 +21,7 @@ const sessionStore = useSessionStore();
 const isChecking = ref(true);
 const pinCode = ref('');
 const isJoining = ref(false);
+const isScannerOpen = ref(false);
 const selectedCourseForSession = ref<Disciplina | null>(null);
 
 const isConfirmDialogOpen = computed({
@@ -173,6 +176,31 @@ async function handleJoinByPin() {
   }
 }
 
+function handleScannerDetected(payload: { code: string; details: ClassroomInviteDetails | null }) {
+  if (payload.details) {
+    if (payload.details.sessao_ativa_id) {
+      $q.notify({
+        type: 'positive',
+        icon: 'login',
+        message: `Turma "${payload.details.nome}" identificada! Conectando à aula ao vivo...`,
+        position: 'top',
+      });
+      void router.push(`/sala/${payload.details.sessao_ativa_id}`);
+    } else {
+      $q.notify({
+        type: 'info',
+        icon: 'school',
+        message: `Turma "${payload.details.nome}" identificada!`,
+        position: 'top',
+      });
+      void router.push(`/join/${payload.code}`);
+    }
+  } else {
+    pinCode.value = payload.code.toUpperCase();
+    void handleJoinByPin();
+  }
+}
+
 function handleCourseClick(course: Disciplina) {
   const status = getSessionStatus(course.id);
   const sessionId = getSessionId(course.id);
@@ -303,19 +331,42 @@ onMounted(() => {
             aria-label="Código de convite ou PIN da turma"
           >
             <template v-slot:prepend>
-              <q-icon name="qr_code_2" color="primary" />
+              <q-icon name="pin" color="primary" />
+            </template>
+            <template v-slot:append>
+              <q-btn
+                flat
+                round
+                dense
+                color="primary"
+                icon="qr_code_scanner"
+                aria-label="Escanear QR Code com a câmera"
+                @click="isScannerOpen = true"
+              >
+                <q-tooltip>Escanear QR Code</q-tooltip>
+              </q-btn>
             </template>
           </q-input>
 
-          <q-btn
-            unelevated
-            type="submit"
-            color="primary"
-            icon="login"
-            label="Entrar na Aula"
-            :loading="isJoining"
-            class="tw-rounded-2xl tw-h-12 tw-px-6 tw-font-bold tw-text-sm tw-shadow-md hover:tw-scale-[1.02] tw-transition-transform"
-          />
+          <div class="tw-flex tw-gap-2">
+            <q-btn
+              outline
+              color="primary"
+              icon="qr_code_scanner"
+              label="Escanear"
+              class="tw-rounded-2xl tw-h-12 tw-px-4 tw-font-bold tw-text-sm"
+              @click="isScannerOpen = true"
+            />
+            <q-btn
+              unelevated
+              type="submit"
+              color="primary"
+              icon="login"
+              label="Entrar na Aula"
+              :loading="isJoining"
+              class="tw-rounded-2xl tw-h-12 tw-px-6 tw-font-bold tw-text-sm tw-shadow-md hover:tw-scale-[1.02] tw-transition-transform"
+            />
+          </div>
         </form>
       </BaseSurfaceCard>
 
@@ -477,6 +528,9 @@ onMounted(() => {
       :courseName="selectedCourseForSession?.nome || ''"
       @confirm="handleConfirmStartSession"
     />
+
+    <!-- Modal de Escaneamento de QR Code -->
+    <QrCodeScannerModal v-model="isScannerOpen" @detected="handleScannerDetected" />
   </q-page>
 </template>
 

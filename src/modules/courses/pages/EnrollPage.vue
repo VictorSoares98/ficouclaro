@@ -7,6 +7,8 @@ import { useQuasar } from 'quasar';
 import CourseCard from '@/modules/courses/components/CourseCard.vue';
 import CourseCardSkeleton from '@/modules/courses/components/CourseCardSkeleton.vue';
 import BaseSurfaceCard from '@/core/components/BaseSurfaceCard.vue';
+import QrCodeScannerModal from '@/components/QrCodeScannerModal.vue';
+import type { ClassroomInviteDetails } from '@/modules/courses/services/course.service';
 
 const courseStore = useCourseStore();
 const sessionStore = useSessionStore();
@@ -14,6 +16,7 @@ const router = useRouter();
 const $q = useQuasar();
 
 const isEnrolling = ref(false);
+const isScannerOpen = ref(false);
 const inviteCode = ref('');
 const isRefreshing = ref(false);
 
@@ -61,6 +64,21 @@ async function handleEnroll() {
   }
 }
 
+async function handleScannerDetected(payload: {
+  code: string;
+  details: ClassroomInviteDetails | null;
+}) {
+  inviteCode.value = payload.code.toUpperCase();
+  $q.notify({
+    type: 'positive',
+    icon: 'qr_code_scanner',
+    message: payload.details
+      ? `Turma "${payload.details.nome}" identificada! Realizando matrícula...`
+      : 'Código do QR Code identificado! Realizando matrícula...',
+  });
+  await handleEnroll();
+}
+
 function getSessionStatus(courseId: string): 'aguardando' | 'ativa' | 'encerrada' | 'nenhuma' {
   return sessionStore.coursesSessions?.[courseId]?.status || 'nenhuma';
 }
@@ -103,9 +121,27 @@ async function handleJoinActiveSession(courseId: string) {
             Atualizar Status das Aulas
           </q-tooltip>
         </q-btn>
-        <q-btn color="primary" icon="add" label="Entrar em Turma" @click="isEnrolling = true">
+        <q-btn
+          outline
+          color="primary"
+          icon="qr_code_scanner"
+          label="Escanear QR Code"
+          class="tw-rounded-xl"
+          @click="isScannerOpen = true"
+        >
           <q-tooltip anchor="top middle" self="bottom middle" :offset="[0, 8]" class="tw-text-sm">
-            Entrar em Turma
+            Escanear QR Code com a câmera
+          </q-tooltip>
+        </q-btn>
+        <q-btn
+          color="primary"
+          icon="add"
+          label="Entrar em Turma"
+          class="tw-rounded-xl"
+          @click="isEnrolling = true"
+        >
+          <q-tooltip anchor="top middle" self="bottom middle" :offset="[0, 8]" class="tw-text-sm">
+            Entrar em Turma via Código
           </q-tooltip>
         </q-btn>
       </div>
@@ -153,15 +189,26 @@ async function handleJoinActiveSession(courseId: string) {
           QR Code do seu professor para começar a acompanhar as aulas ao vivo.
         </p>
 
-        <q-btn
-          unelevated
-          no-caps
-          color="primary"
-          icon="add"
-          label="Usar Código de Convite"
-          class="tw-w-full tw-rounded-2xl tw-h-12 tw-font-bold tw-shadow-md hover:tw-scale-105 tw-transition-transform"
-          @click="isEnrolling = true"
-        />
+        <div class="tw-flex tw-flex-col sm:tw-flex-row tw-gap-3">
+          <q-btn
+            unelevated
+            no-caps
+            color="primary"
+            icon="qr_code_scanner"
+            label="Escanear QR Code"
+            class="tw-flex-1 tw-rounded-2xl tw-h-12 tw-font-bold tw-shadow-md hover:tw-scale-105 tw-transition-transform"
+            @click="isScannerOpen = true"
+          />
+          <q-btn
+            outline
+            no-caps
+            color="primary"
+            icon="pin"
+            label="Inserir Código"
+            class="tw-flex-1 tw-rounded-2xl tw-h-12 tw-font-bold hover:tw-scale-105 tw-transition-transform"
+            @click="isEnrolling = true"
+          />
+        </div>
       </BaseSurfaceCard>
     </div>
 
@@ -196,6 +243,36 @@ async function handleJoinActiveSession(courseId: string) {
             input-class="tw-uppercase"
             @update:model-value="(val) => (inviteCode = String(val).toUpperCase())"
             @keyup.enter="handleEnroll"
+          >
+            <template v-slot:append>
+              <q-btn
+                flat
+                round
+                dense
+                color="primary"
+                icon="qr_code_scanner"
+                aria-label="Escanear com a câmera"
+                @click="
+                  isEnrolling = false;
+                  isScannerOpen = true;
+                "
+              >
+                <q-tooltip>Escanear QR Code</q-tooltip>
+              </q-btn>
+            </template>
+          </q-input>
+
+          <q-btn
+            flat
+            no-caps
+            color="primary"
+            icon="qr_code_scanner"
+            label="Ou aponte a câmera para o QR Code"
+            class="tw-w-full tw-text-xs tw-rounded-xl"
+            @click="
+              isEnrolling = false;
+              isScannerOpen = true;
+            "
           />
         </q-card-section>
 
@@ -205,5 +282,8 @@ async function handleJoinActiveSession(courseId: string) {
         </q-card-actions>
       </q-card>
     </q-dialog>
+
+    <!-- Modal de Escaneamento de QR Code -->
+    <QrCodeScannerModal v-model="isScannerOpen" @detected="handleScannerDetected" />
   </q-page>
 </template>

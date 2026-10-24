@@ -8,13 +8,9 @@ import ThermometerDisplay from '@/modules/thermometer/components/ThermometerDisp
 import QaPanel from '@/modules/qa/components/QaPanel.vue';
 import ProfessorPollPanel from '@/modules/poll/components/ProfessorPollPanel.vue';
 import ProfessorReviewPanel from '@/modules/flash-review/components/ProfessorReviewPanel.vue';
-import { QrcodeSvg } from 'qrcode.vue';
+import ClassroomQrCard from '@/components/ClassroomQrCard.vue';
 
-import {
-  getClassroomJoinUrl,
-  copyClassroomLink,
-  shareClassroomLink,
-} from '@/modules/courses/utils/invite.utils';
+import { getClassroomJoinUrl } from '@/modules/courses/utils/invite.utils';
 
 const route = useRoute();
 const router = useRouter();
@@ -37,22 +33,6 @@ const classroomUrl = computed(() => {
   if (!currentCourse.value) return '';
   return getClassroomJoinUrl(currentCourse.value.codigo_convite);
 });
-
-const qrValue = computed(() => classroomUrl.value);
-
-async function handleCopyLink() {
-  if (!classroomUrl.value) return;
-  await copyClassroomLink(classroomUrl.value, currentCourse.value?.nome);
-}
-
-async function handleShareLink() {
-  if (!classroomUrl.value || !currentCourse.value) return;
-  await shareClassroomLink({
-    title: `Aula de ${currentCourse.value.nome} - Ficou Claro?`,
-    text: `Acesse a matéria de ${currentCourse.value.nome} através do link ou use o código ${currentCourse.value.codigo_convite.toUpperCase()}:`,
-    url: classroomUrl.value,
-  });
-}
 
 onMounted(async () => {
   try {
@@ -238,59 +218,15 @@ function handleEnd() {
           turma.
         </p>
 
-        <!-- QR Code -->
-        <div
-          v-if="currentCourse && qrValue"
-          class="tw-bg-white tw-p-3 sm:tw-p-4 tw-rounded-2xl tw-shadow-sm tw-inline-block tw-mb-4 tw-border tw-border-slate-100 tw-overflow-hidden"
-        >
-          <QrcodeSvg
-            :value="qrValue"
-            :size="220"
-            level="H"
-            :margin="2"
-            background="#ffffff"
-            foreground="#000000"
-            class="tw-block tw-mx-auto"
+        <!-- QR Code com Moldura e Modo Telão -->
+        <div class="tw-max-w-md tw-mx-auto tw-mb-6">
+          <ClassroomQrCard
+            v-if="currentCourse"
+            :code="currentCourse.codigo_convite"
+            :title="currentCourse.nome"
+            :subtitle="'Os alunos já podem entrar na aula. Escaneie o QR Code abaixo ou acesse pelo código da turma.'"
+            :url="classroomUrl"
           />
-        </div>
-
-        <div
-          v-if="currentCourse"
-          class="tw-text-4xl tw-font-black tw-tracking-widest tw-text-primary tw-uppercase tw-mb-4 tw-font-mono"
-        >
-          {{ currentCourse.codigo_convite }}
-        </div>
-
-        <!-- Ações de Compartilhamento do Link da Aula -->
-        <div
-          v-if="currentCourse"
-          class="tw-flex tw-flex-col sm:tw-flex-row tw-items-center tw-justify-center tw-gap-2.5 tw-mb-6 tw-max-w-md tw-mx-auto"
-        >
-          <q-btn
-            unelevated
-            no-caps
-            color="primary"
-            icon="content_copy"
-            label="Copiar Link da Aula"
-            class="tw-rounded-xl tw-px-5 tw-h-10 tw-font-bold tw-w-full sm:tw-w-auto tw-shadow-sm hover:tw-scale-[1.02] tw-transition-transform"
-            @click="handleCopyLink"
-          />
-          <q-btn
-            outline
-            no-caps
-            color="primary"
-            icon="share"
-            label="Compartilhar"
-            class="tw-rounded-xl tw-px-4 tw-h-10 tw-font-bold tw-w-full sm:tw-w-auto"
-            @click="handleShareLink"
-          />
-        </div>
-
-        <div
-          v-if="currentCourse && classroomUrl"
-          class="tw-mb-8 tw-p-2.5 tw-bg-slate-100 dark:tw-bg-slate-800/80 tw-rounded-xl tw-text-xs text-muted tw-select-all tw-break-all tw-font-mono tw-max-w-md tw-mx-auto tw-border tw-border-slate-200 dark:tw-border-slate-700/60"
-        >
-          {{ classroomUrl }}
         </div>
 
         <q-btn
@@ -305,69 +241,17 @@ function handleEnd() {
     </div>
 
     <!-- Modal de Exibição Rápida do QR Code da Turma -->
-    <q-dialog v-model="isQrDialogOpen">
-      <q-card class="tw-p-6 tw-rounded-3xl tw-text-center tw-max-w-sm tw-w-full">
-        <div class="tw-flex tw-items-center tw-justify-between tw-mb-4">
-          <div class="tw-text-left">
-            <h2 class="tw-text-base sm:tw-text-lg tw-font-bold tw-font-space-grotesk tw-m-0">
-              Acesso à Turma
-            </h2>
-            <p class="text-muted tw-text-xs tw-m-0">
-              {{ currentCourse?.nome || 'Disciplina' }}
-            </p>
-          </div>
-          <q-btn flat round dense icon="close" v-close-popup />
-        </div>
-
-        <!-- Renderizador do QR Code -->
-        <div
-          v-if="currentCourse && qrValue"
-          class="tw-bg-white tw-p-3 sm:tw-p-4 tw-rounded-2xl tw-shadow-inner tw-inline-block tw-mb-4 tw-border tw-border-slate-200 tw-overflow-hidden"
-        >
-          <QrcodeSvg
-            :value="qrValue"
-            :size="220"
-            level="H"
-            :margin="2"
-            background="#ffffff"
-            foreground="#000000"
-            class="tw-block tw-mx-auto"
-          />
-        </div>
-
-        <div
+    <q-dialog v-model="isQrDialogOpen" :position="$q.screen.lt.md ? 'bottom' : 'standard'">
+      <div class="tw-max-w-md tw-w-full">
+        <ClassroomQrCard
           v-if="currentCourse"
-          class="tw-text-3xl tw-font-black tw-tracking-widest tw-text-primary tw-uppercase tw-mb-3 tw-font-mono"
-        >
-          {{ currentCourse.codigo_convite }}
-        </div>
-
-        <p class="text-muted tw-text-xs tw-mb-4">
-          Aponte a câmera para ingressar ou digite o código acima.
-        </p>
-
-        <!-- Botões de Ação -->
-        <div class="tw-flex tw-gap-2 tw-justify-center">
-          <q-btn
-            unelevated
-            no-caps
-            color="primary"
-            icon="content_copy"
-            label="Copiar Link"
-            class="tw-rounded-xl tw-text-xs tw-font-bold tw-flex-1"
-            @click="handleCopyLink"
-          />
-          <q-btn
-            outline
-            no-caps
-            color="primary"
-            icon="share"
-            label="Compartilhar"
-            class="tw-rounded-xl tw-text-xs tw-font-bold tw-flex-1"
-            @click="handleShareLink"
-          />
-        </div>
-      </q-card>
+          :code="currentCourse.codigo_convite"
+          :title="currentCourse.nome"
+          :url="classroomUrl"
+          :showClose="true"
+          @close="isQrDialogOpen = false"
+        />
+      </div>
     </q-dialog>
   </q-page>
 </template>

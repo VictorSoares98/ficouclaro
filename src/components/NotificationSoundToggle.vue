@@ -139,7 +139,10 @@ function handleDelete(id: string) {
 
             <!-- Permissão de Notificações do Aparelho / Navegador -->
             <div>
-              <div v-if="permission === 'granted'" class="tw-flex tw-items-center tw-gap-2 tw-text-[11px] text-positive">
+              <div
+                v-if="permission === 'granted'"
+                class="tw-flex tw-items-center tw-gap-2 tw-text-[11px] text-positive"
+              >
                 <q-icon name="check_circle" size="16px" />
                 <span>Notificações push do aparelho ativadas</span>
               </div>
@@ -150,7 +153,8 @@ function handleDelete(id: string) {
               >
                 <q-icon name="info" size="16px" class="tw-shrink-0 tw-mt-0.5" />
                 <span>
-                  Notificações do navegador bloqueadas. O app continuará emitindo alertas na tela normalmente.
+                  Notificações do navegador bloqueadas. O app continuará emitindo alertas na tela
+                  normalmente.
                 </span>
               </div>
 

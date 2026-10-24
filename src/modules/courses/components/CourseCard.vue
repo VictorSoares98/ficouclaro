@@ -2,13 +2,9 @@
 import { ref, computed } from 'vue';
 import type { Disciplina } from '@/modules/courses/services/course.service';
 import BaseSurfaceCard from '@/core/components/BaseSurfaceCard.vue';
-import { QrcodeSvg } from 'qrcode.vue';
+import ClassroomQrCard from '@/components/ClassroomQrCard.vue';
 import { useQuasar } from 'quasar';
-import {
-  getClassroomJoinUrl,
-  copyClassroomLink,
-  shareClassroomLink,
-} from '@/modules/courses/utils/invite.utils';
+import { getClassroomJoinUrl, copyClassroomLink } from '@/modules/courses/utils/invite.utils';
 
 const $q = useQuasar();
 
@@ -32,18 +28,9 @@ defineEmits<{
 
 const showQrCode = ref(false);
 const classroomUrl = computed(() => getClassroomJoinUrl(props.course.codigo_convite));
-const qrValue = computed(() => classroomUrl.value);
 
 async function handleCopyLink() {
   await copyClassroomLink(classroomUrl.value, props.course.nome);
-}
-
-async function handleShareLink() {
-  await shareClassroomLink({
-    title: `Aula de ${props.course.nome} - Ficou Claro?`,
-    text: `Acesse a matéria de ${props.course.nome} através do link ou utilize o código ${props.course.codigo_convite.toUpperCase()}:`,
-    url: classroomUrl.value,
-  });
 }
 
 // Estilo dinâmico da barra de moldura superior por status
@@ -284,76 +271,16 @@ const topBorderStyle = computed(() => {
 
   <!-- Modal de QR Code da Turma -->
   <q-dialog v-model="showQrCode" :position="$q.screen.lt.md ? 'bottom' : 'standard'">
-    <q-card class="tw-rounded-3xl tw-p-5 sm:tw-p-6 tw-text-center tw-max-w-md tw-w-full">
-      <q-card-section class="tw-p-0">
-        <div class="tw-flex tw-items-center tw-justify-between tw-mb-2">
-          <div class="tw-flex tw-items-center tw-gap-2">
-            <q-icon name="qr_code_2" size="24px" color="primary" />
-            <h3 class="tw-text-lg tw-font-bold tw-font-space-grotesk tw-m-0">Convite da Turma</h3>
-          </div>
-          <q-btn flat round dense icon="close" v-close-popup aria-label="Fechar" />
-        </div>
-
-        <p class="text-muted tw-text-xs tw-mb-5">
-          Escaneie o QR Code abaixo com a câmera do celular para ingressar diretamente na turma de
-          <strong>{{ course.nome }}</strong
-          >.
-        </p>
-
-        <!-- Moldura do QR Code -->
-        <div
-          v-if="qrValue"
-          class="tw-bg-white tw-p-3 sm:tw-p-4 tw-rounded-2xl tw-shadow-sm tw-inline-block tw-border tw-border-slate-100 tw-overflow-hidden"
-        >
-          <QrcodeSvg
-            :value="qrValue"
-            :size="240"
-            level="H"
-            :margin="2"
-            background="#ffffff"
-            foreground="#000000"
-            class="tw-block tw-mx-auto"
-          />
-        </div>
-
-        <div
-          class="tw-text-3xl tw-font-black tw-tracking-widest tw-mt-5 tw-text-primary tw-uppercase tw-font-mono"
-        >
-          {{ course.codigo_convite }}
-        </div>
-
-        <!-- Ações de Compartilhamento e Cópia -->
-        <div
-          class="tw-flex tw-flex-col sm:tw-flex-row tw-items-center tw-justify-center tw-gap-2.5 tw-mt-5"
-        >
-          <q-btn
-            unelevated
-            no-caps
-            color="primary"
-            icon="content_copy"
-            label="Copiar Link da Aula"
-            class="tw-rounded-2xl tw-px-5 tw-h-11 tw-font-bold tw-w-full sm:tw-w-auto tw-shadow-sm hover:tw-scale-[1.02] tw-transition-transform"
-            @click="handleCopyLink"
-          />
-          <q-btn
-            outline
-            no-caps
-            color="primary"
-            icon="share"
-            label="Compartilhar"
-            class="tw-rounded-2xl tw-px-4 tw-h-11 tw-font-bold tw-w-full sm:tw-w-auto"
-            @click="handleShareLink"
-          />
-        </div>
-
-        <!-- Visualização do Link Direto -->
-        <div
-          class="tw-mt-4 tw-p-2.5 fc-badge-button tw-rounded-xl tw-text-xs text-muted tw-select-all tw-break-all tw-font-mono"
-        >
-          {{ classroomUrl }}
-        </div>
-      </q-card-section>
-    </q-card>
+    <div class="tw-max-w-md tw-w-full">
+      <ClassroomQrCard
+        :code="course.codigo_convite"
+        :title="course.nome"
+        :subtitle="`Escaneie com a câmera do celular para ingressar diretamente na turma de ${course.nome}.`"
+        :url="classroomUrl"
+        :showClose="true"
+        @close="showQrCode = false"
+      />
+    </div>
   </q-dialog>
 </template>
 
